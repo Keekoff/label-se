@@ -1,6 +1,6 @@
 
 import { cn } from "@/lib/utils";
-import { FormStep } from "./MultiStepFormDialog";
+import { FormStep } from "@/pages/Dashboard/Form";
 
 interface StepProgressProps {
   steps: FormStep[];
