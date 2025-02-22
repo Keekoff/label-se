@@ -1,16 +1,13 @@
-
 import { useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EligibilityDialog from "./eligibility/EligibilityDialog";
-
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
-
   const menuItems = [{
     icon: LayoutDashboard,
     label: "Tableau de bord",
@@ -20,12 +17,11 @@ const DashboardLayout = () => {
     label: "Paramètres",
     path: "/dashboard/settings"
   }];
-
   return <div className="min-h-screen bg-background">
       {/* Sidebar */}
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
-          <span className={`font-bold text-lg text-secondary ${!sidebarOpen && "hidden"}`}>
+          <span className="text-slate-50 text-base font-bold">
             Startup Engagée
           </span>
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-white/10 text-white">
@@ -79,5 +75,4 @@ const DashboardLayout = () => {
       </div>
     </div>;
 };
-
 export default DashboardLayout;
