@@ -65,12 +65,14 @@ const MultiStepFormDialog = ({ open, onOpenChange }: MultiStepFormDialogProps) =
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] md:max-w-[85vw] h-[95vh] md:h-[90vh] p-0 gap-0 overflow-hidden">
-        <div className="flex flex-col h-full">
+      <DialogContent className="max-w-[95vw] md:max-w-[85vw] h-[95vh] md:h-[90vh] p-0 gap-0 overflow-hidden flex flex-col">
+        <div className="flex-1 flex flex-col min-h-0">
           {/* Fixed Header with Title for accessibility */}
           <DialogTitle className="sr-only">Formulaire de candidature</DialogTitle>
           <div className="p-4 md:p-6 border-b">
-            <StepProgress steps={steps} currentStep={currentStep} />
+            <div className="overflow-x-auto -mx-4 md:-mx-6 px-4 md:px-6">
+              <StepProgress steps={steps} currentStep={currentStep} />
+            </div>
           </div>
 
           {/* Scrollable Content */}

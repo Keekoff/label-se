@@ -9,35 +9,34 @@ interface StepProgressProps {
 
 const StepProgress = ({ steps, currentStep }: StepProgressProps) => {
   return (
-    <div className="relative">
-      <div className="overflow-x-auto">
-        <div className="flex justify-between min-w-max gap-2">
-          {steps.map((step, index) => (
+    <div className="min-w-max">
+      <div className="flex justify-between gap-2">
+        {steps.map((step, index) => (
+          <div
+            key={step.id}
+            className={cn(
+              "flex flex-col items-center relative min-w-[100px]",
+              index < steps.length - 1 && 
+              "after:content-[''] after:absolute after:top-4 after:left-[calc(50%+0.5rem)] after:w-[calc(100%-1rem)] after:h-[2px] after:bg-gray-200"
+            )}
+          >
             <div
-              key={step.id}
               className={cn(
-                "flex flex-col items-center relative min-w-[100px]",
-                index < steps.length - 1 && "after:content-[''] after:absolute after:top-4 after:left-[calc(50%+1rem)] after:w-[calc(100%-2rem)] after:h-[2px] after:bg-gray-200"
+                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 relative z-10 bg-white",
+                currentStep > step.id
+                  ? "border-primary bg-primary text-white"
+                  : currentStep === step.id
+                  ? "border-primary text-primary"
+                  : "border-gray-200 text-gray-400"
               )}
             >
-              <div
-                className={cn(
-                  "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 relative z-10 bg-white",
-                  currentStep > step.id
-                    ? "border-primary bg-primary text-white"
-                    : currentStep === step.id
-                    ? "border-primary text-primary"
-                    : "border-gray-200 text-gray-400"
-                )}
-              >
-                {step.id}
-              </div>
-              <span className="text-xs mt-2 text-center px-1">
-                {step.title}
-              </span>
+              {step.id}
             </div>
-          ))}
-        </div>
+            <span className="text-xs mt-2 text-center px-1">
+              {step.title}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );
