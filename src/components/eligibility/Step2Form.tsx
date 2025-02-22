@@ -104,7 +104,10 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
                   checked={formData.sectors.includes(sector)}
                   onCheckedChange={() => toggleSector(sector)}
                 />
-                <Label htmlFor={`sector-${sector}`} className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                <Label 
+                  htmlFor={`sector-${sector}`} 
+                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                >
                   {sector}
                 </Label>
               </div>
@@ -146,4 +149,34 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
             className="mt-2"
           >
             {employeeCounts.map((count) => (
-              <div key={count} className="flex items-center space
+              <div key={count} className="flex items-center space-x-2">
+                <RadioGroupItem value={count} id={`employee-${count}`} />
+                <Label htmlFor={`employee-${count}`}>{count}</Label>
+              </div>
+            ))}
+          </RadioGroup>
+          {errors.employeeCount && (
+            <span className="text-sm text-red-500">{errors.employeeCount}</span>
+          )}
+        </div>
+      </div>
+
+      <div className="flex justify-between pt-4">
+        <Button 
+          type="button" 
+          variant="ghost" 
+          onClick={onBack}
+          className="flex items-center gap-2"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Retour
+        </Button>
+        <Button type="submit" className="bg-primary hover:bg-primary/90">
+          Suivant
+        </Button>
+      </div>
+    </form>
+  );
+};
+
+export default Step2Form;
