@@ -1,9 +1,29 @@
 
 import { useState, useEffect } from "react";
-import BasicInformation from "./BasicInformation";
-import CompanyDetails from "./CompanyDetails";
-import AddressInformation from "./AddressInformation";
-import CompanyMetrics from "./CompanyMetrics";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface FormContactProps {
   onValidityChange: (isValid: boolean) => void;
@@ -38,11 +58,20 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
     fundingDetails: formState.fundingDetails || ""
   });
 
+  const [sectorsOpen, setSectorsOpen] = useState(false);
+
   const updateForm = (field: string, value: any) => {
     const newForm = { ...form, [field]: value };
     setForm(newForm);
     setFormState({ ...formState, ...newForm });
     validateForm(newForm);
+  };
+
+  const toggleSector = (sector: string) => {
+    const newSectors = form.sectors.includes(sector)
+      ? form.sectors.filter(s => s !== sector)
+      : [...form.sectors, sector];
+    updateForm('sectors', newSectors);
   };
 
   const validateForm = (data: typeof form) => {
@@ -66,26 +95,196 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
       <h2 className="text-2xl font-semibold mb-8">Contact et Entreprise</h2>
 
       <div className="grid md:grid-cols-2 gap-8">
-        <div className="space-y-8">
-          <BasicInformation
-            form={form}
-            updateForm={updateForm}
-          />
-          <CompanyDetails
-            form={form}
-            updateForm={updateForm}
-          />
+        {/* Left Column */}
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="firstName">Quel est votre prénom ?</Label>
+              <Input
+                id="firstName"
+                value={form.firstName}
+                onChange={(e) => updateForm("firstName", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="email">Votre e-mail de contact</Label>
+              <Input
+                id="email"
+                type="email"
+                value={form.email}
+                onChange={(e) => updateForm("email", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="companyName">Quel est le nom de votre société ?</Label>
+              <Input
+                id="companyName"
+                value={form.companyName}
+                onChange={(e) => updateForm("companyName", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Quel est le secteur d'activité de l'entreprise ?</Label>
+              <Popover open={sectorsOpen} onOpenChange={setSectorsOpen}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={sectorsOpen}
+                    className="w-full justify-between"
+                  >
+                    {form.sectors.length > 0
+                      ? `${form.sectors.length} secteur${form.sectors.length > 1 ? 's' : ''} sélectionné${form.sectors.length > 1 ? 's' : ''}`
+                      : "Sélectionner des secteurs"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0" align="start">
+                  <Command>
+                    <CommandInput placeholder="Rechercher un secteur..." />
+                    <CommandEmpty>Aucun secteur trouvé.</CommandEmpty>
+                    <CommandGroup className="max-h-60 overflow-auto">
+                      {SECTORS.map((sector) => (
+                        <CommandItem
+                          key={sector}
+                          onSelect={() => toggleSector(sector)}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              form.sectors.includes(sector) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          {sector}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Quelle est la forme juridique de votre structure ?</Label>
+              <Select
+                value={form.legalForm}
+                onValueChange={(value) => updateForm("legalForm", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner une forme juridique" />
+                </SelectTrigger>
+                <SelectContent>
+                  {LEGAL_FORMS.map((form) => (
+                    <SelectItem key={form} value={form}>
+                      {form}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
         </div>
-        
-        <div className="space-y-8">
-          <AddressInformation
-            form={form}
-            updateForm={updateForm}
-          />
-          <CompanyMetrics
-            form={form}
-            updateForm={updateForm}
-          />
+
+        {/* Right Column */}
+        <div className="space-y-6">
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="streetAddress">Quelle est l'adresse du siège social ?</Label>
+              <Input
+                id="streetAddress"
+                placeholder="Numéro et nom de rue"
+                value={form.streetAddress}
+                onChange={(e) => updateForm("streetAddress", e.target.value)}
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="postalCode">Le code postal</Label>
+                <Input
+                  id="postalCode"
+                  value={form.postalCode}
+                  onChange={(e) => updateForm("postalCode", e.target.value)}
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="city">La ville ?</Label>
+                <Input
+                  id="city"
+                  value={form.city}
+                  onChange={(e) => updateForm("city", e.target.value)}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="foundingYear">Quelle est l'année de création de votre société ?</Label>
+              <Input
+                id="foundingYear"
+                value={form.foundingYear}
+                onChange={(e) => updateForm("foundingYear", e.target.value)}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label>Quel est le nombre de collaborateurs de votre structure ?</Label>
+              <Select
+                value={form.employeeCount}
+                onValueChange={(value) => updateForm("employeeCount", value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Sélectionner le nombre de collaborateurs" />
+                </SelectTrigger>
+                <SelectContent>
+                  {EMPLOYEE_COUNTS.map((count) => (
+                    <SelectItem key={count} value={count}>
+                      {count}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <Label>Avez-vous déjà levé des fonds ?</Label>
+                <Select
+                  value={form.hasFunding}
+                  onValueChange={(value) => updateForm("hasFunding", value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Sélectionner une réponse" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {FUNDING_OPTIONS.map((option) => (
+                      <SelectItem key={option} value={option}>
+                        {option}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {form.hasFunding === "Oui" && (
+                <div className="space-y-2">
+                  <Label htmlFor="fundingDetails">Si oui, pour quel montant ?</Label>
+                  <Input
+                    id="fundingDetails"
+                    placeholder="Ex: Seed 500k€, Série A 2M€..."
+                    value={form.fundingDetails}
+                    onChange={(e) => updateForm("fundingDetails", e.target.value)}
+                  />
+                  <p className="text-sm text-gray-500 mt-1">
+                    Vous pouvez mentionner si vous avez levé en Seed, Série A, B, C... ou une fourchette.
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </div>
