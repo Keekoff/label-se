@@ -12,7 +12,7 @@ const Dashboard = () => {
       </div>
 
       <Card className="border-none shadow-md bg-gradient-to-br from-primary/5 to-secondary/5">
-        <CardContent className="p-6">
+        <CardContent className="p-6 bg-green-50">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-primary">Label Startup Engagée</h2>
             <p className="text-base">
