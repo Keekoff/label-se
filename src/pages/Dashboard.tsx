@@ -27,7 +27,7 @@ const Dashboard = () => {
             </p>
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="mt-4 bg-[8985FF]">
+                <Button className="mt-4 bg-[8985FF] bg-[#8a86fe]">
                   Remplir le questionnaire
                 </Button>
               </DialogTrigger>
