@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -9,6 +10,7 @@ import Login from "./pages/Login";
 import Signup from "./pages/Signup";
 import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
+import Form from "./pages/Dashboard/Form";
 import NotFound from "./pages/NotFound";
 import EligibilityForm from "./pages/EligibilityForm";
 
@@ -63,6 +65,7 @@ const App = () => (
             </ProtectedRoute>
           }>
             <Route index element={<Dashboard />} />
+            <Route path="form" element={<Form />} />
             <Route path="eligibility" element={<EligibilityForm />} />
           </Route>
           <Route path="*" element={<NotFound />} />

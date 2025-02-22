@@ -1,11 +1,11 @@
 
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import MultiStepFormDialog from "@/components/form/MultiStepFormDialog";
 
 const Dashboard = () => {
-  const [showForm, setShowForm] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <div className="space-y-8 animate-fadeIn">
@@ -32,7 +32,7 @@ const Dashboard = () => {
             </p>
             <Button 
               className="mt-4 bg-[#8985FF]"
-              onClick={() => setShowForm(true)}
+              onClick={() => navigate("/dashboard/form")}
             >
               Remplir le questionnaire
             </Button>
@@ -68,11 +68,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-
-      <MultiStepFormDialog 
-        open={showForm}
-        onOpenChange={setShowForm}
-      />
     </div>
   );
 };
