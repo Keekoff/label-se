@@ -1,9 +1,14 @@
+
+import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import EligibilityForm from "./EligibilityForm";
+import MultiStepFormDialog from "@/components/form/MultiStepFormDialog";
+
 const Dashboard = () => {
-  return <div className="space-y-8 animate-fadeIn">
+  const [showForm, setShowForm] = useState(false);
+
+  return (
+    <div className="space-y-8 animate-fadeIn">
       <div>
         <h1 className="text-3xl font-bold">Bienvenue, Client</h1>
         <p className="text-gray-500 mt-2">
@@ -25,16 +30,12 @@ const Dashboard = () => {
               Vous disposez de 30 jours pour compléter le questionnaire.<br />
               Nous restons disponibles si besoin !
             </p>
-            <Dialog>
-              <DialogTrigger asChild>
-                <Button className="mt-4 bg-[8985FF] bg-[#8a86fe]">
-                  Remplir le questionnaire
-                </Button>
-              </DialogTrigger>
-              <DialogContent className="max-w-5xl">
-                <EligibilityForm />
-              </DialogContent>
-            </Dialog>
+            <Button 
+              className="mt-4 bg-[#8985FF]"
+              onClick={() => setShowForm(true)}
+            >
+              Remplir le questionnaire
+            </Button>
           </div>
         </CardContent>
       </Card>
@@ -67,6 +68,13 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </div>;
+
+      <MultiStepFormDialog 
+        open={showForm}
+        onOpenChange={setShowForm}
+      />
+    </div>
+  );
 };
+
 export default Dashboard;
