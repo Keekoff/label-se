@@ -1,4 +1,3 @@
-
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { useState } from "react";
 import StepProgress from "./StepProgress";
@@ -65,15 +64,15 @@ const MultiStepFormDialog = ({ open, onOpenChange }: MultiStepFormDialogProps) =
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] h-[90vh] p-0 gap-0">
+      <DialogContent className="max-w-[90vw] md:max-w-[85vw] h-[90vh] p-0 gap-0 overflow-hidden">
         <div className="flex flex-col h-full">
           {/* Fixed Header */}
-          <div className="p-6 border-b">
+          <div className="p-4 md:p-6 border-b">
             <StepProgress steps={steps} currentStep={currentStep} />
           </div>
 
           {/* Scrollable Content */}
-          <div className="flex-1 overflow-y-auto p-6">
+          <div className="flex-1 overflow-y-auto p-4 md:p-6">
             <div className={cn(
               "transition-all duration-300 transform",
               currentStep === 1 ? "translate-x-0" : "-translate-x-full"
@@ -131,7 +130,7 @@ const MultiStepFormDialog = ({ open, onOpenChange }: MultiStepFormDialogProps) =
           </div>
 
           {/* Sticky Footer */}
-          <div className="p-6 border-t bg-white">
+          <div className="p-4 md:p-6 border-t bg-white mt-auto">
             <div className="flex justify-between items-center">
               <Button
                 variant="outline"

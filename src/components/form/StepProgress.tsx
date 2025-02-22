@@ -11,13 +11,13 @@ const StepProgress = ({ steps, currentStep }: StepProgressProps) => {
   return (
     <div className="relative">
       <div className="overflow-x-auto">
-        <div className="flex justify-between min-w-max gap-4">
+        <div className="flex justify-between min-w-max gap-2">
           {steps.map((step, index) => (
             <div
               key={step.id}
               className={cn(
-                "flex flex-col items-center relative",
-                index < steps.length - 1 && "after:content-[''] after:absolute after:top-4 after:left-[50%] after:w-full after:h-[2px] after:bg-gray-200"
+                "flex flex-col items-center relative min-w-[100px]",
+                index < steps.length - 1 && "after:content-[''] after:absolute after:top-4 after:left-[calc(50%+1rem)] after:w-[calc(100%-2rem)] after:h-[2px] after:bg-gray-200"
               )}
             >
               <div
@@ -32,7 +32,7 @@ const StepProgress = ({ steps, currentStep }: StepProgressProps) => {
               >
                 {step.id}
               </div>
-              <span className="text-xs mt-2 whitespace-nowrap px-2">
+              <span className="text-xs mt-2 text-center px-1">
                 {step.title}
               </span>
             </div>
