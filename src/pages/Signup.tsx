@@ -8,7 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const Login = () => {
+const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,7 +19,7 @@ const Login = () => {
     setLoading(true);
 
     try {
-      const { error } = await supabase.auth.signInWithPassword({
+      const { error } = await supabase.auth.signUp({
         email,
         password,
       });
@@ -27,11 +27,11 @@ const Login = () => {
       if (error) {
         toast.error(error.message);
       } else {
-        toast.success("Connexion réussie !");
-        navigate("/dashboard");
+        toast.success("Inscription réussie ! Veuillez vérifier votre email.");
+        navigate("/login");
       }
     } catch (error) {
-      toast.error("Une erreur est survenue lors de la connexion.");
+      toast.error("Une erreur est survenue lors de l'inscription.");
     } finally {
       setLoading(false);
     }
@@ -43,7 +43,7 @@ const Login = () => {
         <Button
           variant="ghost"
           className="mb-8"
-          onClick={() => navigate("/")}
+          onClick={() => navigate("/login")}
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Retour
@@ -52,7 +52,7 @@ const Login = () => {
         <Card className="border-none shadow-lg">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center font-bold">
-              Connexion
+              Créer un compte
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -82,32 +82,27 @@ const Login = () => {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="w-full"
+                  minLength={6}
                 />
-              </div>
-              <div className="flex items-center justify-between">
-                <Button
-                  type="button"
-                  variant="link"
-                  onClick={() => navigate("/signup")}
-                  className="text-sm text-primary hover:text-primary/80"
-                >
-                  Créer un compte
-                </Button>
-                <Button
-                  type="button"
-                  variant="link"
-                  className="text-sm text-primary hover:text-primary/80"
-                >
-                  Mot de passe oublié ?
-                </Button>
               </div>
               <Button 
                 type="submit" 
                 className="w-full bg-primary hover:bg-primary/90"
                 disabled={loading}
               >
-                {loading ? "Connexion..." : "Se connecter"}
+                {loading ? "Création en cours..." : "Créer un compte"}
               </Button>
+              <p className="text-center text-sm text-gray-500">
+                Déjà inscrit ?{" "}
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => navigate("/login")}
+                  className="text-primary hover:text-primary/80 p-0"
+                >
+                  Se connecter
+                </Button>
+              </p>
             </form>
           </CardContent>
         </Card>
@@ -116,4 +111,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Signup;
