@@ -62,26 +62,31 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
   }, []);
 
   return (
-    <div className="max-w-2xl mx-auto space-y-8">
-      <h2 className="text-2xl font-semibold mb-6">Contact et Entreprise</h2>
+    <div className="max-w-4xl mx-auto p-4">
+      <h2 className="text-2xl font-semibold mb-8">Contact et Entreprise</h2>
 
-      <div className="space-y-6">
-        <BasicInformation
-          form={form}
-          updateForm={updateForm}
-        />
-        <CompanyDetails
-          form={form}
-          updateForm={updateForm}
-        />
-        <AddressInformation
-          form={form}
-          updateForm={updateForm}
-        />
-        <CompanyMetrics
-          form={form}
-          updateForm={updateForm}
-        />
+      <div className="grid md:grid-cols-2 gap-8">
+        <div className="space-y-8">
+          <BasicInformation
+            form={form}
+            updateForm={updateForm}
+          />
+          <CompanyDetails
+            form={form}
+            updateForm={updateForm}
+          />
+        </div>
+        
+        <div className="space-y-8">
+          <AddressInformation
+            form={form}
+            updateForm={updateForm}
+          />
+          <CompanyMetrics
+            form={form}
+            updateForm={updateForm}
+          />
+        </div>
       </div>
     </div>
   );

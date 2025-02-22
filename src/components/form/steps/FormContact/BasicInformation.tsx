@@ -9,24 +9,28 @@ interface BasicInformationProps {
 
 const BasicInformation = ({ form, updateForm }: BasicInformationProps) => {
   return (
-    <div className="grid gap-6 sm:grid-cols-2">
-      <div className="space-y-2">
-        <Label htmlFor="firstName">Quel est votre prénom ?</Label>
-        <Input
-          id="firstName"
-          value={form.firstName}
-          onChange={(e) => updateForm("firstName", e.target.value)}
-        />
-      </div>
+    <div className="space-y-4">
+      <h3 className="text-lg font-medium">Informations de contact</h3>
+      
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="firstName">Quel est votre prénom ?</Label>
+          <Input
+            id="firstName"
+            value={form.firstName}
+            onChange={(e) => updateForm("firstName", e.target.value)}
+          />
+        </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="email">Votre e-mail de contact</Label>
-        <Input
-          id="email"
-          type="email"
-          value={form.email}
-          onChange={(e) => updateForm("email", e.target.value)}
-        />
+        <div className="space-y-2">
+          <Label htmlFor="email">Votre e-mail de contact</Label>
+          <Input
+            id="email"
+            type="email"
+            value={form.email}
+            onChange={(e) => updateForm("email", e.target.value)}
+          />
+        </div>
       </div>
     </div>
   );
