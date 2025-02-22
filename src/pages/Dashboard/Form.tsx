@@ -27,9 +27,25 @@ const steps: FormStep[] = [
   { id: 7, title: "Remerciement", isValid: true },
 ];
 
+const initialFormState = {
+  // Contact form initial state
+  firstName: "",
+  email: "",
+  companyName: "",
+  sectors: [], // Initialize sectors as an empty array
+  legalForm: "",
+  streetAddress: "",
+  postalCode: "",
+  city: "",
+  foundingYear: "",
+  employeeCount: "",
+  hasFunding: "",
+  fundingDetails: "",
+};
+
 const Form = () => {
   const [currentStep, setCurrentStep] = useState(1);
-  const [formState, setFormState] = useState<Record<string, any>>({});
+  const [formState, setFormState] = useState<Record<string, any>>(initialFormState);
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(steps);
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
