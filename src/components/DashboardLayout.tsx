@@ -1,13 +1,16 @@
+
 import { useState } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EligibilityDialog from "./eligibility/EligibilityDialog";
+
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+
   const menuItems = [{
     icon: LayoutDashboard,
     label: "Tableau de bord",
@@ -17,6 +20,7 @@ const DashboardLayout = () => {
     label: "Paramètres",
     path: "/dashboard/settings"
   }];
+
   return <div className="min-h-screen bg-background">
       {/* Sidebar */}
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30`}>
@@ -29,10 +33,19 @@ const DashboardLayout = () => {
           </Button>
         </div>
         <nav className="p-4 space-y-2">
-          {menuItems.map(item => <Button key={item.path} variant="ghost" className={`w-full justify-start text-white hover:bg-secondary ${!sidebarOpen && "justify-center"} ${location.pathname === item.path ? "bg-secondary" : ""}`} onClick={() => navigate(item.path)}>
+          {menuItems.map(item => (
+            <Button 
+              key={item.path} 
+              variant="ghost" 
+              className={`w-full justify-start text-white hover:bg-[#35DA56] ${
+                !sidebarOpen && "justify-center"
+              } ${location.pathname === item.path ? "bg-[#35DA56]" : ""}`} 
+              onClick={() => navigate(item.path)}
+            >
               <item.icon className="h-4 w-4 mr-2" />
               {sidebarOpen && <span>{item.label}</span>}
-            </Button>)}
+            </Button>
+          ))}
           {sidebarOpen && <EligibilityDialog />}
         </nav>
       </div>
@@ -75,4 +88,5 @@ const DashboardLayout = () => {
       </div>
     </div>;
 };
+
 export default DashboardLayout;
