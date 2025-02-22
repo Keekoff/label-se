@@ -47,7 +47,7 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
     firstName: formState.firstName || "",
     email: formState.email || "",
     companyName: formState.companyName || "",
-    sectors: formState.sectors || [],
+    sectors: Array.isArray(formState.sectors) ? formState.sectors : [],
     legalForm: formState.legalForm || "",
     streetAddress: formState.streetAddress || "",
     postalCode: formState.postalCode || "",
@@ -59,6 +59,7 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
   });
 
   const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
 
   const updateForm = (field: string, value: any) => {
     const newForm = { ...form, [field]: value };
@@ -89,6 +90,10 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
   useEffect(() => {
     validateForm(form);
   }, []);
+
+  const filteredSectors = SECTORS.filter(sector =>
+    sector.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <div className="max-w-4xl mx-auto p-4">
@@ -142,38 +147,49 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent align="start" className="p-0 w-[--radix-popover-trigger-width]">
-                  <Command>
-                    <CommandInput placeholder="Rechercher un secteur..." />
-                    <CommandGroup className="max-h-[300px] overflow-auto">
-                      {SECTORS.map((sector) => (
-                        <CommandItem
+                  <div className="border-b px-3 py-2">
+                    <Input
+                      placeholder="Rechercher un secteur..."
+                      value={search}
+                      onChange={(e) => setSearch(e.target.value)}
+                    />
+                  </div>
+                  <div className="max-h-[300px] overflow-auto p-1">
+                    {filteredSectors.length === 0 ? (
+                      <div className="text-sm text-center py-6 text-muted-foreground">
+                        Aucun secteur trouvé.
+                      </div>
+                    ) : (
+                      filteredSectors.map((sector) => (
+                        <div
                           key={sector}
-                          onSelect={() => {
-                            toggleSector(sector);
-                          }}
+                          className={cn(
+                            "flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer",
+                            "hover:bg-accent hover:text-accent-foreground",
+                            form.sectors.includes(sector) && "bg-accent"
+                          )}
+                          onClick={() => toggleSector(sector)}
                         >
-                          <div className="flex items-center">
-                            <div
+                          <div
+                            className={cn(
+                              "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                              form.sectors.includes(sector)
+                                ? "bg-primary text-primary-foreground"
+                                : "opacity-50"
+                            )}
+                          >
+                            <Check
                               className={cn(
-                                "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                                form.sectors.includes(sector)
-                                  ? "bg-primary text-primary-foreground"
-                                  : "opacity-50"
+                                "h-4 w-4",
+                                form.sectors.includes(sector) ? "opacity-100" : "opacity-0"
                               )}
-                            >
-                              <Check
-                                className={cn(
-                                  "h-4 w-4",
-                                  form.sectors.includes(sector) ? "opacity-100" : "opacity-0"
-                                )}
-                              />
-                            </div>
-                            {sector}
+                            />
                           </div>
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
+                          {sector}
+                        </div>
+                      ))
+                    )}
+                  </div>
                 </PopoverContent>
               </Popover>
             </div>
