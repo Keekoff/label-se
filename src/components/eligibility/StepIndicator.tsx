@@ -1,40 +1,42 @@
 
+import { cn } from "@/lib/utils";
+
 interface StepIndicatorProps {
   currentStep: number;
 }
 
 const steps = [
-  "Informations personnelles et entreprise",
+  "Informations générales",
   "Profil de l'entreprise",
-  "Rôle et motivations"
+  "Rôle et motivations",
 ];
 
 const StepIndicator = ({ currentStep }: StepIndicatorProps) => {
   return (
-    <div className="w-full">
-      <div className="flex justify-between relative mb-4">
-        <div className="w-full absolute top-1/2 h-0.5 bg-gray-200 -z-10" />
-        {steps.map((step, index) => (
+    <div className="flex justify-between">
+      {steps.map((step, index) => (
+        <div
+          key={index}
+          className={cn(
+            "flex flex-col items-center space-y-2 relative w-1/3",
+            index === steps.length - 1 ? "flex-1" : "after:content-[''] after:absolute after:top-5 after:left-1/2 after:w-full after:h-[2px] after:bg-gray-200"
+          )}
+        >
           <div
-            key={index}
-            className="flex flex-col items-center gap-2"
+            className={cn(
+              "w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium border-2 relative z-10 bg-white",
+              currentStep > index + 1
+                ? "border-primary bg-primary text-white"
+                : currentStep === index + 1
+                ? "border-primary text-primary"
+                : "border-gray-200 text-gray-400"
+            )}
           >
-            <div
-              className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium
-                ${
-                  index + 1 <= currentStep
-                    ? "bg-primary text-white"
-                    : "bg-gray-200 text-gray-600"
-                }`}
-            >
-              {index + 1}
-            </div>
-            <span className="text-sm text-gray-600 text-center max-w-[120px]">
-              {step}
-            </span>
+            {index + 1}
           </div>
-        ))}
-      </div>
+          <span className="text-xs text-center px-4">{step}</span>
+        </div>
+      ))}
     </div>
   );
 };
