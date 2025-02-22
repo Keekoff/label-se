@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -57,7 +58,7 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
     fundingDetails: formState.fundingDetails || ""
   });
 
-  const [sectorsOpen, setSectorsOpen] = useState(false);
+  const [open, setOpen] = useState(false);
 
   const updateForm = (field: string, value: any) => {
     const newForm = { ...form, [field]: value };
@@ -94,7 +95,6 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
       <h2 className="text-2xl font-semibold mb-8">Contact et Entreprise</h2>
 
       <div className="grid md:grid-cols-2 gap-8">
-        {/* Left Column */}
         <div className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
@@ -127,12 +127,12 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
 
             <div className="space-y-2">
               <Label>Quel est le secteur d'activité de l'entreprise ?</Label>
-              <Popover open={sectorsOpen} onOpenChange={setSectorsOpen}>
+              <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <Button
                     variant="outline"
                     role="combobox"
-                    aria-expanded={sectorsOpen}
+                    aria-expanded={open}
                     className="w-full justify-between"
                   >
                     {form.sectors.length > 0
@@ -141,27 +141,35 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-                  <Command shouldFilter={false}>
+                <PopoverContent align="start" className="p-0 w-[--radix-popover-trigger-width]">
+                  <Command>
                     <CommandInput placeholder="Rechercher un secteur..." />
-                    <CommandEmpty>Aucun secteur trouvé.</CommandEmpty>
-                    <CommandGroup>
+                    <CommandGroup className="max-h-[300px] overflow-auto">
                       {SECTORS.map((sector) => (
                         <CommandItem
                           key={sector}
-                          value={sector}
                           onSelect={() => {
                             toggleSector(sector);
-                            setSectorsOpen(false);
                           }}
                         >
-                          <Check
-                            className={cn(
-                              "mr-2 h-4 w-4",
-                              form.sectors.includes(sector) ? "opacity-100" : "opacity-0"
-                            )}
-                          />
-                          {sector}
+                          <div className="flex items-center">
+                            <div
+                              className={cn(
+                                "mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                                form.sectors.includes(sector)
+                                  ? "bg-primary text-primary-foreground"
+                                  : "opacity-50"
+                              )}
+                            >
+                              <Check
+                                className={cn(
+                                  "h-4 w-4",
+                                  form.sectors.includes(sector) ? "opacity-100" : "opacity-0"
+                                )}
+                              />
+                            </div>
+                            {sector}
+                          </div>
                         </CommandItem>
                       ))}
                     </CommandGroup>
@@ -191,7 +199,6 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
           </div>
         </div>
 
-        {/* Right Column */}
         <div className="space-y-6">
           <div className="space-y-4">
             <div className="space-y-2">
