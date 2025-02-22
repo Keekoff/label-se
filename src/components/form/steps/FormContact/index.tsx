@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -142,15 +141,19 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
                     <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                   </Button>
                 </PopoverTrigger>
-                <PopoverContent className="w-full p-0" align="start">
-                  <Command>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                  <Command shouldFilter={false}>
                     <CommandInput placeholder="Rechercher un secteur..." />
                     <CommandEmpty>Aucun secteur trouvé.</CommandEmpty>
-                    <CommandGroup className="max-h-60 overflow-auto">
+                    <CommandGroup>
                       {SECTORS.map((sector) => (
                         <CommandItem
                           key={sector}
-                          onSelect={() => toggleSector(sector)}
+                          value={sector}
+                          onSelect={() => {
+                            toggleSector(sector);
+                            setSectorsOpen(false);
+                          }}
                         >
                           <Check
                             className={cn(
