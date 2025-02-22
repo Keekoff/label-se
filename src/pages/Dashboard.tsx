@@ -1,12 +1,9 @@
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import EligibilityForm from "./EligibilityForm";
-
 const Dashboard = () => {
-  return (
-    <div className="space-y-8 animate-fadeIn">
+  return <div className="space-y-8 animate-fadeIn">
       <div>
         <h1 className="text-3xl font-bold">Bienvenue, Client</h1>
         <p className="text-gray-500 mt-2">
@@ -30,7 +27,7 @@ const Dashboard = () => {
             </p>
             <Dialog>
               <DialogTrigger asChild>
-                <Button className="mt-4">
+                <Button className="mt-4 bg-[8985FF]">
                   Remplir le questionnaire
                 </Button>
               </DialogTrigger>
@@ -70,8 +67,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
