@@ -65,72 +65,65 @@ const MultiStepFormDialog = ({ open, onOpenChange }: MultiStepFormDialogProps) =
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[95vw] md:max-w-[85vw] h-[95vh] md:h-[90vh] p-0 gap-0 overflow-hidden flex flex-col">
-        <div className="flex-1 flex flex-col min-h-0">
-          {/* Fixed Header with Title for accessibility */}
+      <DialogContent className="max-w-[95vw] md:max-w-[85vw] h-[95vh] md:h-[90vh] p-0 gap-0">
+        <div className="flex flex-col h-full">
+          {/* Fixed Header with Title */}
           <DialogTitle className="sr-only">Formulaire de candidature</DialogTitle>
           <div className="p-4 md:p-6 border-b">
-            <div className="overflow-x-auto -mx-4 md:-mx-6 px-4 md:px-6">
-              <StepProgress steps={steps} currentStep={currentStep} />
-            </div>
+            <StepProgress steps={steps} currentStep={currentStep} />
           </div>
 
           {/* Scrollable Content */}
           <div className="flex-1 overflow-y-auto p-4 md:p-6">
-            <div className={cn(
-              "transition-all duration-300 transform",
-              currentStep === 1 ? "translate-x-0" : "-translate-x-full"
-            )}>
-              {currentStep === 1 && (
-                <FormDisclaimer
-                  onValidityChange={(isValid) => updateStepValidity(1, isValid)}
-                  formState={formState}
-                  setFormState={setFormState}
-                />
-              )}
-              {currentStep === 2 && (
-                <FormContact
-                  onValidityChange={(isValid) => updateStepValidity(2, isValid)}
-                  formState={formState}
-                  setFormState={setFormState}
-                />
-              )}
-              {currentStep === 3 && (
-                <FormPart1
-                  onValidityChange={(isValid) => updateStepValidity(3, isValid)}
-                  formState={formState}
-                  setFormState={setFormState}
-                />
-              )}
-              {currentStep === 4 && (
-                <FormPart2
-                  onValidityChange={(isValid) => updateStepValidity(4, isValid)}
-                  formState={formState}
-                  setFormState={setFormState}
-                />
-              )}
-              {currentStep === 5 && (
-                <FormPart3
-                  onValidityChange={(isValid) => updateStepValidity(5, isValid)}
-                  formState={formState}
-                  setFormState={setFormState}
-                />
-              )}
-              {currentStep === 6 && (
-                <FormPart4
-                  onValidityChange={(isValid) => updateStepValidity(6, isValid)}
-                  formState={formState}
-                  setFormState={setFormState}
-                />
-              )}
-              {currentStep === 7 && (
-                <FormThanks
-                  onValidityChange={(isValid) => updateStepValidity(7, isValid)}
-                  formState={formState}
-                  setFormState={setFormState}
-                />
-              )}
-            </div>
+            {currentStep === 1 && (
+              <FormDisclaimer
+                onValidityChange={(isValid) => updateStepValidity(1, isValid)}
+                formState={formState}
+                setFormState={setFormState}
+              />
+            )}
+            {currentStep === 2 && (
+              <FormContact
+                onValidityChange={(isValid) => updateStepValidity(2, isValid)}
+                formState={formState}
+                setFormState={setFormState}
+              />
+            )}
+            {currentStep === 3 && (
+              <FormPart1
+                onValidityChange={(isValid) => updateStepValidity(3, isValid)}
+                formState={formState}
+                setFormState={setFormState}
+              />
+            )}
+            {currentStep === 4 && (
+              <FormPart2
+                onValidityChange={(isValid) => updateStepValidity(4, isValid)}
+                formState={formState}
+                setFormState={setFormState}
+              />
+            )}
+            {currentStep === 5 && (
+              <FormPart3
+                onValidityChange={(isValid) => updateStepValidity(5, isValid)}
+                formState={formState}
+                setFormState={setFormState}
+              />
+            )}
+            {currentStep === 6 && (
+              <FormPart4
+                onValidityChange={(isValid) => updateStepValidity(6, isValid)}
+                formState={formState}
+                setFormState={setFormState}
+              />
+            )}
+            {currentStep === 7 && (
+              <FormThanks
+                onValidityChange={(isValid) => updateStepValidity(7, isValid)}
+                formState={formState}
+                setFormState={setFormState}
+              />
+            )}
           </div>
 
           {/* Sticky Footer */}
