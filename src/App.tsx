@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -11,6 +10,7 @@ import Signup from "./pages/Signup";
 import DashboardLayout from "./components/DashboardLayout";
 import Dashboard from "./pages/Dashboard";
 import NotFound from "./pages/NotFound";
+import EligibilityForm from "./pages/EligibilityForm";
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
@@ -63,6 +63,7 @@ const App = () => (
             </ProtectedRoute>
           }>
             <Route index element={<Dashboard />} />
+            <Route path="eligibility" element={<EligibilityForm />} />
           </Route>
           <Route path="*" element={<NotFound />} />
         </Routes>

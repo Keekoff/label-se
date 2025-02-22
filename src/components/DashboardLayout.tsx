@@ -18,6 +18,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import EligibilityDialog from "./eligibility/EligibilityDialog";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -40,19 +41,19 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-background">
       {/* Sidebar */}
       <div
-        className={`fixed top-0 left-0 h-full bg-sidebar border-r border-sidebar-border transition-all duration-300 ease-in-out ${
+        className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${
           sidebarOpen ? "w-64" : "w-20"
         } z-30`}
       >
-        <div className="flex items-center justify-between p-4 h-16 border-b border-sidebar-border">
-          <span className={`font-bold text-lg ${!sidebarOpen && "hidden"}`}>
+        <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
+          <span className={`font-bold text-lg text-white ${!sidebarOpen && "hidden"}`}>
             Portal
           </span>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="hover:bg-gray-100"
+            className="hover:bg-white/10 text-white"
           >
             {sidebarOpen ? (
               <X className="h-4 w-4" />
@@ -66,7 +67,7 @@ const DashboardLayout = () => {
             <Button
               key={item.path}
               variant="ghost"
-              className={`w-full justify-start hover:bg-gray-100 ${
+              className={`w-full justify-start text-white hover:bg-secondary ${
                 !sidebarOpen && "justify-center"
               }`}
               onClick={() => navigate(item.path)}
@@ -75,6 +76,7 @@ const DashboardLayout = () => {
               {sidebarOpen && <span>{item.label}</span>}
             </Button>
           ))}
+          {sidebarOpen && <EligibilityDialog />}
         </nav>
       </div>
 

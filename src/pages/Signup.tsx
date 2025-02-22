@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -40,15 +39,6 @@ const Signup = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50/30 px-4">
       <div className="w-full max-w-md space-y-8 animate-fadeIn">
-        <Button
-          variant="ghost"
-          className="mb-8"
-          onClick={() => navigate("/login")}
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Retour
-        </Button>
-        
         <Card className="border-none shadow-lg">
           <CardHeader className="space-y-1">
             <CardTitle className="text-2xl text-center font-bold">
