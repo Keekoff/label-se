@@ -1,13 +1,14 @@
 
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Check, ChevronsUpDown } from "lucide-react";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 interface FormPart1Props {
   onValidityChange: (isValid: boolean) => void;
@@ -125,22 +126,29 @@ const QUESTIONS: Question[] = [
 ];
 
 const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props) => {
-  const [answers, setAnswers] = useState<Record<string, string>>(() => {
-    const initialAnswers: Record<string, string> = {};
+  const [answers, setAnswers] = useState<Record<string, string[]>>(() => {
+    const initialAnswers: Record<string, string[]> = {};
     QUESTIONS.forEach(question => {
-      initialAnswers[question.id] = formState[question.id] || "";
+      initialAnswers[question.id] = Array.isArray(formState[question.id]) 
+        ? formState[question.id] 
+        : [];
     });
     return initialAnswers;
   });
 
-  const updateAnswer = (questionId: string, value: string) => {
-    const newAnswers = { ...answers, [questionId]: value };
-    setAnswers(newAnswers);
-    setFormState({ ...formState, ...newAnswers });
+  const toggleAnswer = (questionId: string, value: string) => {
+    const currentAnswers = answers[questionId] || [];
+    const newAnswers = currentAnswers.includes(value)
+      ? currentAnswers.filter(v => v !== value)
+      : [...currentAnswers, value];
+    
+    const updatedAnswers = { ...answers, [questionId]: newAnswers };
+    setAnswers(updatedAnswers);
+    setFormState({ ...formState, ...updatedAnswers });
   };
 
   useEffect(() => {
-    const isValid = Object.values(answers).every(answer => answer !== "");
+    const isValid = Object.values(answers).every(answer => answer.length > 0);
     onValidityChange(isValid);
   }, [answers]);
 
@@ -163,21 +171,52 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
 
             <div className="space-y-2">
               <Label>Votre réponse</Label>
-              <Select
-                value={answers[question.id]}
-                onValueChange={(value) => updateAnswer(question.id, value)}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Sélectionner une réponse" />
-                </SelectTrigger>
-                <SelectContent>
-                  {question.options.map((option) => (
-                    <SelectItem key={option.value} value={option.value}>
-                      {option.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    {answers[question.id]?.length > 0
+                      ? `${answers[question.id].length} réponse${answers[question.id].length > 1 ? 's' : ''} sélectionnée${answers[question.id].length > 1 ? 's' : ''}`
+                      : "Sélectionner vos réponses"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+                  <div className="max-h-[300px] overflow-auto p-1">
+                    {question.options.map((option) => (
+                      <div
+                        key={option.value}
+                        className={cn(
+                          "flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer",
+                          "hover:bg-accent hover:text-accent-foreground",
+                          answers[question.id]?.includes(option.value) && "bg-accent"
+                        )}
+                        onClick={() => toggleAnswer(question.id, option.value)}
+                      >
+                        <div
+                          className={cn(
+                            "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
+                            answers[question.id]?.includes(option.value)
+                              ? "bg-primary text-primary-foreground"
+                              : "opacity-50"
+                          )}
+                        >
+                          <Check
+                            className={cn(
+                              "h-4 w-4",
+                              answers[question.id]?.includes(option.value) ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                        </div>
+                        {option.label}
+                      </div>
+                    ))}
+                  </div>
+                </PopoverContent>
+              </Popover>
             </div>
           </div>
         ))}
