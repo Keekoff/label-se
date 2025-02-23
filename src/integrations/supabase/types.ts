@@ -9,7 +9,171 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      eligibility_submissions: {
+        Row: {
+          certification_status: string
+          company_name: string
+          created_at: string | null
+          email: string
+          employee_count: string
+          first_name: string
+          growth_stage: string
+          id: string
+          implemented_actions: string[]
+          is_mission_driven: string
+          last_name: string
+          legal_form: string
+          motivations: string[]
+          phone: string
+          responsibilities: string[]
+          roles: string[]
+          sectors: string[]
+          siret: string
+        }
+        Insert: {
+          certification_status: string
+          company_name: string
+          created_at?: string | null
+          email: string
+          employee_count: string
+          first_name: string
+          growth_stage: string
+          id?: string
+          implemented_actions: string[]
+          is_mission_driven: string
+          last_name: string
+          legal_form: string
+          motivations: string[]
+          phone: string
+          responsibilities: string[]
+          roles: string[]
+          sectors: string[]
+          siret: string
+        }
+        Update: {
+          certification_status?: string
+          company_name?: string
+          created_at?: string | null
+          email?: string
+          employee_count?: string
+          first_name?: string
+          growth_stage?: string
+          id?: string
+          implemented_actions?: string[]
+          is_mission_driven?: string
+          last_name?: string
+          legal_form?: string
+          motivations?: string[]
+          phone?: string
+          responsibilities?: string[]
+          roles?: string[]
+          sectors?: string[]
+          siret?: string
+        }
+        Relationships: []
+      }
+      label_submissions: {
+        Row: {
+          associative_contribution: string[] | null
+          carbon_emissions: string[] | null
+          circular_economy: string[] | null
+          city: string | null
+          communication: string[] | null
+          company_name: string | null
+          continuous_evaluation: string[] | null
+          created_at: string | null
+          current_step: number | null
+          disclaimer_accepted: boolean | null
+          eco_design: string[] | null
+          email: string | null
+          employee_count: string | null
+          energy_management: string[] | null
+          first_name: string | null
+          founding_year: string | null
+          funding_details: string | null
+          has_funding: string | null
+          id: string
+          legal_form: string | null
+          postal_code: string | null
+          production: string[] | null
+          responsible_digital: string[] | null
+          responsible_purchasing: string[] | null
+          sectors: string[] | null
+          social_impact: string[] | null
+          status: string | null
+          street_address: string | null
+          supplier_relations: string[] | null
+          updated_at: string | null
+          waste_management: string[] | null
+        }
+        Insert: {
+          associative_contribution?: string[] | null
+          carbon_emissions?: string[] | null
+          circular_economy?: string[] | null
+          city?: string | null
+          communication?: string[] | null
+          company_name?: string | null
+          continuous_evaluation?: string[] | null
+          created_at?: string | null
+          current_step?: number | null
+          disclaimer_accepted?: boolean | null
+          eco_design?: string[] | null
+          email?: string | null
+          employee_count?: string | null
+          energy_management?: string[] | null
+          first_name?: string | null
+          founding_year?: string | null
+          funding_details?: string | null
+          has_funding?: string | null
+          id?: string
+          legal_form?: string | null
+          postal_code?: string | null
+          production?: string[] | null
+          responsible_digital?: string[] | null
+          responsible_purchasing?: string[] | null
+          sectors?: string[] | null
+          social_impact?: string[] | null
+          status?: string | null
+          street_address?: string | null
+          supplier_relations?: string[] | null
+          updated_at?: string | null
+          waste_management?: string[] | null
+        }
+        Update: {
+          associative_contribution?: string[] | null
+          carbon_emissions?: string[] | null
+          circular_economy?: string[] | null
+          city?: string | null
+          communication?: string[] | null
+          company_name?: string | null
+          continuous_evaluation?: string[] | null
+          created_at?: string | null
+          current_step?: number | null
+          disclaimer_accepted?: boolean | null
+          eco_design?: string[] | null
+          email?: string | null
+          employee_count?: string | null
+          energy_management?: string[] | null
+          first_name?: string | null
+          founding_year?: string | null
+          funding_details?: string | null
+          has_funding?: string | null
+          id?: string
+          legal_form?: string | null
+          postal_code?: string | null
+          production?: string[] | null
+          responsible_digital?: string[] | null
+          responsible_purchasing?: string[] | null
+          sectors?: string[] | null
+          social_impact?: string[] | null
+          status?: string | null
+          street_address?: string | null
+          supplier_relations?: string[] | null
+          updated_at?: string | null
+          waste_management?: string[] | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

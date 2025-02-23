@@ -9,6 +9,7 @@ import Step3Form from "@/components/eligibility/Step3Form";
 import StepIndicator from "@/components/eligibility/StepIndicator";
 import { toast } from "sonner";
 import { FormData } from "@/types/eligibility";
+import { supabase } from "@/integrations/supabase/client";
 
 const EligibilityForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -38,16 +39,28 @@ const EligibilityForm = () => {
   
   const navigate = useNavigate();
 
-  const handleNext = (stepData: Partial<FormData>) => {
-    setFormData(prev => ({ ...prev, ...stepData }));
+  const handleNext = async (stepData: Partial<FormData>) => {
+    const updatedFormData = { ...formData, ...stepData };
+    setFormData(updatedFormData);
+
     if (currentStep < 3) {
       setCurrentStep(prev => prev + 1);
       window.scrollTo(0, 0);
     } else {
-      // Handle form submission
-      console.log("Form submitted:", { ...formData, ...stepData });
-      toast.success("Formulaire envoyé avec succès !");
-      navigate("/dashboard");
+      try {
+        // Submit to Supabase
+        const { error } = await supabase
+          .from('eligibility_submissions')
+          .insert([updatedFormData]);
+
+        if (error) throw error;
+
+        toast.success("Formulaire envoyé avec succès !");
+        navigate("/dashboard");
+      } catch (error) {
+        console.error('Error submitting form:', error);
+        toast.error("Une erreur est survenue lors de l'envoi du formulaire. Veuillez réessayer.");
+      }
     }
   };
 

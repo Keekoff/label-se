@@ -10,6 +10,7 @@ import FormThanks from "@/components/form/steps/FormThanks";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Save } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export type FormStep = {
   id: number;
@@ -47,6 +48,7 @@ const Form = () => {
   const [formState, setFormState] = useState<Record<string, any>>(initialFormState);
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(steps);
   const { toast } = useToast();
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
     setStepsValidity(prev => 
@@ -56,13 +58,46 @@ const Form = () => {
     );
   };
 
-  const handleSave = () => {
-    // Here you would implement the actual save logic
-    localStorage.setItem('formDraft', JSON.stringify({ formState, currentStep }));
-    toast({
-      title: "Brouillon sauvegardé",
-      description: "Votre progression a été enregistrée avec succès.",
-    });
+  const handleSave = async () => {
+    try {
+      const submissionData = {
+        ...formState,
+        current_step: currentStep,
+        status: 'draft'
+      };
+
+      if (submissionId) {
+        // Update existing draft
+        const { error } = await supabase
+          .from('label_submissions')
+          .update(submissionData)
+          .eq('id', submissionId);
+
+        if (error) throw error;
+      } else {
+        // Create new draft
+        const { data, error } = await supabase
+          .from('label_submissions')
+          .insert([submissionData])
+          .select('id')
+          .single();
+
+        if (error) throw error;
+        setSubmissionId(data.id);
+      }
+
+      toast({
+        title: "Brouillon sauvegardé",
+        description: "Votre progression a été enregistrée avec succès.",
+      });
+    } catch (error) {
+      console.error('Error saving draft:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la sauvegarde.",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleNext = () => {
@@ -95,12 +130,33 @@ const Form = () => {
     }
   };
 
-  const handlePay = () => {
-    // Implement payment logic here
-    toast({
-      title: "Redirection vers le paiement",
-      description: "Vous allez être redirigé vers la page de paiement.",
-    });
+  const handlePay = async () => {
+    try {
+      // Update the submission status to 'submitted'
+      if (submissionId) {
+        const { error } = await supabase
+          .from('label_submissions')
+          .update({ status: 'submitted' })
+          .eq('id', submissionId);
+
+        if (error) throw error;
+      }
+
+      toast({
+        title: "Redirection vers le paiement",
+        description: "Vous allez être redirigé vers la page de paiement.",
+      });
+      
+      // Here you would implement the actual payment logic
+      // For now, we just show the toast
+    } catch (error) {
+      console.error('Error submitting form:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur est survenue lors de la soumission du formulaire.",
+        variant: "destructive"
+      });
+    }
   };
 
   return (
