@@ -48,10 +48,30 @@ const EligibilityForm = () => {
       window.scrollTo(0, 0);
     } else {
       try {
+        // Map form data to match database schema
+        const submissionData = {
+          first_name: updatedFormData.firstName,
+          last_name: updatedFormData.lastName,
+          company_name: updatedFormData.companyName,
+          siret: updatedFormData.siret,
+          legal_form: updatedFormData.legalForm,
+          is_mission_driven: updatedFormData.isMissionDriven,
+          sectors: updatedFormData.sectors,
+          growth_stage: updatedFormData.growthStage,
+          employee_count: updatedFormData.employeeCount,
+          roles: updatedFormData.roles,
+          responsibilities: updatedFormData.responsibilities,
+          motivations: updatedFormData.motivations,
+          implemented_actions: updatedFormData.implementedActions,
+          certification_status: updatedFormData.certificationStatus,
+          email: updatedFormData.email,
+          phone: updatedFormData.phone
+        };
+
         // Submit to Supabase
         const { error } = await supabase
           .from('eligibility_submissions')
-          .insert([updatedFormData]);
+          .insert([submissionData]);
 
         if (error) throw error;
 
