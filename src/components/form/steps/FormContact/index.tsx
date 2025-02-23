@@ -140,7 +140,7 @@ const FormContact = ({
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="city">La ville ?</Label>
+                <Label htmlFor="city">Ville</Label>
                 <Input id="city" value={form.city} onChange={e => updateForm("city", e.target.value)} />
               </div>
             </div>
