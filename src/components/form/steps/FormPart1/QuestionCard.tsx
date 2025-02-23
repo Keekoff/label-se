@@ -15,16 +15,16 @@ const QuestionCard = ({ question, answers, onAnswerToggle }: QuestionProps) => {
     if (value === "D") {
       // If clicking "Non applicable", clear other selections
       if (!answers.includes("D")) {
-        onAnswerToggle(question.id, "D", true);
+        onAnswerToggle(question.id, value, true);
       } else {
-        onAnswerToggle(question.id, "D", false);
+        onAnswerToggle(question.id, value, false);
       }
     } else {
       // If clicking other option, remove "Non applicable" if present
       if (answers.includes("D")) {
         onAnswerToggle(question.id, "D", false);
       }
-      onAnswerToggle(question.id, value, false);
+      onAnswerToggle(question.id, value);
     }
   };
 

@@ -15,5 +15,5 @@ export interface FormPart1Props {
 export interface QuestionProps {
   question: Question;
   answers: string[];
-  onAnswerToggle: (questionId: string, value: string) => void;
+  onAnswerToggle: (questionId: string, value: string, clearOthers?: boolean) => void;
 }
