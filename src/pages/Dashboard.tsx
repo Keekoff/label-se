@@ -1,14 +1,10 @@
-
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-
 const Dashboard = () => {
   const navigate = useNavigate();
-
-  return (
-    <div className="space-y-8 animate-fadeIn">
+  return <div className="space-y-8 animate-fadeIn">
       <div>
         <h1 className="text-3xl font-bold">Bienvenue, Client</h1>
         <p className="text-gray-500 mt-2">
@@ -20,7 +16,7 @@ const Dashboard = () => {
         <CardContent className="p-6 bg-green-50">
           <div className="space-y-4">
             <h2 className="text-xl font-semibold text-primary">Label Startup Engagée</h2>
-            <p className="text-base">
+            <p className="text-base font-semibold">
               Félicitations 🎉 Vous êtes éligible pour poursuivre le processus de labellisation !
             </p>
             <p className="text-sm text-gray-600">
@@ -30,10 +26,7 @@ const Dashboard = () => {
               Vous disposez de 30 jours pour compléter le questionnaire.<br />
               Nous restons disponibles si besoin !
             </p>
-            <Button 
-              className="mt-4 bg-[#8985FF]"
-              onClick={() => navigate("/dashboard/form")}
-            >
+            <Button className="mt-4 bg-[#8985FF]" onClick={() => navigate("/dashboard/form")}>
               Remplir le questionnaire
             </Button>
           </div>
@@ -68,8 +61,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
-  );
+    </div>;
 };
-
 export default Dashboard;
