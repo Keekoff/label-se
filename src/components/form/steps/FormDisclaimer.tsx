@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -17,6 +17,10 @@ const FormDisclaimer = ({ onValidityChange, formState, setFormState }: FormDiscl
     setFormState({ ...formState, disclaimerAccepted: value });
     onValidityChange(value);
   };
+
+  useEffect(() => {
+    onValidityChange(accepted);
+  }, [accepted, onValidityChange]);
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">

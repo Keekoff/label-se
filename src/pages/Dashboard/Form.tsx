@@ -8,7 +8,8 @@ import FormPart2 from "@/components/form/steps/FormPart2";
 import FormPart3 from "@/components/form/steps/FormPart3";
 import FormThanks from "@/components/form/steps/FormThanks";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 
 export type FormStep = {
   id: number;
@@ -45,6 +46,7 @@ const Form = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formState, setFormState] = useState<Record<string, any>>(initialFormState);
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(steps);
+  const { toast } = useToast();
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
     setStepsValidity(prev => 
@@ -54,8 +56,22 @@ const Form = () => {
     );
   };
 
+  const handleSave = () => {
+    // Here you would implement the actual save logic
+    localStorage.setItem('formDraft', JSON.stringify({ formState, currentStep }));
+    toast({
+      title: "Brouillon sauvegardé",
+      description: "Votre progression a été enregistrée avec succès.",
+    });
+  };
+
   const handleNext = () => {
     if (currentStep < steps.length) {
+      // Block navigation from Disclaimer if not accepted
+      if (currentStep === 1 && !formState.disclaimerAccepted) {
+        return;
+      }
+      
       // Only validate when moving to the final "Thanks" step
       if (currentStep === steps.length - 2) {
         const allStepsValid = stepsValidity
@@ -63,10 +79,10 @@ const Form = () => {
           .every(step => step.isValid);
         
         if (!allStepsValid) {
-          // Prevent moving to Thanks if form is incomplete
           return;
         }
       }
+      
       setCurrentStep(prev => prev + 1);
       window.scrollTo(0, 0);
     }
@@ -77,6 +93,14 @@ const Form = () => {
       setCurrentStep(prev => prev - 1);
       window.scrollTo(0, 0);
     }
+  };
+
+  const handlePay = () => {
+    // Implement payment logic here
+    toast({
+      title: "Redirection vers le paiement",
+      description: "Vous allez être redirigé vers la page de paiement.",
+    });
   };
 
   return (
@@ -142,15 +166,35 @@ const Form = () => {
               <ArrowLeft className="w-4 h-4" />
               Retour
             </Button>
-            <Button
-              onClick={handleNext}
-              // Only disable the button on the last step if form is incomplete
-              disabled={currentStep === steps.length - 1 && !stepsValidity.every(step => step.isValid)}
-              className="flex items-center gap-2"
-            >
-              Suivant
-              <ArrowRight className="w-4 h-4" />
-            </Button>
+            <div className="flex items-center gap-3">
+              {currentStep < steps.length && (
+                <Button
+                  variant="outline"
+                  onClick={handleSave}
+                  className="flex items-center gap-2"
+                >
+                  <Save className="w-4 h-4" />
+                  Sauvegarder
+                </Button>
+              )}
+              {currentStep === steps.length ? (
+                <Button
+                  onClick={handlePay}
+                  className="flex items-center gap-2 bg-primary"
+                >
+                  Payer
+                </Button>
+              ) : (
+                <Button
+                  onClick={handleNext}
+                  disabled={currentStep === 1 && !formState.disclaimerAccepted}
+                  className="flex items-center gap-2"
+                >
+                  Suivant
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
           </div>
         </div>
       </div>
