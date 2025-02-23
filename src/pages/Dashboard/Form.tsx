@@ -6,7 +6,6 @@ import FormContact from "@/components/form/steps/FormContact";
 import FormPart1 from "@/components/form/steps/FormPart1";
 import FormPart2 from "@/components/form/steps/FormPart2";
 import FormPart3 from "@/components/form/steps/FormPart3";
-import FormPart4 from "@/components/form/steps/FormPart4";
 import FormThanks from "@/components/form/steps/FormThanks";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight } from "lucide-react";
@@ -23,8 +22,7 @@ const steps: FormStep[] = [
   { id: 3, title: "Partie 1", isValid: false },
   { id: 4, title: "Partie 2", isValid: false },
   { id: 5, title: "Partie 3", isValid: false },
-  { id: 6, title: "Partie 4", isValid: false },
-  { id: 7, title: "Remerciement", isValid: true },
+  { id: 6, title: "Remerciement", isValid: true },
 ];
 
 const initialFormState = {
@@ -32,7 +30,7 @@ const initialFormState = {
   firstName: "",
   email: "",
   companyName: "",
-  sectors: [], // Initialize sectors as an empty array
+  sectors: [], 
   legalForm: "",
   streetAddress: "",
   postalCode: "",
@@ -58,6 +56,17 @@ const Form = () => {
 
   const handleNext = () => {
     if (currentStep < steps.length) {
+      // Only validate when moving to the final "Thanks" step
+      if (currentStep === steps.length - 2) {
+        const allStepsValid = stepsValidity
+          .slice(0, -1) // Exclude the "Thanks" step
+          .every(step => step.isValid);
+        
+        if (!allStepsValid) {
+          // Prevent moving to Thanks if form is incomplete
+          return;
+        }
+      }
       setCurrentStep(prev => prev + 1);
       window.scrollTo(0, 0);
     }
@@ -69,8 +78,6 @@ const Form = () => {
       window.scrollTo(0, 0);
     }
   };
-
-  const currentStepIsValid = stepsValidity.find(step => step.id === currentStep)?.isValid;
 
   return (
     <div className="max-w-7xl mx-auto">
@@ -116,15 +123,8 @@ const Form = () => {
             />
           )}
           {currentStep === 6 && (
-            <FormPart4
-              onValidityChange={(isValid) => updateStepValidity(6, isValid)}
-              formState={formState}
-              setFormState={setFormState}
-            />
-          )}
-          {currentStep === 7 && (
             <FormThanks
-              onValidityChange={(isValid) => updateStepValidity(7, isValid)}
+              onValidityChange={(isValid) => updateStepValidity(6, isValid)}
               formState={formState}
               setFormState={setFormState}
             />
@@ -144,7 +144,8 @@ const Form = () => {
             </Button>
             <Button
               onClick={handleNext}
-              disabled={!currentStepIsValid || currentStep === steps.length}
+              // Only disable the button on the last step if form is incomplete
+              disabled={currentStep === steps.length - 1 && !stepsValidity.every(step => step.isValid)}
               className="flex items-center gap-2"
             >
               Suivant
