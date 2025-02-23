@@ -8,7 +8,7 @@ import Step2Form from "@/components/eligibility/Step2Form";
 import Step3Form from "@/components/eligibility/Step3Form";
 import StepIndicator from "@/components/eligibility/StepIndicator";
 import { toast } from "sonner";
-import { FormData } from "@/types/eligibility";
+import { FormData, SubmissionData } from "@/types/eligibility";
 import { supabase } from "@/integrations/supabase/client";
 
 const INELIGIBLE_LEGAL_FORMS = ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"];
@@ -114,7 +114,7 @@ const EligibilityForm = () => {
           return;
         }
 
-        const submissionData = {
+        const submissionData: SubmissionData = {
           user_id: session.user.id,
           first_name: updatedFormData.firstName,
           last_name: updatedFormData.lastName,

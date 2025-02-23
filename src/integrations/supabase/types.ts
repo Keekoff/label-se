@@ -29,6 +29,7 @@ export type Database = {
           roles: string[]
           sectors: string[]
           siret: string
+          user_id: string | null
         }
         Insert: {
           certification_status: string
@@ -49,6 +50,7 @@ export type Database = {
           roles: string[]
           sectors: string[]
           siret: string
+          user_id?: string | null
         }
         Update: {
           certification_status?: string
@@ -69,6 +71,7 @@ export type Database = {
           roles?: string[]
           sectors?: string[]
           siret?: string
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -104,6 +107,7 @@ export type Database = {
           street_address: string | null
           supplier_relations: string[] | null
           updated_at: string | null
+          user_id: string | null
           waste_management: string[] | null
         }
         Insert: {
@@ -137,6 +141,7 @@ export type Database = {
           street_address?: string | null
           supplier_relations?: string[] | null
           updated_at?: string | null
+          user_id?: string | null
           waste_management?: string[] | null
         }
         Update: {
@@ -170,6 +175,7 @@ export type Database = {
           street_address?: string | null
           supplier_relations?: string[] | null
           updated_at?: string | null
+          user_id?: string | null
           waste_management?: string[] | null
         }
         Relationships: []

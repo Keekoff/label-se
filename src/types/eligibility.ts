@@ -22,3 +22,23 @@ export interface FormData {
   email: string;
   phone: string;
 }
+
+export interface SubmissionData {
+  user_id: string;
+  first_name: string;
+  last_name: string;
+  company_name: string;
+  siret: string;
+  legal_form: string;
+  is_mission_driven: string;
+  sectors: string[];
+  growth_stage: string;
+  employee_count: string;
+  roles: string[];
+  responsibilities: string[];
+  motivations: string[];
+  implemented_actions: string[];
+  certification_status: string;
+  email: string;
+  phone: string;
+}
