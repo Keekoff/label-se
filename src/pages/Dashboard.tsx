@@ -33,7 +33,7 @@ const Dashboard = () => {
       </div>
 
       <Card className="border-none shadow-md bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl transition-all duration-200 hover:shadow-xl hover:scale-[1.01]">
-        <CardContent className="p-6 bg-green-500 hover:bg-green-400 rounded-xl bg-[35DA56]">
+        <CardContent className="p-6 rounded-xl bg-[8985FF] bg-[#8a86ff]">
           <div className="space-y-4">
             <h2 className="text-xl text-primary font-extrabold">Label Startup Engagée</h2>
             <p className="text-base font-semibold">
@@ -46,7 +46,7 @@ const Dashboard = () => {
               Vous disposez de 30 jours pour compléter le questionnaire.<br />
               Nous restons disponibles si besoin !
             </p>
-            <Button onClick={() => navigate("/dashboard/form")} className="mt-4 bg-[27017F] bg-[#270181]">
+            <Button onClick={() => navigate("/dashboard/form")} className="mt-4 bg-[35DA56] bg-[#36d857]">
               Remplir le questionnaire
             </Button>
           </div>
