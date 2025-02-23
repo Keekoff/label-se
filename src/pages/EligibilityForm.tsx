@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -11,8 +11,24 @@ import { toast } from "sonner";
 import { FormData } from "@/types/eligibility";
 import { supabase } from "@/integrations/supabase/client";
 
+const INELIGIBLE_LEGAL_FORMS = ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"];
+
+const IneligibleMessage = () => (
+  <div className="text-center space-y-4">
+    <h2 className="text-xl font-semibold">Vous n'êtes pas encore éligible.</h2>
+    <p className="text-gray-600">
+      Le label Startup Engagée n'est pas adapté aux Associations Loi 1901 et aux EI (auto-entrepreneur, micro-entreprise). 
+      Nous reviendrons vers vous dès que ce sera le cas. Merci de votre confiance.
+    </p>
+    <p className="font-medium">L'équipe KeekOff</p>
+  </div>
+);
+
 const EligibilityForm = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [isIneligible, setIsIneligible] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [existingSubmission, setExistingSubmission] = useState<null | any>(null);
   const [formData, setFormData] = useState<FormData>({
     // Step 1
     firstName: "",
@@ -39,17 +55,67 @@ const EligibilityForm = () => {
   
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const checkExistingSubmission = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate('/login');
+          return;
+        }
+
+        const { data: submission, error } = await supabase
+          .from('eligibility_submissions')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows" error
+          throw error;
+        }
+
+        if (submission) {
+          setExistingSubmission(submission);
+          // Check if the existing submission has an ineligible legal form
+          if (INELIGIBLE_LEGAL_FORMS.includes(submission.legal_form)) {
+            setIsIneligible(true);
+          } else {
+            navigate('/dashboard');
+          }
+        }
+      } catch (error) {
+        console.error('Error checking submission:', error);
+        toast.error("Une erreur est survenue lors de la vérification de votre éligibilité.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkExistingSubmission();
+  }, [navigate]);
+
   const handleNext = async (stepData: Partial<FormData>) => {
     const updatedFormData = { ...formData, ...stepData };
     setFormData(updatedFormData);
+
+    // Check ineligibility when legal form is selected in step 1
+    if (currentStep === 1 && INELIGIBLE_LEGAL_FORMS.includes(updatedFormData.legalForm)) {
+      setIsIneligible(true);
+    }
 
     if (currentStep < 3) {
       setCurrentStep(prev => prev + 1);
       window.scrollTo(0, 0);
     } else {
       try {
-        // Map form data to match database schema
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate('/login');
+          return;
+        }
+
         const submissionData = {
+          user_id: session.user.id,
           first_name: updatedFormData.firstName,
           last_name: updatedFormData.lastName,
           company_name: updatedFormData.companyName,
@@ -68,15 +134,18 @@ const EligibilityForm = () => {
           phone: updatedFormData.phone
         };
 
-        // Submit to Supabase
         const { error } = await supabase
           .from('eligibility_submissions')
           .insert([submissionData]);
 
         if (error) throw error;
 
-        toast.success("Formulaire envoyé avec succès !");
-        navigate("/dashboard");
+        if (INELIGIBLE_LEGAL_FORMS.includes(updatedFormData.legalForm)) {
+          setIsIneligible(true);
+        } else {
+          toast.success("Formulaire envoyé avec succès !");
+          navigate("/dashboard");
+        }
       } catch (error) {
         console.error('Error submitting form:', error);
         toast.error("Une erreur est survenue lors de l'envoi du formulaire. Veuillez réessayer.");
@@ -90,6 +159,24 @@ const EligibilityForm = () => {
       window.scrollTo(0, 0);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="max-w-2xl mx-auto p-4 text-center">
+        Chargement...
+      </div>
+    );
+  }
+
+  if (isIneligible) {
+    return (
+      <div className="max-w-2xl mx-auto p-4">
+        <Card className="p-6">
+          <IneligibleMessage />
+        </Card>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto p-4 space-y-6">

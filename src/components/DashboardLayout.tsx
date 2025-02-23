@@ -1,13 +1,15 @@
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, Menu, X, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import EligibilityDialog from "./eligibility/EligibilityDialog";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -20,6 +22,55 @@ const DashboardLayout = () => {
     label: "Paramètres",
     path: "/dashboard/settings"
   }];
+
+  useEffect(() => {
+    const checkEligibility = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          navigate('/login');
+          return;
+        }
+
+        // Check for eligibility submission
+        const { data: submission, error } = await supabase
+          .from('eligibility_submissions')
+          .select('legal_form')
+          .eq('user_id', session.user.id)
+          .single();
+
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        }
+
+        // If no submission exists or if we're already on the eligibility form, don't redirect
+        if (!submission && location.pathname !== '/dashboard/eligibility') {
+          navigate('/dashboard/eligibility');
+          return;
+        }
+
+        // If submission exists but legal form is ineligible, show message and navigate to eligibility
+        if (submission && ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"].includes(submission.legal_form)) {
+          navigate('/dashboard/eligibility');
+          return;
+        }
+
+      } catch (error) {
+        console.error('Error checking eligibility:', error);
+        toast.error("Une erreur est survenue lors de la vérification de votre éligibilité.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkEligibility();
+  }, [navigate, location.pathname]);
+
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">
+      Chargement...
+    </div>;
+  }
 
   return <div className="min-h-screen bg-background">
       {/* Sidebar */}
