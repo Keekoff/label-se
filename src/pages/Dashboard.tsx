@@ -46,7 +46,7 @@ const Dashboard = () => {
               Vous disposez de 30 jours pour compléter le questionnaire.<br />
               Nous restons disponibles si besoin !
             </p>
-            <Button onClick={() => navigate("/dashboard/form")} className="mt-4 bg-[35DA56] bg-[#36d857]">
+            <Button onClick={() => navigate("/dashboard/form")} className="mt-4 bg-[35DA56] bg-[#36d857] text-gray-950">
               Remplir le questionnaire
             </Button>
           </div>
