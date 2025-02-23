@@ -17,12 +17,13 @@ const StepProgress = ({ steps, currentStep }: StepProgressProps) => {
             className={cn(
               "flex flex-col items-center relative min-w-[100px]",
               index < steps.length - 1 && 
-              "after:content-[''] after:absolute after:top-4 after:left-[calc(50%+0.5rem)] after:w-[calc(100%-1rem)] after:h-[2px] after:bg-gray-200"
+              "after:content-[''] after:absolute after:top-4 after:left-[calc(50%+1rem)] after:w-[calc(100%-2rem)] after:h-[2px] after:bg-gray-200 after:transition-colors",
+              index < steps.length - 1 && currentStep > step.id && "after:bg-primary"
             )}
           >
             <div
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 relative z-10 bg-white",
+                "w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium border-2 relative z-10 bg-white transition-colors",
                 currentStep > step.id
                   ? "border-primary bg-primary text-white"
                   : currentStep === step.id

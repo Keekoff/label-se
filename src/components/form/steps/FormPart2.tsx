@@ -104,13 +104,28 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
 
   const toggleAnswer = (questionId: string, value: string) => {
     const currentAnswers = answers[questionId] || [];
-    const newAnswers = currentAnswers.includes(value)
-      ? currentAnswers.filter(v => v !== value)
-      : [...currentAnswers, value];
+    let newAnswers: string[];
+
+    if (value === "D") {
+      // If selecting "Non applicable", clear other selections
+      newAnswers = currentAnswers.includes("D") ? [] : ["D"];
+    } else {
+      // If selecting another option, remove "Non applicable" if present
+      if (currentAnswers.includes("D")) {
+        newAnswers = [value];
+      } else {
+        newAnswers = currentAnswers.includes(value)
+          ? currentAnswers.filter(v => v !== value)
+          : [...currentAnswers, value];
+      }
+    }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
     setFormState({ ...formState, ...updatedAnswers });
+
+    const isValid = Object.values(updatedAnswers).every(answer => answer.length > 0);
+    onValidityChange(isValid);
   };
 
   useEffect(() => {
@@ -131,7 +146,10 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
         {QUESTIONS.map((question) => (
           <div key={question.id} className="space-y-4 pb-6 border-b last:border-0">
             <div>
-              <h3 className="text-lg font-medium">{question.title}</h3>
+              <h3 className="text-lg font-medium flex items-start gap-1">
+                {question.title}
+                <span className="text-red-500 ml-1">*</span>
+              </h3>
               <p className="text-gray-600 mt-1 text-sm">{question.description}</p>
             </div>
 
