@@ -1,12 +1,37 @@
-import { useState } from "react";
+
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+
 const Dashboard = () => {
   const navigate = useNavigate();
-  return <div className="space-y-8 animate-fadeIn">
+  const [firstName, setFirstName] = useState("");
+
+  useEffect(() => {
+    const getFirstName = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data } = await supabase
+          .from('eligibility_submissions')
+          .select('first_name')
+          .eq('user_id', session.user.id)
+          .single();
+        
+        if (data?.first_name) {
+          setFirstName(data.first_name);
+        }
+      }
+    };
+
+    getFirstName();
+  }, []);
+
+  return (
+    <div className="space-y-8 animate-fadeIn">
       <div>
-        <h1 className="text-3xl font-bold">Bienvenue, Client</h1>
+        <h1 className="text-3xl font-bold">Bienvenue, {firstName}</h1>
         <p className="text-gray-500 mt-2">
           Voici un aperçu de votre activité récente
         </p>
@@ -32,35 +57,8 @@ const Dashboard = () => {
           </div>
         </CardContent>
       </Card>
-
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="border-none shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle className="text-lg">Documents récents</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-500">Aucun document récent</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle className="text-lg">Messages</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-500">Aucun message non lu</p>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-md hover:shadow-lg transition-shadow">
-          <CardHeader>
-            <CardTitle className="text-lg">Activité</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-500">Aucune activité récente</p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>;
+    </div>
+  );
 };
+
 export default Dashboard;

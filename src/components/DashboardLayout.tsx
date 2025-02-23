@@ -1,9 +1,9 @@
+
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Settings, User, Menu, X, LogOut } from "lucide-react";
+import { LayoutDashboard, Settings, User, Menu, ArrowLeft, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import EligibilityDialog from "./eligibility/EligibilityDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -72,15 +72,16 @@ const DashboardLayout = () => {
     </div>;
   }
 
-  return <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       {/* Sidebar */}
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
           <span className="text-slate-50 text-base font-bold">
-            Startup Engagée
+            {sidebarOpen ? "Startup Engagée" : "SE"}
           </span>
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-white/10 text-white">
-            {sidebarOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
+            <ArrowLeft className="h-4 w-4" />
           </Button>
         </div>
         <nav className="p-4 space-y-2">
@@ -88,7 +89,7 @@ const DashboardLayout = () => {
             <Button 
               key={item.path} 
               variant="ghost" 
-              className={`w-full justify-start text-white hover:bg-[#35DA56] ${
+              className={`w-full justify-start text-white hover:bg-[#8985FF] ${
                 !sidebarOpen && "justify-center"
               } ${location.pathname === item.path ? "bg-[#35DA56]" : ""}`} 
               onClick={() => navigate(item.path)}
@@ -97,7 +98,6 @@ const DashboardLayout = () => {
               {sidebarOpen && <span>{item.label}</span>}
             </Button>
           ))}
-          {sidebarOpen && <EligibilityDialog />}
         </nav>
       </div>
 
@@ -137,7 +137,8 @@ const DashboardLayout = () => {
           </div>
         </main>
       </div>
-    </div>;
+    </div>
+  );
 };
 
 export default DashboardLayout;
