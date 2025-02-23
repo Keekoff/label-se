@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Settings, User, Menu, ArrowLeft, LogOut } from "lucide-react";
+import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,7 +81,7 @@ const DashboardLayout = () => {
             {sidebarOpen ? "Startup Engagée" : "SE"}
           </span>
           <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-white/10 text-white">
-            <ArrowLeft className="h-4 w-4" />
+            {sidebarOpen ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
           </Button>
         </div>
         <nav className="p-4 space-y-2">

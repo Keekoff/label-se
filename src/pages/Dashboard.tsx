@@ -1,30 +1,35 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
+
   useEffect(() => {
     const getFirstName = async () => {
-      const {
-        data: {
-          session
-        }
-      } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
-        const {
-          data
-        } = await supabase.from('eligibility_submissions').select('first_name').eq('user_id', session.user.id).single();
+        const { data } = await supabase
+          .from('eligibility_submissions')
+          .select('first_name')
+          .eq('user_id', session.user.id)
+          .single();
+        
         if (data?.first_name) {
           setFirstName(data.first_name);
         }
       }
     };
+
     getFirstName();
   }, []);
-  return <div className="space-y-8 animate-fadeIn">
+
+  return (
+    <div className="space-y-8 animate-fadeIn">
       <div>
         <h1 className="text-3xl font-bold">Bienvenue, {firstName}</h1>
         <p className="text-gray-500 mt-2">
@@ -32,8 +37,8 @@ const Dashboard = () => {
         </p>
       </div>
 
-      <Card className="border-none shadow-md bg-gradient-to-br from-primary/5 to-secondary/5">
-        <CardContent className="p-6 bg-green-500 hover:bg-green-400">
+      <Card className="border-none shadow-md bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl transition-all duration-200 hover:shadow-xl hover:scale-[1.01]">
+        <CardContent className="p-6 bg-green-500 hover:bg-green-400 rounded-xl">
           <div className="space-y-4">
             <h2 className="text-xl text-primary font-extrabold">Label Startup Engagée</h2>
             <p className="text-base font-semibold">
@@ -52,6 +57,8 @@ const Dashboard = () => {
           </div>
         </CardContent>
       </Card>
-    </div>;
+    </div>
+  );
 };
+
 export default Dashboard;

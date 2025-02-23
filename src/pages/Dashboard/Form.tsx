@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import StepProgress from "@/components/form/StepProgress";
 import FormDisclaimer from "@/components/form/steps/FormDisclaimer";
@@ -51,6 +50,7 @@ const Form = () => {
   const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
+    console.log(`Updating step ${stepId} validity to:`, isValid);
     setStepsValidity(prev => 
       prev.map(step => 
         step.id === stepId ? { ...step, isValid } : step
@@ -101,21 +101,13 @@ const Form = () => {
   };
 
   const handleNext = () => {
+    console.log('Current step:', currentStep);
+    console.log('Steps validity:', stepsValidity);
+    
     if (currentStep < steps.length) {
-      // Block navigation from Disclaimer if not accepted
+      // Remove the disclaimer validation check since it's handled separately
       if (currentStep === 1 && !formState.disclaimerAccepted) {
         return;
-      }
-      
-      // Only validate when moving to the final "Thanks" step
-      if (currentStep === steps.length - 2) {
-        const allStepsValid = stepsValidity
-          .slice(0, -1) // Exclude the "Thanks" step
-          .every(step => step.isValid);
-        
-        if (!allStepsValid) {
-          return;
-        }
       }
       
       setCurrentStep(prev => prev + 1);

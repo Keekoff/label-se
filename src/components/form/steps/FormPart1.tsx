@@ -145,10 +145,17 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
     setFormState({ ...formState, ...updatedAnswers });
+    
+    // Add logging to debug validation
+    console.log('Updated answers:', updatedAnswers);
+    const isValid = Object.values(updatedAnswers).every(answer => answer.length > 0);
+    console.log('Form valid:', isValid);
+    onValidityChange(isValid);
   };
 
   useEffect(() => {
     const isValid = Object.values(answers).every(answer => answer.length > 0);
+    console.log('Initial form validation:', isValid);
     onValidityChange(isValid);
   }, [answers]);
 
