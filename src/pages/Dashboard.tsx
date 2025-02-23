@@ -39,10 +39,10 @@ const Dashboard = () => {
             <p className="text-base font-semibold">
               Félicitations 🎉 Vous êtes éligible pour poursuivre le processus de labellisation !
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-gray-950">
               Ce questionnaire va nous permettre de vous attribuer le label Startup Engagée à l'échelon 1, 2 ou 3 selon votre maturité sur les sujets RSE.
             </p>
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-slate-950">
               Vous disposez de 30 jours pour compléter le questionnaire.<br />
               Nous restons disponibles si besoin !
             </p>
