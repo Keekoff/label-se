@@ -15,11 +15,19 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
     return initialAnswers;
   });
 
-  const toggleAnswer = (questionId: string, value: string) => {
+  const toggleAnswer = (questionId: string, value: string, clearOthers: boolean = false) => {
     const currentAnswers = answers[questionId] || [];
-    const newAnswers = currentAnswers.includes(value)
-      ? currentAnswers.filter(v => v !== value)
-      : [...currentAnswers, value];
+    let newAnswers: string[];
+
+    if (clearOthers) {
+      // If clearing others (for "Non applicable"), just set this value
+      newAnswers = [value];
+    } else {
+      // Normal toggle behavior
+      newAnswers = currentAnswers.includes(value)
+        ? currentAnswers.filter(v => v !== value)
+        : [...currentAnswers, value];
+    }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, ArrowRight, Save } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
+import { SubmissionModal } from "@/components/form/SubmissionModal";
 
 export type FormStep = {
   id: number;
@@ -27,7 +28,6 @@ const steps: FormStep[] = [
 ];
 
 const initialFormState = {
-  // Contact form initial state
   firstName: "",
   email: "",
   companyName: "",
@@ -48,6 +48,7 @@ const Form = () => {
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(steps);
   const { toast } = useToast();
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [showSubmissionModal, setShowSubmissionModal] = useState(false);
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
     console.log(`Updating step ${stepId} validity to:`, isValid);
@@ -67,7 +68,6 @@ const Form = () => {
       };
 
       if (submissionId) {
-        // Update existing draft
         const { error } = await supabase
           .from('label_submissions')
           .update(submissionData)
@@ -75,7 +75,6 @@ const Form = () => {
 
         if (error) throw error;
       } else {
-        // Create new draft
         const { data, error } = await supabase
           .from('label_submissions')
           .insert([submissionData])
@@ -100,31 +99,8 @@ const Form = () => {
     }
   };
 
-  const handleNext = () => {
-    console.log('Current step:', currentStep);
-    console.log('Steps validity:', stepsValidity);
-    
-    if (currentStep < steps.length) {
-      // Remove the disclaimer validation check since it's handled separately
-      if (currentStep === 1 && !formState.disclaimerAccepted) {
-        return;
-      }
-      
-      setCurrentStep(prev => prev + 1);
-      window.scrollTo(0, 0);
-    }
-  };
-
-  const handleBack = () => {
-    if (currentStep > 1) {
-      setCurrentStep(prev => prev - 1);
-      window.scrollTo(0, 0);
-    }
-  };
-
-  const handlePay = async () => {
+  const handleSubmit = async () => {
     try {
-      // Update the submission status to 'submitted'
       if (submissionId) {
         const { error } = await supabase
           .from('label_submissions')
@@ -132,15 +108,9 @@ const Form = () => {
           .eq('id', submissionId);
 
         if (error) throw error;
-      }
 
-      toast({
-        title: "Redirection vers le paiement",
-        description: "Vous allez être redirigé vers la page de paiement.",
-      });
-      
-      // Here you would implement the actual payment logic
-      // For now, we just show the toast
+        setShowSubmissionModal(true);
+      }
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
@@ -149,6 +119,14 @@ const Form = () => {
         variant: "destructive"
       });
     }
+  };
+
+  const handlePay = () => {
+    toast({
+      title: "Redirection vers le paiement",
+      description: "Vous allez être redirigé vers la page de paiement.",
+    });
+    // Here you would implement the actual payment logic
   };
 
   return (
@@ -207,7 +185,12 @@ const Form = () => {
           <div className="flex justify-between items-center">
             <Button
               variant="outline"
-              onClick={handleBack}
+              onClick={() => {
+                if (currentStep > 1) {
+                  setCurrentStep(prev => prev - 1);
+                  window.scrollTo(0, 0);
+                }
+              }}
               disabled={currentStep === 1}
               className="flex items-center gap-2"
             >
@@ -221,20 +204,25 @@ const Form = () => {
                   onClick={handleSave}
                   className="flex items-center gap-2"
                 >
-                  <Save className="w-4 h-4" />
+                  <Save className="w-4 w-4" />
                   Sauvegarder
                 </Button>
               )}
               {currentStep === steps.length ? (
                 <Button
-                  onClick={handlePay}
+                  onClick={handleSubmit}
                   className="flex items-center gap-2 bg-primary"
                 >
-                  Payer
+                  Envoyer ma demande
                 </Button>
               ) : (
                 <Button
-                  onClick={handleNext}
+                  onClick={() => {
+                    if (currentStep < steps.length) {
+                      setCurrentStep(prev => prev + 1);
+                      window.scrollTo(0, 0);
+                    }
+                  }}
                   disabled={currentStep === 1 && !formState.disclaimerAccepted}
                   className="flex items-center gap-2"
                 >
@@ -246,6 +234,12 @@ const Form = () => {
           </div>
         </div>
       </div>
+
+      <SubmissionModal 
+        open={showSubmissionModal}
+        onOpenChange={setShowSubmissionModal}
+        onPaymentClick={handlePay}
+      />
     </div>
   );
 };

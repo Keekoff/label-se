@@ -11,10 +11,30 @@ import QuestionOption from "./QuestionOption";
 import { QuestionProps } from "./types";
 
 const QuestionCard = ({ question, answers, onAnswerToggle }: QuestionProps) => {
+  const handleOptionClick = (value: string) => {
+    if (value === "D") {
+      // If clicking "Non applicable", clear other selections
+      if (!answers.includes("D")) {
+        onAnswerToggle(question.id, "D", true);
+      } else {
+        onAnswerToggle(question.id, "D", false);
+      }
+    } else {
+      // If clicking other option, remove "Non applicable" if present
+      if (answers.includes("D")) {
+        onAnswerToggle(question.id, "D", false);
+      }
+      onAnswerToggle(question.id, value, false);
+    }
+  };
+
   return (
     <div className="space-y-4 pb-6 border-b last:border-0">
       <div>
-        <h3 className="text-lg font-medium">{question.title}</h3>
+        <h3 className="text-lg font-medium flex items-center gap-1">
+          {question.title}
+          <span className="text-red-500 ml-1">*</span>
+        </h3>
         <p className="text-gray-600 mt-1 text-sm">{question.description}</p>
       </div>
 
@@ -41,7 +61,7 @@ const QuestionCard = ({ question, answers, onAnswerToggle }: QuestionProps) => {
                   value={option.value}
                   label={option.label}
                   isSelected={answers?.includes(option.value)}
-                  onClick={() => onAnswerToggle(question.id, option.value)}
+                  onClick={() => handleOptionClick(option.value)}
                 />
               ))}
             </div>
