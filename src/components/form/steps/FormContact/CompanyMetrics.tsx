@@ -2,7 +2,7 @@
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { EMPLOYEE_COUNTS, FUNDING_OPTIONS } from './index';
+import { EMPLOYEE_COUNTS, FUNDING_OPTIONS } from './constants';
 
 interface CompanyMetricsProps {
   form: Record<string, any>;
@@ -16,7 +16,9 @@ const CompanyMetrics = ({ form, updateForm }: CompanyMetricsProps) => {
       
       <div className="space-y-6">
         <div className="space-y-2">
-          <Label htmlFor="foundingYear">Quelle est l'année de création de votre société ?</Label>
+          <Label htmlFor="foundingYear">
+            Quelle est l'année de création de votre société ? <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="foundingYear"
             value={form.foundingYear}
@@ -25,7 +27,9 @@ const CompanyMetrics = ({ form, updateForm }: CompanyMetricsProps) => {
         </div>
 
         <div className="space-y-3">
-          <Label>Quel est le nombre de collaborateurs de votre structure ?</Label>
+          <Label>
+            Quel est le nombre de collaborateurs de votre structure ? <span className="text-red-500">*</span>
+          </Label>
           <RadioGroup
             value={form.employeeCount}
             onValueChange={(value) => updateForm("employeeCount", value)}
@@ -43,7 +47,9 @@ const CompanyMetrics = ({ form, updateForm }: CompanyMetricsProps) => {
 
         <div className="space-y-4">
           <div className="space-y-3">
-            <Label>Avez-vous déjà levé des fonds ?</Label>
+            <Label>
+              Avez-vous déjà levé des fonds ? <span className="text-red-500">*</span>
+            </Label>
             <RadioGroup
               value={form.hasFunding}
               onValueChange={(value) => updateForm("hasFunding", value)}
@@ -61,7 +67,9 @@ const CompanyMetrics = ({ form, updateForm }: CompanyMetricsProps) => {
 
           {form.hasFunding === "Oui" && (
             <div className="space-y-2">
-              <Label htmlFor="fundingDetails">Si oui, pour quel montant ?</Label>
+              <Label htmlFor="fundingDetails">
+                Si oui, pour quel montant ? <span className="text-red-500">*</span>
+              </Label>
               <Input
                 id="fundingDetails"
                 placeholder="Ex: Seed 500k€, Série A 2M€..."

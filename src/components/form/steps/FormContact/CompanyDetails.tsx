@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { SECTORS, LEGAL_FORMS } from './index';
+import { SECTORS, LEGAL_FORMS } from './constants';
 
 interface CompanyDetailsProps {
   form: Record<string, any>;
@@ -24,7 +24,9 @@ const CompanyDetails = ({ form, updateForm }: CompanyDetailsProps) => {
       
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="companyName">Quel est le nom de votre société ?</Label>
+          <Label htmlFor="companyName">
+            Quel est le nom de votre société ? <span className="text-red-500">*</span>
+          </Label>
           <Input
             id="companyName"
             value={form.companyName}
@@ -33,7 +35,9 @@ const CompanyDetails = ({ form, updateForm }: CompanyDetailsProps) => {
         </div>
 
         <div className="space-y-3">
-          <Label>Quel est le secteur d'activité de l'entreprise ?</Label>
+          <Label>
+            Quel est le secteur d'activité de l'entreprise ? <span className="text-red-500">*</span>
+          </Label>
           <div className="grid grid-cols-1 gap-3">
             {SECTORS.map((sector) => (
               <div key={sector} className="flex items-center space-x-2">
@@ -51,7 +55,9 @@ const CompanyDetails = ({ form, updateForm }: CompanyDetailsProps) => {
         </div>
 
         <div className="space-y-3">
-          <Label>Quelle est la forme juridique de votre structure ?</Label>
+          <Label>
+            Quelle est la forme juridique de votre structure ? <span className="text-red-500">*</span>
+          </Label>
           <RadioGroup
             value={form.legalForm}
             onValueChange={(value) => updateForm("legalForm", value)}
