@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,12 +8,14 @@ import { supabase } from "@/integrations/supabase/client";
 import { Upload, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 
+type PaymentStatus = 'unpaid' | 'pending' | 'paid' | null;
+
 const Dashboard = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [firstName, setFirstName] = useState("");
   const [hasSubmittedForm, setHasSubmittedForm] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,7 +39,7 @@ const Dashboard = () => {
         setFirstName(data.first_name || '');
         setSubmissionId(data.id);
         setHasSubmittedForm(data.status !== 'draft');
-        setPaymentStatus(data.payment_status);
+        setPaymentStatus(data.payment_status as PaymentStatus);
       }
     } catch (error) {
       console.error('Error fetching submission details:', error);
@@ -137,7 +140,7 @@ const Dashboard = () => {
                   <Button 
                     onClick={handlePayment} 
                     className="bg-primary hover:bg-primary-hover"
-                    disabled={isLoading || paymentStatus === 'pending'}
+                    disabled={isLoading}
                   >
                     <CreditCard className="mr-2 h-4 w-4" />
                     {isLoading ? 'Chargement...' : 'Payer maintenant'}
