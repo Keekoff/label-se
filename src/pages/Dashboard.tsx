@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -15,13 +16,16 @@ const Dashboard = () => {
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
 
   useEffect(() => {
     const checkPaymentStatus = async () => {
       const success = searchParams.get('success');
       const sessionId = searchParams.get('session_id');
+      const submissionIdFromUrl = searchParams.get('submission_id');
 
-      if (success === 'true' && sessionId && submissionId) {
+      if (success === 'true' && sessionId && submissionIdFromUrl) {
+        setIsUpdatingPayment(true);
         try {
           const { error } = await supabase
             .from('label_submissions')
@@ -30,52 +34,55 @@ const Dashboard = () => {
               payment_id: sessionId,
               updated_at: new Date().toISOString()
             })
-            .eq('id', submissionId);
+            .eq('id', submissionIdFromUrl);
 
           if (error) throw error;
           
           setPaymentStatus('paid');
           toast.success("Paiement effectué avec succès !");
+
+          // Force refresh submission data
+          await getSubmissionDetails();
         } catch (error) {
           console.error('Error updating payment status:', error);
           toast.error("Erreur lors de la mise à jour du statut de paiement");
+        } finally {
+          setIsUpdatingPayment(false);
         }
       } else if (success === 'false') {
         toast.error("Le paiement a été annulé.");
       }
     };
 
-    if (submissionId) {
-      checkPaymentStatus();
+    checkPaymentStatus();
+  }, [searchParams]);
+
+  const getSubmissionDetails = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data, error } = await supabase
+          .from('label_submissions')
+          .select('id, first_name, status, payment_status')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+
+        if (data) {
+          setFirstName(data.first_name || '');
+          setSubmissionId(data.id);
+          setHasSubmittedForm(data.status !== 'draft');
+          setPaymentStatus(data.payment_status);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching submission details:', error);
+      toast.error("Erreur lors du chargement de vos informations");
     }
-  }, [searchParams, submissionId]);
+  };
 
   useEffect(() => {
-    const getSubmissionDetails = async () => {
-      try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session?.user) {
-          const { data, error } = await supabase
-            .from('label_submissions')
-            .select('id, first_name, status, payment_status')
-            .eq('user_id', session.user.id)
-            .maybeSingle();
-          
-          if (error) throw error;
-
-          if (data) {
-            setFirstName(data.first_name || '');
-            setSubmissionId(data.id);
-            setHasSubmittedForm(data.status !== 'draft');
-            setPaymentStatus(data.payment_status);
-          }
-        }
-      } catch (error) {
-        console.error('Error fetching submission details:', error);
-        toast.error("Erreur lors du chargement de vos informations");
-      }
-    };
-
     getSubmissionDetails();
   }, []);
 
@@ -124,7 +131,7 @@ const Dashboard = () => {
                   " Vous pouvez maintenant accéder aux pièces justificatives nécessaires à la validation de votre dossier."}
               </p>
               <div className="flex gap-4">
-                {paymentStatus === 'unpaid' && (
+                {paymentStatus === 'unpaid' && !isUpdatingPayment && (
                   <Button 
                     onClick={handlePayment} 
                     className="bg-primary hover:bg-primary-hover"
