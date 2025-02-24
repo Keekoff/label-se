@@ -3,4 +3,4 @@ project_id = "xrruijuepuglkguryzlp"
 
 [functions.create-payment]
 verify_jwt = true
-import_map = "supabase/functions/create-payment/import_map.json"
+import_map = "functions/create-payment/import_map.json"
