@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { BarChart, LineChart, PieChart } from "@/components/ui/chart";
+import { LineChart, BarChart, PieChart } from "@/components/ui/chart";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, CreditCard } from "lucide-react";
 
@@ -19,14 +19,16 @@ const Dashboard = () => {
       } = await supabase.auth.getSession();
       if (session?.user) {
         const { data } = await supabase
-          .from('eligibility_submissions')
-          .select('first_name, form_submitted')
+          .from('label_submissions')
+          .select('first_name, status')
           .eq('user_id', session.user.id)
-          .single();
+          .maybeSingle();
+        
         if (data?.first_name) {
           setFirstName(data.first_name);
         }
-        if (data?.form_submitted) {
+        // Check if form is submitted based on status
+        if (data?.status && data.status !== 'draft') {
           setHasSubmittedForm(true);
         }
       }
