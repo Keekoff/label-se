@@ -9,6 +9,7 @@ import Dashboard from "@/pages/Dashboard";
 import Form from "@/pages/Dashboard/Form";
 import EligibilityForm from "@/pages/EligibilityForm";
 import Payments from "@/pages/Dashboard/Payments";
+import Justificatifs from "@/pages/Dashboard/Justificatifs";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +43,10 @@ const router = createBrowserRouter([
       {
         path: "payments",
         element: <Payments />,
+      },
+      {
+        path: "justificatifs",
+        element: <Justificatifs />,
       },
     ],
   },
