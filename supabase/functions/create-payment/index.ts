@@ -10,7 +10,6 @@ const corsHeaders = {
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
-  httpClient: Stripe.createFetchHttpClient(),
 })
 
 const supabaseUrl = Deno.env.get('SUPABASE_URL')
@@ -18,6 +17,7 @@ const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
 const supabaseClient = createClient(supabaseUrl || '', supabaseKey || '')
 
 serve(async (req: Request) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -35,7 +35,7 @@ serve(async (req: Request) => {
       .from('label_submissions')
       .select('*')
       .eq('id', submissionId)
-      .single()
+      .maybeSingle()
 
     if (submissionError || !submission) {
       console.error('Submission not found:', submissionError)
@@ -46,13 +46,14 @@ serve(async (req: Request) => {
       throw new Error('Le paiement a déjà été effectué pour cette soumission')
     }
 
-    console.log('Creating Stripe session for submission:', submissionId)
+    const baseUrl = Deno.env.get('SITE_URL') || 'http://localhost:5173'
+    console.log('Base URL for redirects:', baseUrl)
 
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
-      success_url: `${Deno.env.get('SITE_URL')}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}&submission_id=${submissionId}`,
-      cancel_url: `${Deno.env.get('SITE_URL')}/dashboard?canceled=true`,
+      success_url: `${baseUrl}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}&submission_id=${submissionId}`,
+      cancel_url: `${baseUrl}/dashboard?success=false`,
       client_reference_id: submissionId,
       metadata: {
         submission_id: submissionId,
@@ -72,6 +73,20 @@ serve(async (req: Request) => {
     })
 
     console.log('Stripe session created:', session.id)
+
+    // Pre-update the submission with pending status
+    const { error: updateError } = await supabaseClient
+      .from('label_submissions')
+      .update({ 
+        payment_status: 'pending',
+        payment_id: session.id,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', submissionId)
+
+    if (updateError) {
+      console.error('Error updating submission status:', updateError)
+    }
 
     return new Response(
       JSON.stringify({ url: session.url }),

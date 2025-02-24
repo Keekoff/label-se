@@ -18,6 +18,38 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
 
+  const getSubmissionDetails = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.user) {
+        navigate("/login");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from('label_submissions')
+        .select('id, first_name, status, payment_status')
+        .eq('user_id', session.user.id)
+        .maybeSingle();
+      
+      if (error) throw error;
+
+      if (data) {
+        setFirstName(data.first_name || '');
+        setSubmissionId(data.id);
+        setHasSubmittedForm(data.status !== 'draft');
+        setPaymentStatus(data.payment_status);
+      }
+    } catch (error) {
+      console.error('Error fetching submission details:', error);
+      toast.error("Erreur lors du chargement de vos informations");
+    }
+  };
+
+  useEffect(() => {
+    getSubmissionDetails();
+  }, [navigate]);
+
   useEffect(() => {
     const checkPaymentStatus = async () => {
       const success = searchParams.get('success');
@@ -40,8 +72,11 @@ const Dashboard = () => {
           
           setPaymentStatus('paid');
           toast.success("Paiement effectué avec succès !");
-
-          // Force refresh submission data
+          
+          // Clear URL parameters
+          navigate('/dashboard', { replace: true });
+          
+          // Refresh submission data
           await getSubmissionDetails();
         } catch (error) {
           console.error('Error updating payment status:', error);
@@ -51,40 +86,12 @@ const Dashboard = () => {
         }
       } else if (success === 'false') {
         toast.error("Le paiement a été annulé.");
+        navigate('/dashboard', { replace: true });
       }
     };
 
     checkPaymentStatus();
-  }, [searchParams]);
-
-  const getSubmissionDetails = async () => {
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data, error } = await supabase
-          .from('label_submissions')
-          .select('id, first_name, status, payment_status')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        
-        if (error) throw error;
-
-        if (data) {
-          setFirstName(data.first_name || '');
-          setSubmissionId(data.id);
-          setHasSubmittedForm(data.status !== 'draft');
-          setPaymentStatus(data.payment_status);
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching submission details:', error);
-      toast.error("Erreur lors du chargement de vos informations");
-    }
-  };
-
-  useEffect(() => {
-    getSubmissionDetails();
-  }, []);
+  }, [searchParams, navigate]);
 
   const handlePayment = async () => {
     try {
@@ -131,11 +138,11 @@ const Dashboard = () => {
                   " Vous pouvez maintenant accéder aux pièces justificatives nécessaires à la validation de votre dossier."}
               </p>
               <div className="flex gap-4">
-                {paymentStatus === 'unpaid' && !isUpdatingPayment && (
+                {(paymentStatus === 'unpaid' || paymentStatus === 'pending') && !isUpdatingPayment && (
                   <Button 
                     onClick={handlePayment} 
                     className="bg-primary hover:bg-primary-hover"
-                    disabled={isLoading}
+                    disabled={isLoading || paymentStatus === 'pending'}
                   >
                     <CreditCard className="mr-2 h-4 w-4" />
                     {isLoading ? 'Chargement...' : 'Payer maintenant'}
