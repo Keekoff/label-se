@@ -44,9 +44,11 @@ const Form = () => {
   };
 
   const onSubmit = async () => {
-    const result = await handleSubmit();
-    if (result) {
+    try {
+      await handleSubmit();
       setShowSubmissionModal(true);
+    } catch (error) {
+      console.error("Erreur lors de la soumission:", error);
     }
   };
 
