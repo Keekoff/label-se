@@ -21,8 +21,7 @@ const Form = () => {
 
   const { submissionId, handleSave, handleSubmit } = useFormSubmission(
     formState, 
-    setCurrentStep, 
-    () => setShowSubmissionModal(true)
+    setCurrentStep
   );
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
@@ -45,6 +44,11 @@ const Form = () => {
       setCurrentStep(prev => prev - 1);
       window.scrollTo(0, 0);
     }
+  };
+
+  const onSubmit = async () => {
+    await handleSubmit();
+    setShowSubmissionModal(true);
   };
 
   return (
@@ -106,7 +110,7 @@ const Form = () => {
             onPrevious={handlePrevious}
             onNext={handleNext}
             onSave={handleSave}
-            onSubmit={handleSubmit}
+            onSubmit={onSubmit}
             isDisabled={currentStep === 1 && !formState.disclaimerAccepted}
           />
         </div>
