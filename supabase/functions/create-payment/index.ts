@@ -18,7 +18,8 @@ serve(async (req) => {
       throw new Error('Missing submissionId')
     }
 
-    const baseUrl = new URL(req.url).origin
+    // Hard-code the base URL for production
+    const baseUrl = 'https://startup-engagee.vercel.app'
 
     // Create basic Stripe checkout session with fetch
     const stripeResponse = await fetch('https://api.stripe.com/v1/checkout/sessions', {
@@ -28,7 +29,7 @@ serve(async (req) => {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({
-        'success_url': `${baseUrl}/dashboard?success=true`,
+        'success_url': `${baseUrl}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
         'cancel_url': `${baseUrl}/dashboard?canceled=true`,
         'mode': 'payment',
         'client_reference_id': submissionId,

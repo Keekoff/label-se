@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { LineChart, BarChart, PieChart } from "@/components/ui/chart";
@@ -10,11 +10,42 @@ import { toast } from "sonner";
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [firstName, setFirstName] = useState("");
   const [hasSubmittedForm, setHasSubmittedForm] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const success = searchParams.get('success');
+    const sessionId = searchParams.get('session_id');
+
+    if (success === 'true' && sessionId) {
+      toast.success("Paiement effectué avec succès !");
+      // Update payment status in database
+      updatePaymentStatus();
+    } else if (success === 'false') {
+      toast.error("Le paiement a été annulé.");
+    }
+  }, [searchParams]);
+
+  const updatePaymentStatus = async () => {
+    if (!submissionId) return;
+
+    try {
+      const { error } = await supabase
+        .from('label_submissions')
+        .update({ payment_status: 'paid' })
+        .eq('id', submissionId);
+
+      if (error) throw error;
+      setPaymentStatus('paid');
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      toast.error("Erreur lors de la mise à jour du statut de paiement");
+    }
+  };
 
   useEffect(() => {
     const getSubmissionDetails = async () => {
