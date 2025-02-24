@@ -11,12 +11,43 @@ export const useFormSubmission = (
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const { toast } = useToast();
 
+  const formatSubmissionData = (data: FormState, status: 'draft' | 'submitted') => {
+    return {
+      first_name: data.firstName,
+      email: data.email,
+      company_name: data.companyName,
+      sectors: data.sectors,
+      legal_form: data.legalForm,
+      street_address: data.streetAddress,
+      postal_code: data.postalCode,
+      city: data.city,
+      founding_year: data.foundingYear,
+      employee_count: data.employeeCount,
+      has_funding: data.hasFunding,
+      funding_details: data.fundingDetails,
+      status: status,
+      current_step: status === 'submitted' ? 6 : data.currentStep,
+      disclaimer_accepted: data.disclaimerAccepted,
+      // Add any other form fields that match the table schema
+      associative_contribution: data.associativeContribution || [],
+      responsible_digital: data.responsibleDigital || [],
+      communication: data.communication || [],
+      supplier_relations: data.supplierRelations || [],
+      social_impact: data.socialImpact || [],
+      production: data.production || [],
+      eco_design: data.ecoDesign || [],
+      continuous_evaluation: data.continuousEvaluation || [],
+      energy_management: data.energyManagement || [],
+      carbon_emissions: data.carbonEmissions || [],
+      circular_economy: data.circularEconomy || [],
+      waste_management: data.wasteManagement || [],
+      responsible_purchasing: data.responsiblePurchasing || []
+    };
+  };
+
   const handleSave = async () => {
     try {
-      const submissionData = {
-        ...formState,
-        status: 'draft'
-      };
+      const submissionData = formatSubmissionData(formState, 'draft');
 
       if (submissionId) {
         const { error } = await supabase
@@ -52,25 +83,19 @@ export const useFormSubmission = (
 
   const handleSubmit = async () => {
     try {
-      const finalSubmissionData = {
-        ...formState,
-        status: 'submitted',
-        current_step: 6
-      };
+      const submissionData = formatSubmissionData(formState, 'submitted');
 
       if (submissionId) {
-        // Update existing submission
         const { error } = await supabase
           .from('label_submissions')
-          .update(finalSubmissionData)
+          .update(submissionData)
           .eq('id', submissionId);
 
         if (error) throw error;
       } else {
-        // Create new submission
         const { data, error } = await supabase
           .from('label_submissions')
-          .insert([finalSubmissionData])
+          .insert([submissionData])
           .select('id')
           .single();
 
@@ -78,7 +103,6 @@ export const useFormSubmission = (
         setSubmissionId(data.id);
       }
 
-      // Only move to next step if the submission was successful
       setCurrentStep(6);
       window.scrollTo(0, 0);
 
