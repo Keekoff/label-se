@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +14,7 @@ const Dashboard = () => {
   const [hasSubmittedForm, setHasSubmittedForm] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const getSubmissionDetails = async () => {
@@ -45,6 +47,7 @@ const Dashboard = () => {
 
   const handlePayment = async () => {
     try {
+      setIsLoading(true);
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error("Veuillez vous connecter pour continuer");
@@ -53,29 +56,32 @@ const Dashboard = () => {
       }
 
       if (!submissionId) {
-        toast.error("Une erreur est survenue");
+        toast.error("Une erreur est survenue: ID de soumission manquant");
         return;
       }
 
-      const response = await supabase.functions.invoke('create-checkout-session', {
-        body: { submissionId },
+      console.log('Creating checkout session for submission:', submissionId);
+
+      const { data, error } = await supabase.functions.invoke('create-checkout-session', {
+        body: { submissionId }
       });
 
-      if (response.error) {
-        throw new Error(response.error.message);
+      if (error) {
+        console.error('Stripe checkout error:', error);
+        throw error;
       }
 
-      const { data: { url } } = response;
-      
-      if (!url) {
-        throw new Error("No checkout URL returned");
+      if (!data?.url) {
+        throw new Error('URL de paiement non reçue');
       }
 
-      // Redirect to Stripe Checkout
-      window.location.href = url;
+      console.log('Redirecting to checkout URL:', data.url);
+      window.location.href = data.url;
     } catch (error) {
-      console.error("Payment error:", error);
+      console.error('Payment error:', error);
       toast.error("Une erreur est survenue lors de la redirection vers le paiement");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -100,9 +106,13 @@ const Dashboard = () => {
               </p>
               <div className="flex gap-4">
                 {paymentStatus === 'unpaid' && (
-                  <Button onClick={handlePayment} className="bg-primary hover:bg-primary-hover">
+                  <Button 
+                    onClick={handlePayment} 
+                    className="bg-primary hover:bg-primary-hover"
+                    disabled={isLoading}
+                  >
                     <CreditCard className="mr-2 h-4 w-4" />
-                    Payer maintenant
+                    {isLoading ? 'Chargement...' : 'Payer maintenant'}
                   </Button>
                 )}
                 <Button variant="outline" onClick={() => {}}>
