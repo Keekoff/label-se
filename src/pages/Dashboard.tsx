@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -18,62 +17,65 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const success = searchParams.get('success');
-    const sessionId = searchParams.get('session_id');
+    const checkPaymentStatus = async () => {
+      const success = searchParams.get('success');
+      const sessionId = searchParams.get('session_id');
 
-    if (success === 'true' && sessionId) {
-      toast.success("Paiement effectué avec succès !");
-      updatePaymentStatus(sessionId);
-    } else if (success === 'false') {
-      toast.error("Le paiement a été annulé.");
+      if (success === 'true' && sessionId && submissionId) {
+        try {
+          const { error } = await supabase
+            .from('label_submissions')
+            .update({ 
+              payment_status: 'paid',
+              payment_id: sessionId,
+              updated_at: new Date().toISOString()
+            })
+            .eq('id', submissionId);
+
+          if (error) throw error;
+          
+          setPaymentStatus('paid');
+          toast.success("Paiement effectué avec succès !");
+        } catch (error) {
+          console.error('Error updating payment status:', error);
+          toast.error("Erreur lors de la mise à jour du statut de paiement");
+        }
+      } else if (success === 'false') {
+        toast.error("Le paiement a été annulé.");
+      }
+    };
+
+    if (submissionId) {
+      checkPaymentStatus();
     }
-  }, [searchParams]);
-
-  const updatePaymentStatus = async (sessionId: string) => {
-    if (!submissionId) return;
-
-    try {
-      const { error } = await supabase
-        .from('label_submissions')
-        .update({ 
-          payment_status: 'paid',
-          payment_id: sessionId,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', submissionId);
-
-      if (error) throw error;
-      setPaymentStatus('paid');
-    } catch (error) {
-      console.error('Error updating payment status:', error);
-      toast.error("Erreur lors de la mise à jour du statut de paiement");
-    }
-  };
+  }, [searchParams, submissionId]);
 
   useEffect(() => {
     const getSubmissionDetails = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session?.user) {
-        const { data } = await supabase
-          .from('label_submissions')
-          .select('id, first_name, status, payment_status')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        
-        if (data?.first_name) {
-          setFirstName(data.first_name);
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user) {
+          const { data, error } = await supabase
+            .from('label_submissions')
+            .select('id, first_name, status, payment_status')
+            .eq('user_id', session.user.id)
+            .maybeSingle();
+          
+          if (error) throw error;
+
+          if (data) {
+            setFirstName(data.first_name || '');
+            setSubmissionId(data.id);
+            setHasSubmittedForm(data.status !== 'draft');
+            setPaymentStatus(data.payment_status);
+          }
         }
-        if (data?.id) {
-          setSubmissionId(data.id);
-        }
-        if (data?.status && data.status !== 'draft') {
-          setHasSubmittedForm(true);
-        }
-        if (data?.payment_status) {
-          setPaymentStatus(data.payment_status);
-        }
+      } catch (error) {
+        console.error('Error fetching submission details:', error);
+        toast.error("Erreur lors du chargement de vos informations");
       }
     };
+
     getSubmissionDetails();
   }, []);
 
@@ -90,17 +92,11 @@ const Dashboard = () => {
         body: { submissionId }
       });
 
-      if (error) {
-        throw error;
-      }
-
-      if (!data?.url) {
-        throw new Error('URL de paiement non reçue');
-      }
+      if (error) throw error;
+      if (!data?.url) throw new Error('URL de paiement non reçue');
 
       window.location.href = data.url;
-      
-    } catch (error: any) {
+    } catch (error) {
       console.error('Payment error:', error);
       toast.error("Une erreur est survenue lors de la redirection vers le paiement");
     } finally {
