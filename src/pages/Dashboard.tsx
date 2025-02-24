@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,7 +32,6 @@ const Dashboard = () => {
         if (data?.id) {
           setSubmissionId(data.id);
         }
-        // Check if form is submitted based on status
         if (data?.status && data.status !== 'draft') {
           setHasSubmittedForm(true);
         }
@@ -59,22 +57,18 @@ const Dashboard = () => {
         return;
       }
 
-      const response = await fetch(
-        `${window.location.origin}/functions/create-checkout-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ submissionId }),
-        }
-      );
+      const response = await supabase.functions.invoke('create-checkout-session', {
+        body: { submissionId },
+      });
 
-      const { url, error } = await response.json();
+      if (response.error) {
+        throw new Error(response.error.message);
+      }
+
+      const { data: { url } } = response;
       
-      if (error) {
-        throw new Error(error);
+      if (!url) {
+        throw new Error("No checkout URL returned");
       }
 
       // Redirect to Stripe Checkout
