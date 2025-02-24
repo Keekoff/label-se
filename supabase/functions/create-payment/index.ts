@@ -1,12 +1,17 @@
 
-// Follow Deno and Stripe best practices
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { Stripe } from 'https://esm.sh/stripe@12.18.0?target=deno'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
+import Stripe from 'https://esm.sh/stripe@12.18.0'
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
   apiVersion: '2023-10-16',
   httpClient: Stripe.createFetchHttpClient(),
 })
+
+const supabaseClient = createClient(
+  Deno.env.get('SUPABASE_URL') || '',
+  Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
+)
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -14,7 +19,6 @@ const corsHeaders = {
 }
 
 serve(async (req: Request) => {
-  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
@@ -26,13 +30,37 @@ serve(async (req: Request) => {
       throw new Error('Missing submissionId')
     }
 
-    console.log('Creating checkout session for submission:', submissionId)
+    // Check if user already has a valid payment for this year
+    const { data: submission, error: submissionError } = await supabaseClient
+      .from('label_submissions')
+      .select('*')
+      .eq('id', submissionId)
+      .single()
 
+    if (submissionError || !submission) {
+      throw new Error('Submission not found')
+    }
+
+    const currentYear = new Date().getFullYear()
+    const { data: existingPayment } = await supabaseClient
+      .from('label_submissions')
+      .select('*')
+      .eq('user_id', submission.user_id)
+      .eq('payment_status', 'paid')
+      .gte('updated_at', `${currentYear}-01-01`)
+      .lte('updated_at', `${currentYear}-12-31`)
+      .maybeSingle()
+
+    if (existingPayment) {
+      throw new Error('Un paiement a déjà été effectué cette année')
+    }
+
+    // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
-      success_url: `${Deno.env.get('SITE_URL') || 'https://startup-engagee.vercel.app'}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${Deno.env.get('SITE_URL') || 'https://startup-engagee.vercel.app'}/dashboard?canceled=true`,
+      success_url: `${Deno.env.get('SITE_URL')}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${Deno.env.get('SITE_URL')}/dashboard?canceled=true`,
       client_reference_id: submissionId,
       line_items: [
         {
@@ -42,14 +70,20 @@ serve(async (req: Request) => {
               name: 'Label Startup Engagée',
               description: 'Processus de labellisation Startup Engagée',
             },
-            unit_amount: 49900, // 499.00 EUR
+            unit_amount: 49900,
           },
           quantity: 1,
         },
       ],
+      metadata: {
+        submission_id: submissionId,
+        user_id: submission.user_id,
+      },
     })
 
-    console.log('Checkout session created:', session.id)
+    if (!session.url) {
+      throw new Error('Failed to create checkout session')
+    }
 
     return new Response(
       JSON.stringify({ url: session.url }),
@@ -58,16 +92,14 @@ serve(async (req: Request) => {
           ...corsHeaders,
           'Content-Type': 'application/json',
         },
-        status: 200,
       }
     )
   } catch (error) {
-    console.error('Error creating checkout session:', error)
+    const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred'
+    console.error('Error:', errorMessage)
     
     return new Response(
-      JSON.stringify({ 
-        error: error instanceof Error ? error.message : 'An unknown error occurred' 
-      }),
+      JSON.stringify({ error: errorMessage }),
       { 
         headers: { 
           ...corsHeaders,
