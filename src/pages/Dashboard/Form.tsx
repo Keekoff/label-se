@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import StepProgress from "@/components/form/StepProgress";
 import FormDisclaimer from "@/components/form/steps/FormDisclaimer";
@@ -51,7 +52,6 @@ const Form = () => {
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
-    console.log(`Updating step ${stepId} validity to:`, isValid);
     setStepsValidity(prev => 
       prev.map(step => 
         step.id === stepId ? { ...step, isValid } : step
@@ -101,16 +101,40 @@ const Form = () => {
 
   const handleSubmit = async () => {
     try {
+      // Save all form data
+      const finalSubmissionData = {
+        ...formState,
+        status: 'submitted',
+        current_step: 6 // Set to final step
+      };
+
       if (submissionId) {
         const { error } = await supabase
           .from('label_submissions')
-          .update({ status: 'submitted' })
+          .update(finalSubmissionData)
           .eq('id', submissionId);
 
         if (error) throw error;
 
-        setShowSubmissionModal(true);
+        // Move to the thank you step
+        setCurrentStep(6);
+        window.scrollTo(0, 0);
+      } else {
+        // If no submission exists yet, create one
+        const { error } = await supabase
+          .from('label_submissions')
+          .insert([finalSubmissionData]);
+
+        if (error) throw error;
+        
+        setCurrentStep(6);
+        window.scrollTo(0, 0);
       }
+
+      toast({
+        title: "Formulaire envoyé",
+        description: "Votre demande a été enregistrée avec succès.",
+      });
     } catch (error) {
       console.error('Error submitting form:', error);
       toast({
@@ -119,14 +143,6 @@ const Form = () => {
         variant: "destructive"
       });
     }
-  };
-
-  const handlePay = () => {
-    toast({
-      title: "Redirection vers le paiement",
-      description: "Vous allez être redirigé vers la page de paiement.",
-    });
-    // Here you would implement the actual payment logic
   };
 
   const renderNextButton = (currentStep: number) => {
@@ -250,7 +266,10 @@ const Form = () => {
       <SubmissionModal 
         open={showSubmissionModal}
         onOpenChange={setShowSubmissionModal}
-        onPaymentClick={handlePay}
+        onPaymentClick={() => {
+          // Payment logic will be implemented here
+          console.log("Redirecting to payment...");
+        }}
       />
     </div>
   );
