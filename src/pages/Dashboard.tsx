@@ -17,9 +17,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const getSubmissionDetails = async () => {
-      const {
-        data: { session }
-      } = await supabase.auth.getSession();
+      const { data: { session } } = await supabase.auth.getSession();
       if (session?.user) {
         const { data } = await supabase
           .from('label_submissions')
@@ -48,30 +46,23 @@ const Dashboard = () => {
     try {
       setIsLoading(true);
       
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) {
-        toast.error("Veuillez vous connecter pour continuer");
-        navigate("/login");
-        return;
-      }
-
       if (!submissionId) {
         toast.error("Une erreur est survenue: ID de soumission manquant");
         return;
       }
 
-      console.log('Creating checkout session for submission:', submissionId);
-      
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: { submissionId }
       });
 
-      if (error || !data?.url) {
-        console.error('Error:', error);
-        throw new Error(error?.message || 'URL de paiement non reçue');
+      if (error) {
+        throw error;
       }
 
-      console.log('Redirecting to:', data.url);
+      if (!data?.url) {
+        throw new Error('URL de paiement non reçue');
+      }
+
       window.location.href = data.url;
       
     } catch (error: any) {
