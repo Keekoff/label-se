@@ -97,6 +97,8 @@ export type Database = {
           has_funding: string | null
           id: string
           legal_form: string | null
+          payment_id: string | null
+          payment_status: string | null
           postal_code: string | null
           production: string[] | null
           responsible_digital: string[] | null
@@ -131,6 +133,8 @@ export type Database = {
           has_funding?: string | null
           id?: string
           legal_form?: string | null
+          payment_id?: string | null
+          payment_status?: string | null
           postal_code?: string | null
           production?: string[] | null
           responsible_digital?: string[] | null
@@ -165,6 +169,8 @@ export type Database = {
           has_funding?: string | null
           id?: string
           legal_form?: string | null
+          payment_id?: string | null
+          payment_status?: string | null
           postal_code?: string | null
           production?: string[] | null
           responsible_digital?: string[] | null

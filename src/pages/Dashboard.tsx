@@ -11,16 +11,17 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [hasSubmittedForm, setHasSubmittedForm] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
 
   useEffect(() => {
-    const getFirstName = async () => {
+    const getSubmissionDetails = async () => {
       const {
         data: { session }
       } = await supabase.auth.getSession();
       if (session?.user) {
         const { data } = await supabase
           .from('label_submissions')
-          .select('first_name, status')
+          .select('first_name, status, payment_status')
           .eq('user_id', session.user.id)
           .maybeSingle();
         
@@ -31,9 +32,12 @@ const Dashboard = () => {
         if (data?.status && data.status !== 'draft') {
           setHasSubmittedForm(true);
         }
+        if (data?.payment_status) {
+          setPaymentStatus(data.payment_status);
+        }
       }
     };
-    getFirstName();
+    getSubmissionDetails();
   }, []);
 
   if (hasSubmittedForm) {
@@ -46,18 +50,22 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Main Container */}
         <Card className="border-none shadow-md bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl transition-all duration-200 hover:shadow-xl hover:scale-[1.01]">
           <CardContent className="p-6">
             <div className="space-y-6">
               <p className="text-lg">
-                Bravo, nous avons bien reçu votre formulaire de labellisation. Merci de procéder au paiement pour accéder aux pièces justificatives à nous envoyer, nécessaire à la validation de votre dossier.
+                Bravo, nous avons bien reçu votre formulaire de labellisation. 
+                {paymentStatus === 'unpaid' ? 
+                  "Merci de procéder au paiement pour accéder aux pièces justificatives à nous envoyer, nécessaire à la validation de votre dossier." : 
+                  "Vous pouvez maintenant accéder aux pièces justificatives nécessaires à la validation de votre dossier."}
               </p>
               <div className="flex gap-4">
-                <Button onClick={() => {}} className="bg-primary hover:bg-primary-hover">
-                  <CreditCard className="mr-2 h-4 w-4" />
-                  Payer maintenant
-                </Button>
+                {paymentStatus === 'unpaid' && (
+                  <Button onClick={() => {}} className="bg-primary hover:bg-primary-hover">
+                    <CreditCard className="mr-2 h-4 w-4" />
+                    Payer maintenant
+                  </Button>
+                )}
                 <Button variant="outline" onClick={() => {}}>
                   <Upload className="mr-2 h-4 w-4" />
                   Envoyer mes justificatifs

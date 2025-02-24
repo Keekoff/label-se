@@ -1,6 +1,7 @@
+
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut } from "lucide-react";
+import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +17,10 @@ const DashboardLayout = () => {
     icon: LayoutDashboard,
     label: "Tableau de bord",
     path: "/dashboard"
+  }, {
+    icon: Receipt,
+    label: "Mes paiements",
+    path: "/dashboard/payments"
   }, {
     icon: Settings,
     label: "Paramètres",
@@ -73,7 +78,6 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Sidebar */}
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
           <span className="text-slate-50 text-base font-bold">
@@ -105,7 +109,6 @@ const DashboardLayout = () => {
         </nav>
       </div>
 
-      {/* Main content */}
       <div className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         <header className="h-16 border-b border-border bg-white/80 backdrop-blur-sm fixed top-0 right-0 left-auto w-full z-20">
           <div className="flex items-center justify-end h-full px-6">
