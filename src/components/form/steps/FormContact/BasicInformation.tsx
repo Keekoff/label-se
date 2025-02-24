@@ -30,7 +30,10 @@ const BasicInformation = ({ formState, setFormState, onValidityChange }: BasicIn
   }, [formState]);
 
   const handleChange = (field: string, value: string) => {
-    setFormState({ ...formState, [field]: value });
+    setFormState((prev: Record<string, any>) => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   return (

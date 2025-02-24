@@ -21,13 +21,6 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
     onValidityChange(isBasicValid && isAddressValid && isDetailsValid && isMetricsValid);
   }, [isBasicValid, isAddressValid, isDetailsValid, isMetricsValid, onValidityChange]);
 
-  const updateFormField = (field: string, value: any) => {
-    setFormState((prev: Record<string, any>) => ({
-      ...prev,
-      [field]: value
-    }));
-  };
-
   return (
     <div className="space-y-8">
       <div>
@@ -41,23 +34,23 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
 
       <div className="space-y-6">
         <BasicInformation
-          form={formState}
-          updateForm={updateFormField}
+          formState={formState}
+          setFormState={setFormState}
           onValidityChange={setIsBasicValid}
         />
         <AddressInformation
-          form={formState}
-          updateForm={updateFormField}
+          formState={formState}
+          setFormState={setFormState}
           onValidityChange={setIsAddressValid}
         />
         <CompanyDetails
-          form={formState}
-          updateForm={updateFormField}
+          formState={formState}
+          setFormState={setFormState}
           onValidityChange={setIsDetailsValid}
         />
         <CompanyMetrics
-          form={formState}
-          updateForm={updateFormField}
+          formState={formState}
+          setFormState={setFormState}
           onValidityChange={setIsMetricsValid}
         />
       </div>
