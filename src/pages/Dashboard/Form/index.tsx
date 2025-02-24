@@ -19,7 +19,11 @@ const Form = () => {
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(FORM_STEPS);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
 
-  const { handleSave, handleSubmit } = useFormSubmission(formState, setCurrentStep);
+  const { submissionId, handleSave, handleSubmit } = useFormSubmission(
+    formState, 
+    setCurrentStep, 
+    () => setShowSubmissionModal(true)
+  );
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
     setStepsValidity(prev => 
@@ -111,9 +115,7 @@ const Form = () => {
       <SubmissionModal 
         open={showSubmissionModal}
         onOpenChange={setShowSubmissionModal}
-        onPaymentClick={() => {
-          console.log("Redirecting to payment...");
-        }}
+        submissionId={submissionId}
       />
     </div>
   );
