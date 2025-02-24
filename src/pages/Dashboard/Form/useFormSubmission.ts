@@ -59,6 +59,7 @@ export const useFormSubmission = (
       };
 
       if (submissionId) {
+        // Update existing submission
         const { error } = await supabase
           .from('label_submissions')
           .update(finalSubmissionData)
@@ -66,13 +67,18 @@ export const useFormSubmission = (
 
         if (error) throw error;
       } else {
-        const { error } = await supabase
+        // Create new submission
+        const { data, error } = await supabase
           .from('label_submissions')
-          .insert([finalSubmissionData]);
+          .insert([finalSubmissionData])
+          .select('id')
+          .single();
 
         if (error) throw error;
+        setSubmissionId(data.id);
       }
 
+      // Only move to next step if the submission was successful
       setCurrentStep(6);
       window.scrollTo(0, 0);
 
@@ -80,7 +86,7 @@ export const useFormSubmission = (
         title: "Formulaire envoyé",
         description: "Votre demande a été enregistrée avec succès.",
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error);
       toast({
         title: "Erreur",
