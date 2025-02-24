@@ -15,7 +15,7 @@ const DashboardLayout = () => {
   const location = useLocation();
 
   useEffect(() => {
-    const checkEligibility = async () => {
+    const checkAuth = async () => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
@@ -61,7 +61,16 @@ const DashboardLayout = () => {
       }
     };
 
-    checkEligibility();
+    checkAuth();
+
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        navigate('/login');
+      }
+    });
+
+    return () => subscription.unsubscribe();
   }, [navigate, location.pathname]);
 
   const baseMenuItems = [{
