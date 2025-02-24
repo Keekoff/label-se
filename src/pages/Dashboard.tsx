@@ -23,20 +23,23 @@ const Dashboard = () => {
 
     if (success === 'true' && sessionId) {
       toast.success("Paiement effectué avec succès !");
-      // Update payment status in database
-      updatePaymentStatus();
+      updatePaymentStatus(sessionId);
     } else if (success === 'false') {
       toast.error("Le paiement a été annulé.");
     }
   }, [searchParams]);
 
-  const updatePaymentStatus = async () => {
+  const updatePaymentStatus = async (sessionId: string) => {
     if (!submissionId) return;
 
     try {
       const { error } = await supabase
         .from('label_submissions')
-        .update({ payment_status: 'paid' })
+        .update({ 
+          payment_status: 'paid',
+          payment_id: sessionId,
+          updated_at: new Date().toISOString()
+        })
         .eq('id', submissionId);
 
       if (error) throw error;
@@ -135,9 +138,9 @@ const Dashboard = () => {
                     {isLoading ? 'Chargement...' : 'Payer maintenant'}
                   </Button>
                 )}
-                <Button variant="outline" onClick={() => {}}>
+                <Button variant="outline" onClick={() => navigate('/dashboard/payments')}>
                   <Upload className="mr-2 h-4 w-4" />
-                  Envoyer mes justificatifs
+                  {paymentStatus === 'paid' ? 'Voir mes paiements' : 'Envoyer mes justificatifs'}
                 </Button>
               </div>
             </div>

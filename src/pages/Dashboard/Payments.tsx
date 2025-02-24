@@ -1,37 +1,53 @@
 
 import { useEffect, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
 import { FileText, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 interface Payment {
   id: string;
   created_at: string;
   payment_id: string;
   company_name: string;
-  amount: number;
+  payment_status: string;
 }
 
 const Payments = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchPayments = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) return;
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          toast.error("Vous devez être connecté pour accéder à cette page");
+          return;
+        }
 
-      const { data, error } = await supabase
-        .from('label_submissions')
-        .select('id, created_at, payment_id, company_name')
-        .eq('user_id', session.user.id)
-        .eq('payment_status', 'paid')
-        .order('created_at', { ascending: false });
+        const { data, error } = await supabase
+          .from('label_submissions')
+          .select('id, created_at, payment_id, company_name, payment_status')
+          .eq('user_id', session.user.id)
+          .eq('payment_status', 'paid')
+          .order('created_at', { ascending: false });
 
-      if (!error && data) {
-        setPayments(data as Payment[]);
+        if (error) {
+          throw error;
+        }
+
+        if (data) {
+          setPayments(data as Payment[]);
+        }
+      } catch (error) {
+        console.error('Error fetching payments:', error);
+        toast.error("Une erreur est survenue lors du chargement des paiements");
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -39,9 +55,16 @@ const Payments = () => {
   }, []);
 
   const downloadInvoice = async (paymentId: string) => {
-    // TODO: Implement invoice download from Stripe
-    console.log("Téléchargement de la facture:", paymentId);
+    toast.info("La fonctionnalité de téléchargement sera bientôt disponible");
   };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[200px]">
+        <p>Chargement...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -58,9 +81,12 @@ const Payments = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold">{payment.company_name}</h3>
+                  <h3 className="font-semibold">{payment.company_name || 'Label Startup Engagée'}</h3>
                   <p className="text-sm text-gray-500">
                     {format(new Date(payment.created_at), "dd MMMM yyyy", { locale: fr })}
+                  </p>
+                  <p className="text-sm text-gray-500 mt-1">
+                    ID de paiement: {payment.payment_id}
                   </p>
                 </div>
                 <div className="flex gap-2">
