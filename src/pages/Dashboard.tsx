@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -48,6 +47,7 @@ const Dashboard = () => {
   const handlePayment = async () => {
     try {
       setIsLoading(true);
+      
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) {
         toast.error("Veuillez vous connecter pour continuer");
@@ -61,23 +61,20 @@ const Dashboard = () => {
       }
 
       console.log('Creating checkout session for submission:', submissionId);
-
+      
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
         body: { submissionId }
       });
 
-      if (error) {
-        console.error('Stripe checkout error:', error);
-        throw error;
+      if (error || !data?.url) {
+        console.error('Error:', error);
+        throw new Error(error?.message || 'URL de paiement non reçue');
       }
 
-      if (!data?.url) {
-        throw new Error('URL de paiement non reçue');
-      }
-
-      console.log('Redirecting to checkout URL:', data.url);
+      console.log('Redirecting to:', data.url);
       window.location.href = data.url;
-    } catch (error) {
+      
+    } catch (error: any) {
       console.error('Payment error:', error);
       toast.error("Une erreur est survenue lors de la redirection vers le paiement");
     } finally {
@@ -101,8 +98,8 @@ const Dashboard = () => {
               <p className="text-lg">
                 Bravo, nous avons bien reçu votre formulaire de labellisation. 
                 {paymentStatus === 'unpaid' ? 
-                  "Merci de procéder au paiement pour accéder aux pièces justificatives à nous envoyer, nécessaire à la validation de votre dossier." : 
-                  "Vous pouvez maintenant accéder aux pièces justificatives nécessaires à la validation de votre dossier."}
+                  " Merci de procéder au paiement pour accéder aux pièces justificatives à nous envoyer, nécessaire à la validation de votre dossier." : 
+                  " Vous pouvez maintenant accéder aux pièces justificatives nécessaires à la validation de votre dossier."}
               </p>
               <div className="flex gap-4">
                 {paymentStatus === 'unpaid' && (
@@ -124,7 +121,6 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Graph Boxes */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
             <h3 className="text-lg font-semibold mb-4">Impact Environnemental</h3>
