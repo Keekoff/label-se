@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
@@ -16,7 +15,6 @@ const Dashboard = () => {
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [isUpdatingPayment, setIsUpdatingPayment] = useState(false);
 
   const getSubmissionDetails = async () => {
     try {
@@ -48,7 +46,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     getSubmissionDetails();
-  }, [navigate]);
+  }, []);
 
   useEffect(() => {
     const checkPaymentStatus = async () => {
@@ -57,32 +55,26 @@ const Dashboard = () => {
       const submissionIdFromUrl = searchParams.get('submission_id');
 
       if (success === 'true' && sessionId && submissionIdFromUrl) {
-        setIsUpdatingPayment(true);
         try {
           const { error } = await supabase
             .from('label_submissions')
             .update({ 
               payment_status: 'paid',
               payment_id: sessionId,
-              updated_at: new Date().toISOString()
             })
             .eq('id', submissionIdFromUrl);
 
           if (error) throw error;
           
-          setPaymentStatus('paid');
           toast.success("Paiement effectué avec succès !");
+          setPaymentStatus('paid');
           
-          // Clear URL parameters
+          // Clean URL and refresh data
           navigate('/dashboard', { replace: true });
-          
-          // Refresh submission data
-          await getSubmissionDetails();
+          getSubmissionDetails();
         } catch (error) {
           console.error('Error updating payment status:', error);
           toast.error("Erreur lors de la mise à jour du statut de paiement");
-        } finally {
-          setIsUpdatingPayment(false);
         }
       } else if (success === 'false') {
         toast.error("Le paiement a été annulé.");
@@ -91,7 +83,7 @@ const Dashboard = () => {
     };
 
     checkPaymentStatus();
-  }, [searchParams, navigate]);
+  }, [searchParams]);
 
   const handlePayment = async () => {
     try {
@@ -109,10 +101,13 @@ const Dashboard = () => {
       if (error) throw error;
       if (!data?.url) throw new Error('URL de paiement non reçue');
 
+      // Update local state before redirect
+      setPaymentStatus('pending');
       window.location.href = data.url;
     } catch (error) {
       console.error('Payment error:', error);
       toast.error("Une erreur est survenue lors de la redirection vers le paiement");
+      setPaymentStatus('unpaid');
     } finally {
       setIsLoading(false);
     }
@@ -138,7 +133,7 @@ const Dashboard = () => {
                   " Vous pouvez maintenant accéder aux pièces justificatives nécessaires à la validation de votre dossier."}
               </p>
               <div className="flex gap-4">
-                {(paymentStatus === 'unpaid' || paymentStatus === 'pending') && !isUpdatingPayment && (
+                {paymentStatus === 'unpaid' && (
                   <Button 
                     onClick={handlePayment} 
                     className="bg-primary hover:bg-primary-hover"
