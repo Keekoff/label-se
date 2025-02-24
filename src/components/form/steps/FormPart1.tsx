@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -138,19 +137,19 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
 
   const toggleAnswer = (questionId: string, value: string) => {
     const currentAnswers = answers[questionId] || [];
-    const newAnswers = currentAnswers.includes(value)
-      ? currentAnswers.filter(v => v !== value)
-      : [...currentAnswers, value];
+    let newAnswers: string[];
+
+    if (value.includes("Non applicable")) {
+      newAnswers = currentAnswers.includes(value) ? [] : [value];
+    } else {
+      newAnswers = currentAnswers.includes(value)
+        ? currentAnswers.filter(v => v !== value)
+        : [...currentAnswers.filter(v => !v.includes("Non applicable")), value];
+    }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
     setFormState({ ...formState, ...updatedAnswers });
-    
-    // Add logging to debug validation
-    console.log('Updated answers:', updatedAnswers);
-    const isValid = Object.values(updatedAnswers).every(answer => answer.length > 0);
-    console.log('Form valid:', isValid);
-    onValidityChange(isValid);
   };
 
   useEffect(() => {
@@ -172,7 +171,10 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
         {QUESTIONS.map((question) => (
           <div key={question.id} className="space-y-4 pb-6 border-b last:border-0">
             <div>
-              <h3 className="text-lg font-medium">{question.title}</h3>
+              <h3 className="text-lg font-medium flex items-start gap-1">
+                {question.title}
+                <span className="text-red-500">*</span>
+              </h3>
               <p className="text-gray-600 mt-1 text-sm">{question.description}</p>
             </div>
 

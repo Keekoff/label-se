@@ -129,6 +129,39 @@ const Form = () => {
     // Here you would implement the actual payment logic
   };
 
+  const renderNextButton = (currentStep: number) => {
+    if (currentStep === 5) { // Partie 3
+      return (
+        <Button
+          onClick={handleSubmit}
+          className="flex items-center gap-2 bg-primary"
+        >
+          Envoyer ma demande
+        </Button>
+      );
+    }
+    
+    if (currentStep === 6) { // Remerciement
+      return null;
+    }
+
+    return (
+      <Button
+        onClick={() => {
+          if (currentStep < steps.length) {
+            setCurrentStep(prev => prev + 1);
+            window.scrollTo(0, 0);
+          }
+        }}
+        disabled={currentStep === 1 && !formState.disclaimerAccepted}
+        className="flex items-center gap-2"
+      >
+        Suivant
+        <ArrowRight className="w-4 h-4" />
+      </Button>
+    );
+  };
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="bg-white rounded-lg shadow-sm">
@@ -208,28 +241,7 @@ const Form = () => {
                   Sauvegarder
                 </Button>
               )}
-              {currentStep === steps.length ? (
-                <Button
-                  onClick={handleSubmit}
-                  className="flex items-center gap-2 bg-primary"
-                >
-                  Envoyer ma demande
-                </Button>
-              ) : (
-                <Button
-                  onClick={() => {
-                    if (currentStep < steps.length) {
-                      setCurrentStep(prev => prev + 1);
-                      window.scrollTo(0, 0);
-                    }
-                  }}
-                  disabled={currentStep === 1 && !formState.disclaimerAccepted}
-                  className="flex items-center gap-2"
-                >
-                  Suivant
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              )}
+              {renderNextButton(currentStep)}
             </div>
           </div>
         </div>

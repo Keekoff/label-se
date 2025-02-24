@@ -114,19 +114,22 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
 
   const toggleAnswer = (questionId: string, value: string) => {
     const currentAnswers = answers[questionId] || [];
-    const newAnswers = currentAnswers.includes(value)
-      ? currentAnswers.filter(v => v !== value)
-      : [...currentAnswers, value];
+    let newAnswers: string[];
+
+    // Handle "Non applicable" option
+    if (value.includes("Non applicable")) {
+      newAnswers = currentAnswers.includes(value) ? [] : [value];
+    } else {
+      // If selecting a regular option, remove "Non applicable" if present
+      newAnswers = currentAnswers.includes(value)
+        ? currentAnswers.filter(v => v !== value)
+        : [...currentAnswers.filter(v => !v.includes("Non applicable")), value];
+    }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
     setFormState({ ...formState, ...updatedAnswers });
   };
-
-  useEffect(() => {
-    const isValid = Object.values(answers).every(answer => answer.length > 0);
-    onValidityChange(isValid);
-  }, [answers]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -141,7 +144,10 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
         {QUESTIONS.map((question) => (
           <div key={question.id} className="space-y-4 pb-6 border-b last:border-0">
             <div>
-              <h3 className="text-lg font-medium">{question.title}</h3>
+              <h3 className="text-lg font-medium flex items-start gap-1">
+                {question.title}
+                <span className="text-red-500">*</span>
+              </h3>
               <p className="text-gray-600 mt-1 text-sm">{question.description}</p>
             </div>
 

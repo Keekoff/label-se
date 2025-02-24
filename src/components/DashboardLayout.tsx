@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut } from "lucide-react";
@@ -80,7 +79,12 @@ const DashboardLayout = () => {
           <span className="text-slate-50 text-base font-bold">
             {sidebarOpen ? "Startup Engagée" : "SE"}
           </span>
-          <Button variant="ghost" size="icon" onClick={() => setSidebarOpen(!sidebarOpen)} className="hover:bg-white/10 text-white">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => setSidebarOpen(!sidebarOpen)} 
+            className="hover:bg-white/10 text-white bg-white/0"
+          >
             {sidebarOpen ? <ArrowLeft className="h-4 w-4" /> : <ArrowRight className="h-4 w-4" />}
           </Button>
         </div>
