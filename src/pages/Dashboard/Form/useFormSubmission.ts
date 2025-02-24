@@ -11,8 +11,16 @@ export const useFormSubmission = (
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const { toast } = useToast();
 
-  const formatSubmissionData = (data: FormState, status: 'draft' | 'submitted') => {
+  const formatSubmissionData = async (data: FormState, status: 'draft' | 'submitted') => {
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      throw new Error("User must be authenticated to submit form");
+    }
+
     return {
+      user_id: user.id, // Add user_id to link submission to user
       first_name: data.firstName,
       email: data.email,
       company_name: data.companyName,
@@ -28,7 +36,6 @@ export const useFormSubmission = (
       status: status,
       current_step: status === 'submitted' ? 6 : data.currentStep,
       disclaimer_accepted: data.disclaimerAccepted,
-      // Add any other form fields that match the table schema
       associative_contribution: data.associativeContribution || [],
       responsible_digital: data.responsibleDigital || [],
       communication: data.communication || [],
@@ -47,7 +54,7 @@ export const useFormSubmission = (
 
   const handleSave = async () => {
     try {
-      const submissionData = formatSubmissionData(formState, 'draft');
+      const submissionData = await formatSubmissionData(formState, 'draft');
 
       if (submissionId) {
         const { error } = await supabase
@@ -83,7 +90,7 @@ export const useFormSubmission = (
 
   const handleSubmit = async () => {
     try {
-      const submissionData = formatSubmissionData(formState, 'submitted');
+      const submissionData = await formatSubmissionData(formState, 'submitted');
 
       if (submissionId) {
         const { error } = await supabase
