@@ -146,9 +146,12 @@ const Dashboard = () => {
                     {isLoading ? 'Chargement...' : 'Payer maintenant'}
                   </Button>
                 )}
-                <Button variant="outline" onClick={() => navigate('/dashboard/payments')}>
+                <Button 
+                  variant="outline" 
+                  onClick={() => navigate(paymentStatus === 'paid' ? '/dashboard/justificatifs' : '/dashboard/payments')}
+                >
                   <Upload className="mr-2 h-4 w-4" />
-                  {paymentStatus === 'paid' ? 'Voir mes paiements' : 'Envoyer mes justificatifs'}
+                  {paymentStatus === 'paid' ? 'Ajouter mes justificatifs' : 'Envoyer mes justificatifs'}
                 </Button>
               </div>
             </div>

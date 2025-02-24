@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt } from "lucide-react";
+import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt, Upload } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
@@ -76,6 +76,11 @@ const DashboardLayout = () => {
 
   const menuItems = hasPaid ? [
     ...baseMenuItems.slice(0, 1),
+    {
+      icon: Upload,
+      label: "Justificatifs",
+      path: "/dashboard/justificatifs"
+    },
     {
       icon: Receipt,
       label: "Mes paiements",
