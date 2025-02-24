@@ -7,19 +7,19 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { SECTORS, LEGAL_FORMS } from './constants';
 
 interface CompanyDetailsProps {
-  form: Record<string, any>;
-  updateForm: (field: string, value: any) => void;
+  formState: Record<string, any>;
+  setFormState: (state: Record<string, any>) => void;
   onValidityChange: (isValid: boolean) => void;
 }
 
-const CompanyDetails = ({ form, updateForm, onValidityChange }: CompanyDetailsProps) => {
+const CompanyDetails = ({ formState, setFormState, onValidityChange }: CompanyDetailsProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form?.companyName?.trim()) newErrors.companyName = "Le nom de la société est requis";
-    if (!form?.sectors?.length) newErrors.sectors = "Au moins un secteur est requis";
-    if (!form?.legalForm) newErrors.legalForm = "La forme juridique est requise";
+    if (!formState?.companyName?.trim()) newErrors.companyName = "Le nom de la société est requis";
+    if (!formState?.sectors?.length) newErrors.sectors = "Au moins un secteur est requis";
+    if (!formState?.legalForm) newErrors.legalForm = "La forme juridique est requise";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -28,14 +28,21 @@ const CompanyDetails = ({ form, updateForm, onValidityChange }: CompanyDetailsPr
   useEffect(() => {
     const isValid = validate();
     onValidityChange(isValid);
-  }, [form]);
+  }, [formState]);
+
+  const handleChange = (field: string, value: any) => {
+    setFormState((prev: Record<string, any>) => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   const toggleSector = (sector: string) => {
-    const currentSectors = form?.sectors || [];
+    const currentSectors = formState?.sectors || [];
     const newSectors = currentSectors.includes(sector)
       ? currentSectors.filter((s: string) => s !== sector)
       : [...currentSectors, sector];
-    updateForm('sectors', newSectors);
+    handleChange('sectors', newSectors);
   };
 
   return (
@@ -49,8 +56,8 @@ const CompanyDetails = ({ form, updateForm, onValidityChange }: CompanyDetailsPr
           </Label>
           <Input
             id="companyName"
-            value={form?.companyName || ""}
-            onChange={(e) => updateForm("companyName", e.target.value)}
+            value={formState?.companyName || ""}
+            onChange={(e) => handleChange("companyName", e.target.value)}
           />
           {errors.companyName && <span className="text-sm text-red-500">{errors.companyName}</span>}
         </div>
@@ -64,7 +71,7 @@ const CompanyDetails = ({ form, updateForm, onValidityChange }: CompanyDetailsPr
               <div key={sector} className="flex items-center space-x-2">
                 <Checkbox
                   id={`sector-${sector}`}
-                  checked={(form?.sectors || []).includes(sector)}
+                  checked={(formState?.sectors || []).includes(sector)}
                   onCheckedChange={() => toggleSector(sector)}
                 />
                 <Label htmlFor={`sector-${sector}`} className="text-sm">
@@ -81,8 +88,8 @@ const CompanyDetails = ({ form, updateForm, onValidityChange }: CompanyDetailsPr
             Quelle est la forme juridique de votre structure ? <span className="text-red-500">*</span>
           </Label>
           <RadioGroup
-            value={form?.legalForm || ""}
-            onValueChange={(value) => updateForm("legalForm", value)}
+            value={formState?.legalForm || ""}
+            onValueChange={(value) => handleChange("legalForm", value)}
           >
             <div className="grid grid-cols-2 gap-3">
               {LEGAL_FORMS.map((formType) => (

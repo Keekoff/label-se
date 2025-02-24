@@ -4,19 +4,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 interface AddressInformationProps {
-  form: Record<string, any>;
-  updateForm: (field: string, value: any) => void;
+  formState: Record<string, any>;
+  setFormState: (state: Record<string, any>) => void;
   onValidityChange: (isValid: boolean) => void;
 }
 
-const AddressInformation = ({ form, updateForm, onValidityChange }: AddressInformationProps) => {
+const AddressInformation = ({ formState, setFormState, onValidityChange }: AddressInformationProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form?.streetAddress?.trim()) newErrors.streetAddress = "L'adresse est requise";
-    if (!form?.postalCode?.trim()) newErrors.postalCode = "Le code postal est requis";
-    if (!form?.city?.trim()) newErrors.city = "La ville est requise";
+    if (!formState?.streetAddress?.trim()) newErrors.streetAddress = "L'adresse est requise";
+    if (!formState?.postalCode?.trim()) newErrors.postalCode = "Le code postal est requis";
+    if (!formState?.city?.trim()) newErrors.city = "La ville est requise";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -25,7 +25,14 @@ const AddressInformation = ({ form, updateForm, onValidityChange }: AddressInfor
   useEffect(() => {
     const isValid = validate();
     onValidityChange(isValid);
-  }, [form]);
+  }, [formState]);
+
+  const handleChange = (field: string, value: string) => {
+    setFormState((prev: Record<string, any>) => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -39,8 +46,8 @@ const AddressInformation = ({ form, updateForm, onValidityChange }: AddressInfor
           <Input
             id="streetAddress"
             placeholder="Numéro et nom de rue"
-            value={form?.streetAddress || ""}
-            onChange={(e) => updateForm("streetAddress", e.target.value)}
+            value={formState?.streetAddress || ""}
+            onChange={(e) => handleChange("streetAddress", e.target.value)}
           />
           {errors.streetAddress && <span className="text-sm text-red-500">{errors.streetAddress}</span>}
         </div>
@@ -52,8 +59,8 @@ const AddressInformation = ({ form, updateForm, onValidityChange }: AddressInfor
             </Label>
             <Input
               id="postalCode"
-              value={form?.postalCode || ""}
-              onChange={(e) => updateForm("postalCode", e.target.value)}
+              value={formState?.postalCode || ""}
+              onChange={(e) => handleChange("postalCode", e.target.value)}
             />
             {errors.postalCode && <span className="text-sm text-red-500">{errors.postalCode}</span>}
           </div>
@@ -64,8 +71,8 @@ const AddressInformation = ({ form, updateForm, onValidityChange }: AddressInfor
             </Label>
             <Input
               id="city"
-              value={form?.city || ""}
-              onChange={(e) => updateForm("city", e.target.value)}
+              value={formState?.city || ""}
+              onChange={(e) => handleChange("city", e.target.value)}
             />
             {errors.city && <span className="text-sm text-red-500">{errors.city}</span>}
           </div>

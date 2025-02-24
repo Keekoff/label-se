@@ -6,20 +6,20 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { EMPLOYEE_COUNTS, FUNDING_OPTIONS } from './constants';
 
 interface CompanyMetricsProps {
-  form: Record<string, any>;
-  updateForm: (field: string, value: any) => void;
+  formState: Record<string, any>;
+  setFormState: (state: Record<string, any>) => void;
   onValidityChange: (isValid: boolean) => void;
 }
 
-const CompanyMetrics = ({ form, updateForm, onValidityChange }: CompanyMetricsProps) => {
+const CompanyMetrics = ({ formState, setFormState, onValidityChange }: CompanyMetricsProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!form?.foundingYear?.trim()) newErrors.foundingYear = "L'année de création est requise";
-    if (!form?.employeeCount) newErrors.employeeCount = "Le nombre de collaborateurs est requis";
-    if (!form?.hasFunding) newErrors.hasFunding = "La réponse est requise";
-    if (form?.hasFunding === "Oui" && !form?.fundingDetails?.trim()) {
+    if (!formState?.foundingYear?.trim()) newErrors.foundingYear = "L'année de création est requise";
+    if (!formState?.employeeCount) newErrors.employeeCount = "Le nombre de collaborateurs est requis";
+    if (!formState?.hasFunding) newErrors.hasFunding = "La réponse est requise";
+    if (formState?.hasFunding === "Oui" && !formState?.fundingDetails?.trim()) {
       newErrors.fundingDetails = "Le montant est requis";
     }
 
@@ -30,7 +30,14 @@ const CompanyMetrics = ({ form, updateForm, onValidityChange }: CompanyMetricsPr
   useEffect(() => {
     const isValid = validate();
     onValidityChange(isValid);
-  }, [form]);
+  }, [formState]);
+
+  const handleChange = (field: string, value: string) => {
+    setFormState((prev: Record<string, any>) => ({
+      ...prev,
+      [field]: value
+    }));
+  };
 
   return (
     <div className="space-y-6">
@@ -43,8 +50,8 @@ const CompanyMetrics = ({ form, updateForm, onValidityChange }: CompanyMetricsPr
           </Label>
           <Input
             id="foundingYear"
-            value={form?.foundingYear || ""}
-            onChange={(e) => updateForm("foundingYear", e.target.value)}
+            value={formState?.foundingYear || ""}
+            onChange={(e) => handleChange("foundingYear", e.target.value)}
           />
           {errors.foundingYear && <span className="text-sm text-red-500">{errors.foundingYear}</span>}
         </div>
@@ -54,8 +61,8 @@ const CompanyMetrics = ({ form, updateForm, onValidityChange }: CompanyMetricsPr
             Quel est le nombre de collaborateurs de votre structure ? <span className="text-red-500">*</span>
           </Label>
           <RadioGroup
-            value={form?.employeeCount || ""}
-            onValueChange={(value) => updateForm("employeeCount", value)}
+            value={formState?.employeeCount || ""}
+            onValueChange={(value) => handleChange("employeeCount", value)}
           >
             <div className="grid gap-3">
               {EMPLOYEE_COUNTS.map((count) => (
@@ -75,8 +82,8 @@ const CompanyMetrics = ({ form, updateForm, onValidityChange }: CompanyMetricsPr
               Avez-vous déjà levé des fonds ? <span className="text-red-500">*</span>
             </Label>
             <RadioGroup
-              value={form?.hasFunding || ""}
-              onValueChange={(value) => updateForm("hasFunding", value)}
+              value={formState?.hasFunding || ""}
+              onValueChange={(value) => handleChange("hasFunding", value)}
             >
               <div className="grid gap-3">
                 {FUNDING_OPTIONS.map((option) => (
@@ -90,7 +97,7 @@ const CompanyMetrics = ({ form, updateForm, onValidityChange }: CompanyMetricsPr
             {errors.hasFunding && <span className="text-sm text-red-500">{errors.hasFunding}</span>}
           </div>
 
-          {form?.hasFunding === "Oui" && (
+          {formState?.hasFunding === "Oui" && (
             <div className="space-y-2">
               <Label htmlFor="fundingDetails">
                 Si oui, pour quel montant ? <span className="text-red-500">*</span>
@@ -98,8 +105,8 @@ const CompanyMetrics = ({ form, updateForm, onValidityChange }: CompanyMetricsPr
               <Input
                 id="fundingDetails"
                 placeholder="Ex: Seed 500k€, Série A 2M€..."
-                value={form?.fundingDetails || ""}
-                onChange={(e) => updateForm("fundingDetails", e.target.value)}
+                value={formState?.fundingDetails || ""}
+                onChange={(e) => handleChange("fundingDetails", e.target.value)}
               />
               {errors.fundingDetails && <span className="text-sm text-red-500">{errors.fundingDetails}</span>}
             </div>
