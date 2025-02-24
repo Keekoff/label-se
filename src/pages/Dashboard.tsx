@@ -6,12 +6,14 @@ import { Button } from "@/components/ui/button";
 import { LineChart, BarChart, PieChart } from "@/components/ui/chart";
 import { supabase } from "@/integrations/supabase/client";
 import { Upload, CreditCard } from "lucide-react";
+import { toast } from "sonner";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [firstName, setFirstName] = useState("");
   const [hasSubmittedForm, setHasSubmittedForm] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<string | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   useEffect(() => {
     const getSubmissionDetails = async () => {
@@ -21,12 +23,15 @@ const Dashboard = () => {
       if (session?.user) {
         const { data } = await supabase
           .from('label_submissions')
-          .select('first_name, status, payment_status')
+          .select('id, first_name, status, payment_status')
           .eq('user_id', session.user.id)
           .maybeSingle();
         
         if (data?.first_name) {
           setFirstName(data.first_name);
+        }
+        if (data?.id) {
+          setSubmissionId(data.id);
         }
         // Check if form is submitted based on status
         if (data?.status && data.status !== 'draft') {
@@ -39,6 +44,46 @@ const Dashboard = () => {
     };
     getSubmissionDetails();
   }, []);
+
+  const handlePayment = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Veuillez vous connecter pour continuer");
+        navigate("/login");
+        return;
+      }
+
+      if (!submissionId) {
+        toast.error("Une erreur est survenue");
+        return;
+      }
+
+      const response = await fetch(
+        `${window.location.origin}/functions/create-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ submissionId }),
+        }
+      );
+
+      const { url, error } = await response.json();
+      
+      if (error) {
+        throw new Error(error);
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = url;
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Une erreur est survenue lors de la redirection vers le paiement");
+    }
+  };
 
   if (hasSubmittedForm) {
     return (
@@ -61,7 +106,7 @@ const Dashboard = () => {
               </p>
               <div className="flex gap-4">
                 {paymentStatus === 'unpaid' && (
-                  <Button onClick={() => {}} className="bg-primary hover:bg-primary-hover">
+                  <Button onClick={handlePayment} className="bg-primary hover:bg-primary-hover">
                     <CreditCard className="mr-2 h-4 w-4" />
                     Payer maintenant
                   </Button>

@@ -1,78 +1,58 @@
 
-import { Toaster } from "@/components/ui/toaster";
-import { Toaster as Sonner } from "@/components/ui/sonner";
-import { TooltipProvider } from "@/components/ui/tooltip";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route, Navigate, useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { supabase } from "@/integrations/supabase/client";
-import Login from "./pages/Login";
-import Signup from "./pages/Signup";
-import DashboardLayout from "./components/DashboardLayout";
-import Dashboard from "./pages/Dashboard";
-import Form from "./pages/Dashboard/Form";
-import NotFound from "./pages/NotFound";
-import EligibilityForm from "./pages/EligibilityForm";
+import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import Index from "@/pages/Index";
+import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
+import NotFound from "@/pages/NotFound";
+import DashboardLayout from "@/components/DashboardLayout";
+import Dashboard from "@/pages/Dashboard";
+import Form from "@/pages/Dashboard/Form";
+import EligibilityForm from "@/pages/EligibilityForm";
+import Payments from "@/pages/Dashboard/Payments";
 
-const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState(null);
-  const navigate = useNavigate();
+const router = createBrowserRouter([
+  {
+    path: "/",
+    element: <Index />,
+  },
+  {
+    path: "/login",
+    element: <Login />,
+  },
+  {
+    path: "/signup",
+    element: <Signup />,
+  },
+  {
+    path: "/dashboard",
+    element: <DashboardLayout />,
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: "form",
+        element: <Form />,
+      },
+      {
+        path: "eligibility",
+        element: <EligibilityForm />,
+      },
+      {
+        path: "payments",
+        element: <Payments />,
+      },
+    ],
+  },
+  {
+    path: "*",
+    element: <NotFound />,
+  },
+]);
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user || null);
-      setLoading(false);
-      if (!session?.user) {
-        navigate("/login");
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user || null);
-      if (!session?.user) {
-        navigate("/login");
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [navigate]);
-
-  if (loading) {
-    return <div className="h-screen w-screen flex items-center justify-center">
-      Chargement...
-    </div>;
-  }
-
-  return user ? <>{children}</> : null;
-};
-
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/dashboard" element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }>
-            <Route index element={<Dashboard />} />
-            <Route path="form" element={<Form />} />
-            <Route path="eligibility" element={<EligibilityForm />} />
-          </Route>
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
-);
+function App() {
+  return <RouterProvider router={router} />;
+}
 
 export default App;

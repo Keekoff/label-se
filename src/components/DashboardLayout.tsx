@@ -10,22 +10,9 @@ import { toast } from "sonner";
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [hasPaid, setHasPaid] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
-  const menuItems = [{
-    icon: LayoutDashboard,
-    label: "Tableau de bord",
-    path: "/dashboard"
-  }, {
-    icon: Receipt,
-    label: "Mes paiements",
-    path: "/dashboard/payments"
-  }, {
-    icon: Settings,
-    label: "Paramètres",
-    path: "/dashboard/settings"
-  }];
 
   useEffect(() => {
     const checkEligibility = async () => {
@@ -36,8 +23,17 @@ const DashboardLayout = () => {
           return;
         }
 
+        // Check payment status
+        const { data: submission } = await supabase
+          .from('label_submissions')
+          .select('payment_status')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+
+        setHasPaid(submission?.payment_status === 'paid');
+
         // Check for eligibility submission
-        const { data: submission, error } = await supabase
+        const { data: eligibilitySubmission, error } = await supabase
           .from('eligibility_submissions')
           .select('legal_form')
           .eq('user_id', session.user.id)
@@ -47,14 +43,12 @@ const DashboardLayout = () => {
           throw error;
         }
 
-        // If no submission exists or if we're already on the eligibility form, don't redirect
-        if (!submission && location.pathname !== '/dashboard/eligibility') {
+        if (!eligibilitySubmission && location.pathname !== '/dashboard/eligibility') {
           navigate('/dashboard/eligibility');
           return;
         }
 
-        // If submission exists but legal form is ineligible, show message and navigate to eligibility
-        if (submission && ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"].includes(submission.legal_form)) {
+        if (eligibilitySubmission && ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"].includes(eligibilitySubmission.legal_form)) {
           navigate('/dashboard/eligibility');
           return;
         }
@@ -69,6 +63,26 @@ const DashboardLayout = () => {
 
     checkEligibility();
   }, [navigate, location.pathname]);
+
+  const baseMenuItems = [{
+    icon: LayoutDashboard,
+    label: "Tableau de bord",
+    path: "/dashboard"
+  }, {
+    icon: Settings,
+    label: "Paramètres",
+    path: "/dashboard/settings"
+  }];
+
+  const menuItems = hasPaid ? [
+    ...baseMenuItems.slice(0, 1),
+    {
+      icon: Receipt,
+      label: "Mes paiements",
+      path: "/dashboard/payments"
+    },
+    ...baseMenuItems.slice(1)
+  ] : baseMenuItems;
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
