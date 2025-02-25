@@ -45,13 +45,12 @@ Deno.serve(async (req) => {
 
     console.log('User ID:', user.id);
 
-    // Get user's submission with company name
+    // Get user's submission with company name - removed status filter
     const { data: submission, error: submissionError } = await supabaseClient
       .from('label_submissions')
       .select('company_name')
       .eq('user_id', user.id)
-      .eq('status', 'submitted')
-      .single();
+      .maybeSingle();
 
     if (submissionError) {
       console.error('Submission error:', submissionError);
@@ -89,17 +88,22 @@ Deno.serve(async (req) => {
     const airtableData = await airtableResponse.json();
     console.log('Total Airtable records:', airtableData.records.length);
     
-    // Filter and map records for user's company
+    // Filter and map records for user's company - adding more debug logs
     const userRecords = airtableData.records
       .filter((record: AirtableRecord) => {
+        // Debug log for each record's Entreprises field
+        console.log(`Record ${record.id} - Entreprises:`, record.fields.Entreprises);
+        
         const hasCompany = Array.isArray(record.fields.Entreprises) && 
-          record.fields.Entreprises.includes(submission.company_name);
+          record.fields.Entreprises.some(company => 
+            company.toLowerCase() === submission.company_name.toLowerCase()
+          );
+        
         console.log(
-          `Record ${record.id}: checking if ${submission.company_name} is in`,
-          record.fields.Entreprises,
-          '->',
+          `Checking if "${submission.company_name}" matches any company in record ${record.id}:`,
           hasCompany
         );
+        
         return hasCompany;
       })
       .map((record: AirtableRecord) => ({
