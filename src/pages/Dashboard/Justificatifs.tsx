@@ -6,6 +6,8 @@ import { Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
+import { AlertCircle } from "lucide-react";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 type Document = {
   id: string;
@@ -19,6 +21,7 @@ type Document = {
 const Justificatifs = () => {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -35,6 +38,12 @@ const Justificatifs = () => {
           },
         });
 
+        if (error?.message === "Company name not found" || error?.message?.includes("incomplete_profile")) {
+          setError("Veuillez d'abord compléter votre formulaire de candidature pour voir les documents à fournir.");
+          setIsLoading(false);
+          return;
+        }
+
         if (error) throw error;
 
         // Transform the data to include status
@@ -44,9 +53,11 @@ const Justificatifs = () => {
         }));
 
         setDocuments(docsWithStatus);
+        setError(null);
       } catch (error) {
         console.error('Error fetching documents:', error);
         toast.error("Erreur lors du chargement des documents");
+        setError("Une erreur est survenue lors du chargement des documents.");
       } finally {
         setIsLoading(false);
       }
@@ -88,6 +99,26 @@ const Justificatifs = () => {
     return (
       <div className="flex items-center justify-center h-64">
         <p>Chargement des documents...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold">Pièces justificatives</h1>
+          <p className="text-gray-500 mt-2">
+            Veuillez télécharger les documents demandés ci-dessous pour compléter votre dossier
+          </p>
+        </div>
+
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            {error}
+          </AlertDescription>
+        </Alert>
       </div>
     );
   }

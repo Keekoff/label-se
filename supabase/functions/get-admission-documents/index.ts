@@ -9,7 +9,6 @@ interface AirtableRecord {
     Réponse?: string;
     "Idée de justificatifs"?: string;
     Entreprises?: string[];
-    Email?: string;
   };
 }
 
@@ -45,11 +44,9 @@ Deno.serve(async (req) => {
       throw new Error('Authentication failed');
     }
 
-    if (!user?.email) {
-      throw new Error('User email not found');
+    if (!user) {
+      throw new Error('User not found');
     }
-
-    console.log('Authenticated user email:', user.email);
 
     // Get user's company name from Supabase
     const { data: submission, error: submissionError } = await supabaseClient
@@ -60,15 +57,26 @@ Deno.serve(async (req) => {
 
     if (submissionError) {
       console.error('Error fetching company data:', submissionError);
-      throw new Error('Error fetching company data');
+      return new Response(
+        JSON.stringify({ error: 'incomplete_profile', message: 'Veuillez d\'abord compléter votre formulaire de candidature' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404
+        }
+      );
     }
 
     if (!submission?.company_name) {
-      throw new Error('Company name not found');
+      return new Response(
+        JSON.stringify({ error: 'incomplete_profile', message: 'Veuillez d\'abord compléter votre formulaire de candidature' }),
+        {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 404
+        }
+      );
     }
 
-    const companyName = submission.company_name;
-    console.log('User company name:', companyName);
+    console.log('User company name:', submission.company_name);
 
     // Get Airtable API key
     const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY');
@@ -99,9 +107,9 @@ Deno.serve(async (req) => {
     const userRecords = airtableData.records
       .filter((record: AirtableRecord) => {
         const hasCompany = Array.isArray(record.fields.Entreprises) && 
-          record.fields.Entreprises.includes(companyName);
+          record.fields.Entreprises.includes(submission.company_name);
         console.log(
-          `Checking if ${companyName} is in`,
+          `Checking if ${submission.company_name} is in`,
           record.fields.Entreprises,
           '->',
           hasCompany
