@@ -33,16 +33,37 @@ Deno.serve(async (req) => {
     }
 
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
+    
+    // Get the user first
+    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
+      authHeader.replace('Bearer ', '')
+    );
 
-    // Get user data and company name in one go
-    const { data: submission } = await supabaseClient
+    if (userError || !user) {
+      throw new Error('Failed to get user');
+    }
+
+    console.log('User ID:', user.id);
+
+    // Get user's submission with company name
+    const { data: submission, error: submissionError } = await supabaseClient
       .from('label_submissions')
       .select('company_name')
+      .eq('user_id', user.id)
+      .eq('status', 'submitted')
       .single();
 
+    if (submissionError) {
+      console.error('Submission error:', submissionError);
+      throw new Error('Failed to get company data');
+    }
+
     if (!submission?.company_name) {
+      console.error('No company name found for user:', user.id);
       throw new Error('Company name not found');
     }
+
+    console.log('Found company name:', submission.company_name);
 
     // Get Airtable API key
     const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY');
@@ -61,23 +82,34 @@ Deno.serve(async (req) => {
     );
 
     if (!airtableResponse.ok) {
+      console.error('Airtable response:', await airtableResponse.text());
       throw new Error(`Airtable API error: ${airtableResponse.status}`);
     }
 
     const airtableData = await airtableResponse.json();
+    console.log('Total Airtable records:', airtableData.records.length);
     
     // Filter and map records for user's company
     const userRecords = airtableData.records
-      .filter((record: AirtableRecord) => 
-        Array.isArray(record.fields.Entreprises) && 
-        record.fields.Entreprises.includes(submission.company_name)
-      )
+      .filter((record: AirtableRecord) => {
+        const hasCompany = Array.isArray(record.fields.Entreprises) && 
+          record.fields.Entreprises.includes(submission.company_name);
+        console.log(
+          `Record ${record.id}: checking if ${submission.company_name} is in`,
+          record.fields.Entreprises,
+          '->',
+          hasCompany
+        );
+        return hasCompany;
+      })
       .map((record: AirtableRecord) => ({
         id: record.id,
         identifier: record.fields.Identifiant || '',
         response: record.fields.Réponse || '',
         document: record.fields["Idée de justificatifs"] || ''
       }));
+
+    console.log('Matching records found:', userRecords.length);
 
     return new Response(
       JSON.stringify(userRecords),
