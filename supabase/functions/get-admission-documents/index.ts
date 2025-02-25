@@ -13,64 +13,95 @@ interface AirtableRecord {
 }
 
 Deno.serve(async (req) => {
+  // Handle CORS
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Get the user's JWT token from the request headers
     const authHeader = req.headers.get('Authorization');
     if (!authHeader) {
-      throw new Error('No authorization header');
+      throw new Error('Authorization header is missing');
     }
 
-    // Create Supabase client
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
-    );
+    // Initialize Supabase client
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
+    
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase configuration');
+    }
 
-    // Get user session from the JWT
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
+
+    // Get user data
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
       authHeader.replace('Bearer ', '')
     );
 
-    if (userError || !user) {
-      throw new Error('Error getting user');
+    if (userError) {
+      console.error('User auth error:', userError);
+      throw new Error('Authentication failed');
     }
 
-    // Get user's company name from their label submission
+    if (!user) {
+      throw new Error('User not found');
+    }
+
+    console.log('Authenticated user ID:', user.id);
+
+    // Get user's company name
     const { data: submission, error: submissionError } = await supabaseClient
       .from('label_submissions')
       .select('company_name')
       .eq('user_id', user.id)
       .maybeSingle();
 
-    if (submissionError || !submission?.company_name) {
-      throw new Error('Error getting company name');
+    if (submissionError) {
+      console.error('Submission fetch error:', submissionError);
+      throw new Error('Error fetching company data');
     }
 
-    // Fetch data from Airtable
+    if (!submission?.company_name) {
+      throw new Error('Company name not found for user');
+    }
+
+    console.log('Found company name:', submission.company_name);
+
+    // Get Airtable API key
+    const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY');
+    if (!airtableApiKey) {
+      throw new Error('Airtable API key not configured');
+    }
+
+    // Fetch from Airtable
     const airtableResponse = await fetch(
       'https://api.airtable.com/v0/apphVGTsH9QXBfiAw/Admissions',
       {
         headers: {
-          'Authorization': `Bearer ${Deno.env.get('AIRTABLE_API_KEY')}`,
+          'Authorization': `Bearer ${airtableApiKey}`,
         },
       }
     );
 
     if (!airtableResponse.ok) {
-      throw new Error('Airtable API error');
+      console.error('Airtable response error:', await airtableResponse.text());
+      throw new Error(`Airtable API error: ${airtableResponse.status}`);
     }
 
     const airtableData = await airtableResponse.json();
     
-    // Filter records for the user's company
+    console.log('Total Airtable records:', airtableData.records.length);
+    
+    // Filter and map records for user's company
     const userRecords = airtableData.records
-      .filter((record: AirtableRecord) => 
-        record.fields.Entreprise === submission.company_name
-      )
+      .filter((record: AirtableRecord) => {
+        const matches = record.fields.Entreprise === submission.company_name;
+        console.log(
+          `Comparing: "${record.fields.Entreprise}" with "${submission.company_name}" -> ${matches}`
+        );
+        return matches;
+      })
       .map((record: AirtableRecord) => ({
         id: record.id,
         identifier: record.fields.Identifiant || '',
@@ -78,16 +109,26 @@ Deno.serve(async (req) => {
         document: record.fields["Idée de justificatifs"] || ''
       }));
 
-    return new Response(JSON.stringify(userRecords), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    });
+    console.log('Filtered records for company:', userRecords.length);
+
+    return new Response(
+      JSON.stringify(userRecords),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    );
 
   } catch (error) {
-    console.error('Error:', error.message);
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    });
+    console.error('Function error:', error);
+    return new Response(
+      JSON.stringify({
+        error: error.message || 'An unknown error occurred',
+      }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    );
   }
 });
