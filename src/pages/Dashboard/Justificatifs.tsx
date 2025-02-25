@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Upload } from "lucide-react";
@@ -9,33 +9,51 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Document = {
   id: string;
-  title: string;
-  description: string;
+  identifier: string;
+  response: string;
+  document: string;
   file?: File | null;
   status: 'pending' | 'uploaded' | 'validated';
 };
 
 const Justificatifs = () => {
-  const [documents, setDocuments] = useState<Document[]>([
-    {
-      id: '1',
-      title: 'Extrait Kbis',
-      description: 'Document officiel attestant l\'existence juridique de l\'entreprise',
-      status: 'pending'
-    },
-    {
-      id: '2',
-      title: 'Attestation URSSAF',
-      description: 'Attestation de vigilance de moins de 6 mois',
-      status: 'pending'
-    },
-    {
-      id: '3',
-      title: 'Bilan comptable',
-      description: 'Dernier bilan comptable',
-      status: 'pending'
-    }
-  ]);
+  const [documents, setDocuments] = useState<Document[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
+          toast.error("Session expirée");
+          return;
+        }
+
+        const { data, error } = await supabase.functions.invoke('get-admission-documents', {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (error) throw error;
+
+        // Transform the data to include status
+        const docsWithStatus = data.map((doc: any) => ({
+          ...doc,
+          status: 'pending' as const
+        }));
+
+        setDocuments(docsWithStatus);
+      } catch (error) {
+        console.error('Error fetching documents:', error);
+        toast.error("Erreur lors du chargement des documents");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDocuments();
+  }, []);
 
   const handleFileUpload = async (documentId: string, file: File) => {
     try {
@@ -43,7 +61,7 @@ const Justificatifs = () => {
       if (!document) throw new Error("Document non trouvé");
 
       const fileExt = file.name.split('.').pop();
-      const fileName = `${document.title.toLowerCase().replace(/ /g, '-')}-${Date.now()}.${fileExt}`;
+      const fileName = `${document.identifier.toLowerCase().replace(/ /g, '-')}-${Date.now()}.${fileExt}`;
       
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('justificatifs')
@@ -66,6 +84,14 @@ const Justificatifs = () => {
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <p>Chargement des documents...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6 animate-fadeIn">
       <div>
@@ -79,16 +105,18 @@ const Justificatifs = () => {
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="w-[200px]">Document</TableHead>
-              <TableHead className="w-[300px]">Description</TableHead>
-              <TableHead className="w-[200px] text-right">Action</TableHead>
+              <TableHead>Identifiant</TableHead>
+              <TableHead>Réponse</TableHead>
+              <TableHead>Document demandé</TableHead>
+              <TableHead className="text-right">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {documents.map((doc) => (
               <TableRow key={doc.id}>
-                <TableCell className="font-medium">{doc.title}</TableCell>
-                <TableCell>{doc.description}</TableCell>
+                <TableCell className="font-medium">{doc.identifier}</TableCell>
+                <TableCell>{doc.response}</TableCell>
+                <TableCell>{doc.document}</TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
                     {doc.status === 'uploaded' && (
