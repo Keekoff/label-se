@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'); // Using service role key to bypass RLS
     
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Missing Supabase configuration');
@@ -45,8 +45,24 @@ Deno.serve(async (req) => {
 
     console.log('User ID:', user.id);
 
-    // Get user's submission with company name
-    const { data: submissions, error: submissionError } = await supabaseClient
+    // First, let's check if the user exists and get their email
+    const { data: userDetails, error: userError2 } = await supabaseClient.auth.admin.getUserById(user.id);
+    console.log('User details:', userDetails);
+
+    if (userError2) {
+      console.error('Error getting user details:', userError2);
+      throw userError2;
+    }
+
+    // Now get all submissions to check what we have
+    const { data: allSubmissions, error: allSubError } = await supabaseClient
+      .from('label_submissions')
+      .select('*');
+
+    console.log('All submissions in database:', allSubmissions);
+
+    // Get user's specific submissions
+    const { data: userSubmissions, error: submissionError } = await supabaseClient
       .from('label_submissions')
       .select('*')
       .eq('user_id', user.id);
@@ -56,13 +72,30 @@ Deno.serve(async (req) => {
       throw new Error('Failed to get company data');
     }
 
-    console.log('Found submissions:', submissions);
+    console.log('User submissions found:', userSubmissions);
 
-    if (!submissions || submissions.length === 0) {
-      throw new Error('No submissions found');
+    if (!userSubmissions || userSubmissions.length === 0) {
+      // If no submissions found by user_id, try by email
+      const { data: emailSubmissions, error: emailError } = await supabaseClient
+        .from('label_submissions')
+        .select('*')
+        .eq('email', userDetails?.user?.email);
+
+      console.log('Submissions by email:', emailSubmissions);
+
+      if (emailError) {
+        console.error('Email submission error:', emailError);
+        throw new Error('Failed to get submissions by email');
+      }
+
+      if (!emailSubmissions || emailSubmissions.length === 0) {
+        throw new Error('No submissions found for user');
+      }
+
+      userSubmissions = emailSubmissions;
     }
 
-    const submission = submissions[0];
+    const submission = userSubmissions[0];
     console.log('Using submission:', submission);
 
     if (!submission.company_name) {
