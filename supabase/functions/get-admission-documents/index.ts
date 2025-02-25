@@ -8,6 +8,7 @@ interface AirtableRecord {
     Identifiant?: string;
     Réponse?: string;
     "Idée de justificatifs"?: string;
+    Entreprises?: string[];
     Email?: string;
   };
 }
@@ -50,6 +51,25 @@ Deno.serve(async (req) => {
 
     console.log('Authenticated user email:', user.email);
 
+    // Get user's company name from Supabase
+    const { data: submission, error: submissionError } = await supabaseClient
+      .from('label_submissions')
+      .select('company_name')
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (submissionError) {
+      console.error('Error fetching company data:', submissionError);
+      throw new Error('Error fetching company data');
+    }
+
+    if (!submission?.company_name) {
+      throw new Error('Company name not found');
+    }
+
+    const companyName = submission.company_name;
+    console.log('User company name:', companyName);
+
     // Get Airtable API key
     const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY');
     if (!airtableApiKey) {
@@ -75,14 +95,18 @@ Deno.serve(async (req) => {
     
     console.log('Total Airtable records:', airtableData.records.length);
     
-    // Filter and map records for user's email
+    // Filter and map records for user's company
     const userRecords = airtableData.records
       .filter((record: AirtableRecord) => {
-        const matches = record.fields.Email === user.email;
+        const hasCompany = Array.isArray(record.fields.Entreprises) && 
+          record.fields.Entreprises.includes(companyName);
         console.log(
-          `Comparing: "${record.fields.Email}" with "${user.email}" -> ${matches}`
+          `Checking if ${companyName} is in`,
+          record.fields.Entreprises,
+          '->',
+          hasCompany
         );
-        return matches;
+        return hasCompany;
       })
       .map((record: AirtableRecord) => ({
         id: record.id,
@@ -91,7 +115,7 @@ Deno.serve(async (req) => {
         document: record.fields["Idée de justificatifs"] || ''
       }));
 
-    console.log('Filtered records for user:', userRecords.length);
+    console.log('Filtered records for company:', userRecords.length);
 
     return new Response(
       JSON.stringify(userRecords),
