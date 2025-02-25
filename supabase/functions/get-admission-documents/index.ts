@@ -26,7 +26,7 @@ Deno.serve(async (req) => {
 
     // Initialize Supabase client
     const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'); // Using service role key to bypass RLS
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
     
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Missing Supabase configuration');
@@ -54,18 +54,11 @@ Deno.serve(async (req) => {
       throw userError2;
     }
 
-    // Now get all submissions to check what we have
-    const { data: allSubmissions, error: allSubError } = await supabaseClient
-      .from('label_submissions')
-      .select('*');
-
-    console.log('All submissions in database:', allSubmissions);
-
     // Get user's specific submissions
     const { data: userSubmissions, error: submissionError } = await supabaseClient
       .from('label_submissions')
       .select('*')
-      .eq('user_id', user.id);
+      .eq('email', userDetails?.user?.email);
 
     if (submissionError) {
       console.error('Submission error:', submissionError);
@@ -75,24 +68,7 @@ Deno.serve(async (req) => {
     console.log('User submissions found:', userSubmissions);
 
     if (!userSubmissions || userSubmissions.length === 0) {
-      // If no submissions found by user_id, try by email
-      const { data: emailSubmissions, error: emailError } = await supabaseClient
-        .from('label_submissions')
-        .select('*')
-        .eq('email', userDetails?.user?.email);
-
-      console.log('Submissions by email:', emailSubmissions);
-
-      if (emailError) {
-        console.error('Email submission error:', emailError);
-        throw new Error('Failed to get submissions by email');
-      }
-
-      if (!emailSubmissions || emailSubmissions.length === 0) {
-        throw new Error('No submissions found for user');
-      }
-
-      userSubmissions = emailSubmissions;
+      throw new Error('No submissions found for user');
     }
 
     const submission = userSubmissions[0];
@@ -110,22 +86,27 @@ Deno.serve(async (req) => {
       throw new Error('Airtable API key not configured');
     }
 
+    console.log('Making Airtable API request...');
+    
     // Fetch from Airtable
     const airtableResponse = await fetch(
       'https://api.airtable.com/v0/apphVGTsH9QXBfiAw/Admissions',
       {
         headers: {
           'Authorization': `Bearer ${airtableApiKey}`,
+          'Content-Type': 'application/json',
         },
       }
     );
 
     if (!airtableResponse.ok) {
-      throw new Error(`Airtable API error: ${airtableResponse.status}`);
+      const responseText = await airtableResponse.text();
+      console.error('Airtable error response:', responseText);
+      throw new Error(`Airtable API error: ${airtableResponse.status} - ${responseText}`);
     }
 
     const airtableData = await airtableResponse.json();
-    console.log('Airtable records:', JSON.stringify(airtableData.records, null, 2));
+    console.log('Airtable response received. Number of records:', airtableData.records?.length);
 
     // Filter and map records for user's company
     const userRecords = airtableData.records
@@ -135,7 +116,7 @@ Deno.serve(async (req) => {
         
         return Array.isArray(record.fields.Entreprises) && 
           record.fields.Entreprises.some(company => 
-            company.trim() === submission.company_name.trim()
+            company.trim().toLowerCase() === submission.company_name.trim().toLowerCase()
           );
       })
       .map((record: AirtableRecord) => ({
