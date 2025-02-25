@@ -34,49 +34,15 @@ Deno.serve(async (req) => {
 
     const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
-    // Get user data
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser(
-      authHeader.replace('Bearer ', '')
-    );
-
-    if (userError) {
-      console.error('User auth error:', userError);
-      throw new Error('Authentication failed');
-    }
-
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    // Get user's company name from Supabase
-    const { data: submission, error: submissionError } = await supabaseClient
+    // Get user data and company name in one go
+    const { data: submission } = await supabaseClient
       .from('label_submissions')
       .select('company_name')
-      .eq('user_id', user.id)
-      .maybeSingle();
-
-    if (submissionError) {
-      console.error('Error fetching company data:', submissionError);
-      return new Response(
-        JSON.stringify({ error: 'incomplete_profile', message: 'Veuillez d\'abord compléter votre formulaire de candidature' }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 404
-        }
-      );
-    }
+      .single();
 
     if (!submission?.company_name) {
-      return new Response(
-        JSON.stringify({ error: 'incomplete_profile', message: 'Veuillez d\'abord compléter votre formulaire de candidature' }),
-        {
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          status: 404
-        }
-      );
+      throw new Error('Company name not found');
     }
-
-    console.log('User company name:', submission.company_name);
 
     // Get Airtable API key
     const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY');
@@ -95,35 +61,23 @@ Deno.serve(async (req) => {
     );
 
     if (!airtableResponse.ok) {
-      console.error('Airtable response error:', await airtableResponse.text());
       throw new Error(`Airtable API error: ${airtableResponse.status}`);
     }
 
     const airtableData = await airtableResponse.json();
     
-    console.log('Total Airtable records:', airtableData.records.length);
-    
     // Filter and map records for user's company
     const userRecords = airtableData.records
-      .filter((record: AirtableRecord) => {
-        const hasCompany = Array.isArray(record.fields.Entreprises) && 
-          record.fields.Entreprises.includes(submission.company_name);
-        console.log(
-          `Checking if ${submission.company_name} is in`,
-          record.fields.Entreprises,
-          '->',
-          hasCompany
-        );
-        return hasCompany;
-      })
+      .filter((record: AirtableRecord) => 
+        Array.isArray(record.fields.Entreprises) && 
+        record.fields.Entreprises.includes(submission.company_name)
+      )
       .map((record: AirtableRecord) => ({
         id: record.id,
         identifier: record.fields.Identifiant || '',
         response: record.fields.Réponse || '',
         document: record.fields["Idée de justificatifs"] || ''
       }));
-
-    console.log('Filtered records for company:', userRecords.length);
 
     return new Response(
       JSON.stringify(userRecords),
@@ -136,9 +90,7 @@ Deno.serve(async (req) => {
   } catch (error) {
     console.error('Function error:', error);
     return new Response(
-      JSON.stringify({
-        error: error.message || 'An unknown error occurred',
-      }),
+      JSON.stringify({ error: error.message }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
