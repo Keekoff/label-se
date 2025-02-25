@@ -45,24 +45,31 @@ Deno.serve(async (req) => {
 
     console.log('User ID:', user.id);
 
-    // Get user's submission with company name - removed status filter
-    const { data: submission, error: submissionError } = await supabaseClient
+    // Get user's submission with company name
+    const { data: submissions, error: submissionError } = await supabaseClient
       .from('label_submissions')
-      .select('company_name')
-      .eq('user_id', user.id)
-      .maybeSingle();
+      .select('*')
+      .eq('user_id', user.id);
 
     if (submissionError) {
       console.error('Submission error:', submissionError);
       throw new Error('Failed to get company data');
     }
 
-    if (!submission?.company_name) {
-      console.error('No company name found for user:', user.id);
-      throw new Error('Company name not found');
+    console.log('Found submissions:', submissions);
+
+    if (!submissions || submissions.length === 0) {
+      throw new Error('No submissions found');
     }
 
-    console.log('Found company name:', submission.company_name);
+    const submission = submissions[0];
+    console.log('Using submission:', submission);
+
+    if (!submission.company_name) {
+      throw new Error('Company name not found in submission');
+    }
+
+    console.log('Using company name:', submission.company_name);
 
     // Get Airtable API key
     const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY');
@@ -81,30 +88,22 @@ Deno.serve(async (req) => {
     );
 
     if (!airtableResponse.ok) {
-      console.error('Airtable response:', await airtableResponse.text());
       throw new Error(`Airtable API error: ${airtableResponse.status}`);
     }
 
     const airtableData = await airtableResponse.json();
-    console.log('Total Airtable records:', airtableData.records.length);
-    
-    // Filter and map records for user's company - adding more debug logs
+    console.log('Airtable records:', JSON.stringify(airtableData.records, null, 2));
+
+    // Filter and map records for user's company
     const userRecords = airtableData.records
       .filter((record: AirtableRecord) => {
-        // Debug log for each record's Entreprises field
-        console.log(`Record ${record.id} - Entreprises:`, record.fields.Entreprises);
+        console.log(`Checking record:`, record);
+        console.log(`Looking for company "${submission.company_name}" in:`, record.fields.Entreprises);
         
-        const hasCompany = Array.isArray(record.fields.Entreprises) && 
+        return Array.isArray(record.fields.Entreprises) && 
           record.fields.Entreprises.some(company => 
-            company.toLowerCase() === submission.company_name.toLowerCase()
+            company.trim() === submission.company_name.trim()
           );
-        
-        console.log(
-          `Checking if "${submission.company_name}" matches any company in record ${record.id}:`,
-          hasCompany
-        );
-        
-        return hasCompany;
       })
       .map((record: AirtableRecord) => ({
         id: record.id,
@@ -113,7 +112,7 @@ Deno.serve(async (req) => {
         document: record.fields["Idée de justificatifs"] || ''
       }));
 
-    console.log('Matching records found:', userRecords.length);
+    console.log('Found matching records:', userRecords);
 
     return new Response(
       JSON.stringify(userRecords),
