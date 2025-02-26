@@ -135,16 +135,16 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
     return initialAnswers;
   });
 
-  const toggleAnswer = (questionId: string, value: string) => {
+  const toggleAnswer = (questionId: string, value: string, label: string) => {
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
-    if (value.includes("Non applicable")) {
-      newAnswers = currentAnswers.includes(value) ? [] : [value];
+    if (label.includes("Non applicable")) {
+      newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
-      newAnswers = currentAnswers.includes(value)
-        ? currentAnswers.filter(v => v !== value)
-        : [...currentAnswers.filter(v => !v.includes("Non applicable")), value];
+      newAnswers = currentAnswers.includes(label)
+        ? currentAnswers.filter(v => v !== label)
+        : [...currentAnswers.filter(v => !v.includes("Non applicable")), label];
     }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
@@ -154,7 +154,6 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
 
   useEffect(() => {
     const isValid = Object.values(answers).every(answer => answer.length > 0);
-    console.log('Initial form validation:', isValid);
     onValidityChange(isValid);
   }, [answers]);
 
@@ -201,14 +200,14 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
                         className={cn(
                           "flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer",
                           "hover:bg-accent hover:text-accent-foreground",
-                          answers[question.id]?.includes(option.value) && "bg-accent"
+                          answers[question.id]?.includes(option.label) && "bg-accent"
                         )}
-                        onClick={() => toggleAnswer(question.id, option.value)}
+                        onClick={() => toggleAnswer(question.id, option.value, option.label)}
                       >
                         <div
                           className={cn(
                             "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                            answers[question.id]?.includes(option.value)
+                            answers[question.id]?.includes(option.label)
                               ? "bg-primary text-primary-foreground"
                               : "opacity-50"
                           )}
@@ -216,7 +215,7 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
                           <Check
                             className={cn(
                               "h-4 w-4",
-                              answers[question.id]?.includes(option.value) ? "opacity-100" : "opacity-0"
+                              answers[question.id]?.includes(option.label) ? "opacity-100" : "opacity-0"
                             )}
                           />
                         </div>

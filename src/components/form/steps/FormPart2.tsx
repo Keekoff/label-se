@@ -102,21 +102,21 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
     return initialAnswers;
   });
 
-  const toggleAnswer = (questionId: string, value: string) => {
+  const toggleAnswer = (questionId: string, value: string, label: string) => {
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
-    if (value === "D") {
+    if (value === "D" || label === "Non applicable") {
       // If selecting "Non applicable", clear other selections
-      newAnswers = currentAnswers.includes("D") ? [] : ["D"];
+      newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
       // If selecting another option, remove "Non applicable" if present
-      if (currentAnswers.includes("D")) {
-        newAnswers = [value];
+      if (currentAnswers.includes("Non applicable")) {
+        newAnswers = [label];
       } else {
-        newAnswers = currentAnswers.includes(value)
-          ? currentAnswers.filter(v => v !== value)
-          : [...currentAnswers, value];
+        newAnswers = currentAnswers.includes(label)
+          ? currentAnswers.filter(v => v !== label)
+          : [...currentAnswers, label];
       }
     }
     
@@ -148,7 +148,7 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
             <div>
               <h3 className="text-lg font-medium flex items-start gap-1">
                 {question.title}
-                <span className="text-red-500 ml-1">*</span>
+                <span className="text-red-500">*</span>
               </h3>
               <p className="text-gray-600 mt-1 text-sm">{question.description}</p>
             </div>
@@ -176,14 +176,14 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
                         className={cn(
                           "flex items-center gap-2 px-2 py-1.5 text-sm rounded-sm cursor-pointer",
                           "hover:bg-accent hover:text-accent-foreground",
-                          answers[question.id]?.includes(option.value) && "bg-accent"
+                          answers[question.id]?.includes(option.label) && "bg-accent"
                         )}
-                        onClick={() => toggleAnswer(question.id, option.value)}
+                        onClick={() => toggleAnswer(question.id, option.value, option.label)}
                       >
                         <div
                           className={cn(
                             "flex h-4 w-4 items-center justify-center rounded-sm border border-primary",
-                            answers[question.id]?.includes(option.value)
+                            answers[question.id]?.includes(option.label)
                               ? "bg-primary text-primary-foreground"
                               : "opacity-50"
                           )}
@@ -191,7 +191,7 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
                           <Check
                             className={cn(
                               "h-4 w-4",
-                              answers[question.id]?.includes(option.value) ? "opacity-100" : "opacity-0"
+                              answers[question.id]?.includes(option.label) ? "opacity-100" : "opacity-0"
                             )}
                           />
                         </div>

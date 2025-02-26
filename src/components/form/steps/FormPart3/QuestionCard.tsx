@@ -45,7 +45,7 @@ const QuestionCard = ({ question, selectedAnswers, onAnswerToggle }: QuestionCar
                   key={option.value}
                   value={option.value}
                   label={option.label}
-                  isSelected={selectedAnswers?.includes(option.value)}
+                  isSelected={selectedAnswers?.includes(option.label)}
                   onClick={() => onAnswerToggle(question.id, option.value)}
                 />
               ))}

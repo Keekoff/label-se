@@ -15,24 +15,32 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
     return initialAnswers;
   });
 
-  const toggleAnswer = (questionId: string, value: string) => {
+  const toggleAnswer = (questionId: string, value: string, label: string) => {
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
     // Handle "Non applicable" option
-    if (value.includes("Non applicable")) {
-      newAnswers = currentAnswers.includes(value) ? [] : [value];
+    if (label.includes("Non applicable")) {
+      newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
       // If selecting a regular option, remove "Non applicable" if present
-      newAnswers = currentAnswers.includes(value)
-        ? currentAnswers.filter(v => v !== value)
-        : [...currentAnswers.filter(v => !v.includes("Non applicable")), value];
+      newAnswers = currentAnswers.includes(label)
+        ? currentAnswers.filter(v => v !== label)
+        : [...currentAnswers.filter(v => !v.includes("Non applicable")), label];
     }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
     setFormState({ ...formState, ...updatedAnswers });
+
+    const isValid = Object.values(updatedAnswers).every(answer => answer.length > 0);
+    onValidityChange(isValid);
   };
+
+  useEffect(() => {
+    const isValid = Object.values(answers).every(answer => answer.length > 0);
+    onValidityChange(isValid);
+  }, [answers]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -49,7 +57,8 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
             key={question.id}
             question={question}
             selectedAnswers={answers[question.id] || []}
-            onAnswerToggle={toggleAnswer}
+            onAnswerToggle={(questionId, value) => toggleAnswer(questionId, value, 
+              question.options.find(opt => opt.value === value)?.label || value)}
           />
         ))}
       </div>
