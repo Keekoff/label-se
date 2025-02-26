@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -46,7 +45,7 @@ export const useFormSubmission = (
       throw new Error("User must be authenticated to submit form");
     }
 
-    // Ensure all required fields are present
+    // Map form data to correctly renamed database fields
     const formattedData = {
       user_id: user.id,
       first_name: data.firstName || "",
@@ -64,6 +63,17 @@ export const useFormSubmission = (
       status: status,
       current_step: status === 'submitted' ? 6 : data.currentStep || 1,
       disclaimer_accepted: !!data.disclaimerAccepted,
+      // Part 1 fields with updated names
+      diversity: Array.isArray(data.diversity) ? data.diversity : [],
+      equality: Array.isArray(data.equality) ? data.equality : [],
+      handicap: Array.isArray(data.handicap) ? data.handicap : [],
+      health: Array.isArray(data.health) ? data.health : [],
+      parentality: Array.isArray(data.parentality) ? data.parentality : [],
+      training: Array.isArray(data.training) ? data.training : [],
+      csr: Array.isArray(data.csr) ? data.csr : [],
+      privacy: Array.isArray(data.privacy) ? data.privacy : [],
+      transport: Array.isArray(data.transport) ? data.transport : [],
+      // Keep existing Part 2 and 3 fields
       associative_contribution: Array.isArray(data.associativeContribution) ? data.associativeContribution : [],
       responsible_digital: Array.isArray(data.responsibleDigital) ? data.responsibleDigital : [],
       communication: Array.isArray(data.communication) ? data.communication : [],
