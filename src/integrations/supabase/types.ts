@@ -87,27 +87,36 @@ export type Database = {
           created_at: string | null
           current_step: number | null
           disclaimer_accepted: boolean | null
+          diversite: string[] | null
           eco_design: string[] | null
+          egalite: string[] | null
           email: string | null
           employee_count: string | null
           energy_management: string[] | null
           first_name: string | null
+          formation: string[] | null
           founding_year: string | null
           funding_details: string | null
+          handicap: string[] | null
           has_funding: string | null
           id: string
           legal_form: string | null
+          parentalite: string[] | null
           payment_id: string | null
           payment_status: string | null
+          politique_rse: string[] | null
           postal_code: string | null
+          privacy_data: string[] | null
           production: string[] | null
           responsible_digital: string[] | null
           responsible_purchasing: string[] | null
+          sante_bien_etre: string[] | null
           sectors: string[] | null
           social_impact: string[] | null
           status: string | null
           street_address: string | null
           supplier_relations: string[] | null
+          transports: string[] | null
           updated_at: string | null
           user_id: string | null
           waste_management: string[] | null
@@ -123,27 +132,36 @@ export type Database = {
           created_at?: string | null
           current_step?: number | null
           disclaimer_accepted?: boolean | null
+          diversite?: string[] | null
           eco_design?: string[] | null
+          egalite?: string[] | null
           email?: string | null
           employee_count?: string | null
           energy_management?: string[] | null
           first_name?: string | null
+          formation?: string[] | null
           founding_year?: string | null
           funding_details?: string | null
+          handicap?: string[] | null
           has_funding?: string | null
           id?: string
           legal_form?: string | null
+          parentalite?: string[] | null
           payment_id?: string | null
           payment_status?: string | null
+          politique_rse?: string[] | null
           postal_code?: string | null
+          privacy_data?: string[] | null
           production?: string[] | null
           responsible_digital?: string[] | null
           responsible_purchasing?: string[] | null
+          sante_bien_etre?: string[] | null
           sectors?: string[] | null
           social_impact?: string[] | null
           status?: string | null
           street_address?: string | null
           supplier_relations?: string[] | null
+          transports?: string[] | null
           updated_at?: string | null
           user_id?: string | null
           waste_management?: string[] | null
@@ -159,27 +177,36 @@ export type Database = {
           created_at?: string | null
           current_step?: number | null
           disclaimer_accepted?: boolean | null
+          diversite?: string[] | null
           eco_design?: string[] | null
+          egalite?: string[] | null
           email?: string | null
           employee_count?: string | null
           energy_management?: string[] | null
           first_name?: string | null
+          formation?: string[] | null
           founding_year?: string | null
           funding_details?: string | null
+          handicap?: string[] | null
           has_funding?: string | null
           id?: string
           legal_form?: string | null
+          parentalite?: string[] | null
           payment_id?: string | null
           payment_status?: string | null
+          politique_rse?: string[] | null
           postal_code?: string | null
+          privacy_data?: string[] | null
           production?: string[] | null
           responsible_digital?: string[] | null
           responsible_purchasing?: string[] | null
+          sante_bien_etre?: string[] | null
           sectors?: string[] | null
           social_impact?: string[] | null
           status?: string | null
           street_address?: string | null
           supplier_relations?: string[] | null
+          transports?: string[] | null
           updated_at?: string | null
           user_id?: string | null
           waste_management?: string[] | null
