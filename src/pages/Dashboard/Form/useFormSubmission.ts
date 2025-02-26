@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -48,45 +49,45 @@ export const useFormSubmission = (
     // Map form data to correctly renamed database fields
     const formattedData = {
       user_id: user.id,
-      first_name: data.firstName || "",
-      email: data.email || "",
-      company_name: data.companyName || "",
-      sectors: Array.isArray(data.sectors) ? data.sectors : [],
-      legal_form: data.legalForm || "",
-      street_address: data.streetAddress || "",
-      postal_code: data.postalCode || "",
-      city: data.city || "",
-      founding_year: data.foundingYear || "",
-      employee_count: data.employeeCount || "",
-      has_funding: data.hasFunding || "",
-      funding_details: data.fundingDetails || "",
+      prenom: data.firstName || "",
+      courriel: data.email || "",
+      nom_entreprise: data.companyName || "",
+      secteurs_activite: Array.isArray(data.sectors) ? data.sectors : [],
+      forme_juridique: data.legalForm || "",
+      adresse: data.streetAddress || "",
+      code_postal: data.postalCode || "",
+      ville: data.city || "",
+      annee_creation: data.foundingYear || "",
+      nombre_employes: data.employeeCount || "",
+      a_financements: data.hasFunding || "",
+      details_financement: data.fundingDetails || "",
       status: status,
       current_step: status === 'submitted' ? 6 : data.currentStep || 1,
       disclaimer_accepted: !!data.disclaimerAccepted,
-      // Part 1 fields with updated names
-      diversity: Array.isArray(data.diversity) ? data.diversity : [],
-      equality: Array.isArray(data.equality) ? data.equality : [],
-      handicap: Array.isArray(data.handicap) ? data.handicap : [],
-      health: Array.isArray(data.health) ? data.health : [],
-      parentality: Array.isArray(data.parentality) ? data.parentality : [],
-      training: Array.isArray(data.training) ? data.training : [],
-      csr: Array.isArray(data.csr) ? data.csr : [],
-      privacy: Array.isArray(data.privacy) ? data.privacy : [],
-      transport: Array.isArray(data.transport) ? data.transport : [],
-      // Keep existing Part 2 and 3 fields
-      associative_contribution: Array.isArray(data.associativeContribution) ? data.associativeContribution : [],
-      responsible_digital: Array.isArray(data.responsibleDigital) ? data.responsibleDigital : [],
-      communication: Array.isArray(data.communication) ? data.communication : [],
-      supplier_relations: Array.isArray(data.supplierRelations) ? data.supplierRelations : [],
-      social_impact: Array.isArray(data.socialImpact) ? data.socialImpact : [],
-      production: Array.isArray(data.production) ? data.production : [],
-      eco_design: Array.isArray(data.ecoDesign) ? data.ecoDesign : [],
-      continuous_evaluation: Array.isArray(data.continuousEvaluation) ? data.continuousEvaluation : [],
-      energy_management: Array.isArray(data.energyManagement) ? data.energyManagement : [],
-      carbon_emissions: Array.isArray(data.carbonEmissions) ? data.carbonEmissions : [],
-      circular_economy: Array.isArray(data.circularEconomy) ? data.circularEconomy : [],
-      waste_management: Array.isArray(data.wasteManagement) ? data.wasteManagement : [],
-      responsible_purchasing: Array.isArray(data.responsiblePurchasing) ? data.responsiblePurchasing : []
+      // Part 1 fields with updated French names
+      diversite: Array.isArray(data.diversity) ? data.diversity : [],
+      egalite: Array.isArray(data.equality) ? data.equality : [],
+      situation_handicap: Array.isArray(data.handicap) ? data.handicap : [],
+      sante_bien_etre: Array.isArray(data.health) ? data.health : [],
+      parentalite: Array.isArray(data.parentality) ? data.parentality : [],
+      formation: Array.isArray(data.training) ? data.training : [],
+      politique_rse: Array.isArray(data.csr) ? data.csr : [],
+      confidentialite_donnees: Array.isArray(data.privacy) ? data.privacy : [],
+      mobilite: Array.isArray(data.transport) ? data.transport : [],
+      // Part 2 and 3 fields with updated French names
+      contribution_associative: Array.isArray(data.associativeContribution) ? data.associativeContribution : [],
+      numerique_responsable: Array.isArray(data.responsibleDigital) ? data.responsibleDigital : [],
+      communication_transparente: Array.isArray(data.communication) ? data.communication : [],
+      relations_fournisseurs: Array.isArray(data.supplierRelations) ? data.supplierRelations : [],
+      impact_social: Array.isArray(data.socialImpact) ? data.socialImpact : [],
+      production_durable: Array.isArray(data.production) ? data.production : [],
+      eco_conception: Array.isArray(data.ecoDesign) ? data.ecoDesign : [],
+      evaluation_continue: Array.isArray(data.continuousEvaluation) ? data.continuousEvaluation : [],
+      gestion_energie: Array.isArray(data.energyManagement) ? data.energyManagement : [],
+      emissions_carbone: Array.isArray(data.carbonEmissions) ? data.carbonEmissions : [],
+      economie_circulaire: Array.isArray(data.circularEconomy) ? data.circularEconomy : [],
+      gestion_dechets: Array.isArray(data.wasteManagement) ? data.wasteManagement : [],
+      achats_responsables: Array.isArray(data.responsiblePurchasing) ? data.responsiblePurchasing : []
     };
 
     // Log the formatted data for debugging

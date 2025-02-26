@@ -77,139 +77,139 @@ export type Database = {
       }
       label_submissions: {
         Row: {
-          associative_contribution: string[] | null
-          carbon_emissions: string[] | null
-          circular_economy: string[] | null
-          city: string | null
-          communication: string[] | null
-          company_name: string | null
-          continuous_evaluation: string[] | null
+          a_financements: string | null
+          achats_responsables: string[] | null
+          adresse: string | null
+          annee_creation: string | null
+          code_postal: string | null
+          communication_transparente: string[] | null
+          confidentialite_donnees: string[] | null
+          contribution_associative: string[] | null
+          courriel: string | null
           created_at: string | null
-          csr: string[] | null
           current_step: number | null
+          details_financement: string | null
           disclaimer_accepted: boolean | null
-          diversity: string[] | null
-          eco_design: string[] | null
-          email: string | null
-          employee_count: string | null
-          energy_management: string[] | null
-          equality: string[] | null
-          first_name: string | null
-          founding_year: string | null
-          funding_details: string | null
-          handicap: string[] | null
-          has_funding: string | null
-          health: string[] | null
+          diversite: string[] | null
+          eco_conception: string[] | null
+          economie_circulaire: string[] | null
+          egalite: string[] | null
+          emissions_carbone: string[] | null
+          evaluation_continue: string[] | null
+          formation: string[] | null
+          forme_juridique: string | null
+          gestion_dechets: string[] | null
+          gestion_energie: string[] | null
           id: string
-          legal_form: string | null
-          parentality: string[] | null
+          impact_social: string[] | null
+          mobilite: string[] | null
+          nom_entreprise: string | null
+          nombre_employes: string | null
+          numerique_responsable: string[] | null
+          parentalite: string[] | null
           payment_id: string | null
           payment_status: string | null
-          postal_code: string | null
-          privacy: string[] | null
-          production: string[] | null
-          responsible_digital: string[] | null
-          responsible_purchasing: string[] | null
-          sectors: string[] | null
-          social_impact: string[] | null
+          politique_rse: string[] | null
+          prenom: string | null
+          production_durable: string[] | null
+          relations_fournisseurs: string[] | null
+          sante_bien_etre: string[] | null
+          secteurs_activite: string[] | null
+          situation_handicap: string[] | null
           status: string | null
-          street_address: string | null
-          supplier_relations: string[] | null
-          training: string[] | null
-          transport: string[] | null
           updated_at: string | null
           user_id: string | null
-          waste_management: string[] | null
+          ville: string | null
         }
         Insert: {
-          associative_contribution?: string[] | null
-          carbon_emissions?: string[] | null
-          circular_economy?: string[] | null
-          city?: string | null
-          communication?: string[] | null
-          company_name?: string | null
-          continuous_evaluation?: string[] | null
+          a_financements?: string | null
+          achats_responsables?: string[] | null
+          adresse?: string | null
+          annee_creation?: string | null
+          code_postal?: string | null
+          communication_transparente?: string[] | null
+          confidentialite_donnees?: string[] | null
+          contribution_associative?: string[] | null
+          courriel?: string | null
           created_at?: string | null
-          csr?: string[] | null
           current_step?: number | null
+          details_financement?: string | null
           disclaimer_accepted?: boolean | null
-          diversity?: string[] | null
-          eco_design?: string[] | null
-          email?: string | null
-          employee_count?: string | null
-          energy_management?: string[] | null
-          equality?: string[] | null
-          first_name?: string | null
-          founding_year?: string | null
-          funding_details?: string | null
-          handicap?: string[] | null
-          has_funding?: string | null
-          health?: string[] | null
+          diversite?: string[] | null
+          eco_conception?: string[] | null
+          economie_circulaire?: string[] | null
+          egalite?: string[] | null
+          emissions_carbone?: string[] | null
+          evaluation_continue?: string[] | null
+          formation?: string[] | null
+          forme_juridique?: string | null
+          gestion_dechets?: string[] | null
+          gestion_energie?: string[] | null
           id?: string
-          legal_form?: string | null
-          parentality?: string[] | null
+          impact_social?: string[] | null
+          mobilite?: string[] | null
+          nom_entreprise?: string | null
+          nombre_employes?: string | null
+          numerique_responsable?: string[] | null
+          parentalite?: string[] | null
           payment_id?: string | null
           payment_status?: string | null
-          postal_code?: string | null
-          privacy?: string[] | null
-          production?: string[] | null
-          responsible_digital?: string[] | null
-          responsible_purchasing?: string[] | null
-          sectors?: string[] | null
-          social_impact?: string[] | null
+          politique_rse?: string[] | null
+          prenom?: string | null
+          production_durable?: string[] | null
+          relations_fournisseurs?: string[] | null
+          sante_bien_etre?: string[] | null
+          secteurs_activite?: string[] | null
+          situation_handicap?: string[] | null
           status?: string | null
-          street_address?: string | null
-          supplier_relations?: string[] | null
-          training?: string[] | null
-          transport?: string[] | null
           updated_at?: string | null
           user_id?: string | null
-          waste_management?: string[] | null
+          ville?: string | null
         }
         Update: {
-          associative_contribution?: string[] | null
-          carbon_emissions?: string[] | null
-          circular_economy?: string[] | null
-          city?: string | null
-          communication?: string[] | null
-          company_name?: string | null
-          continuous_evaluation?: string[] | null
+          a_financements?: string | null
+          achats_responsables?: string[] | null
+          adresse?: string | null
+          annee_creation?: string | null
+          code_postal?: string | null
+          communication_transparente?: string[] | null
+          confidentialite_donnees?: string[] | null
+          contribution_associative?: string[] | null
+          courriel?: string | null
           created_at?: string | null
-          csr?: string[] | null
           current_step?: number | null
+          details_financement?: string | null
           disclaimer_accepted?: boolean | null
-          diversity?: string[] | null
-          eco_design?: string[] | null
-          email?: string | null
-          employee_count?: string | null
-          energy_management?: string[] | null
-          equality?: string[] | null
-          first_name?: string | null
-          founding_year?: string | null
-          funding_details?: string | null
-          handicap?: string[] | null
-          has_funding?: string | null
-          health?: string[] | null
+          diversite?: string[] | null
+          eco_conception?: string[] | null
+          economie_circulaire?: string[] | null
+          egalite?: string[] | null
+          emissions_carbone?: string[] | null
+          evaluation_continue?: string[] | null
+          formation?: string[] | null
+          forme_juridique?: string | null
+          gestion_dechets?: string[] | null
+          gestion_energie?: string[] | null
           id?: string
-          legal_form?: string | null
-          parentality?: string[] | null
+          impact_social?: string[] | null
+          mobilite?: string[] | null
+          nom_entreprise?: string | null
+          nombre_employes?: string | null
+          numerique_responsable?: string[] | null
+          parentalite?: string[] | null
           payment_id?: string | null
           payment_status?: string | null
-          postal_code?: string | null
-          privacy?: string[] | null
-          production?: string[] | null
-          responsible_digital?: string[] | null
-          responsible_purchasing?: string[] | null
-          sectors?: string[] | null
-          social_impact?: string[] | null
+          politique_rse?: string[] | null
+          prenom?: string | null
+          production_durable?: string[] | null
+          relations_fournisseurs?: string[] | null
+          sante_bien_etre?: string[] | null
+          secteurs_activite?: string[] | null
+          situation_handicap?: string[] | null
           status?: string | null
-          street_address?: string | null
-          supplier_relations?: string[] | null
-          training?: string[] | null
-          transport?: string[] | null
           updated_at?: string | null
           user_id?: string | null
-          waste_management?: string[] | null
+          ville?: string | null
         }
         Relationships: []
       }
