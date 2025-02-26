@@ -15,35 +15,33 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
     return initialAnswers;
   });
 
-  const toggleAnswer = (questionId: string, value: string, clearOthers: boolean = false) => {
+  const toggleAnswer = (questionId: string, value: string, label: string) => {
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
-    if (clearOthers) {
-      // If clearing others (for "Non applicable"), just set this value
-      newAnswers = [value];
+    if (label === "Ce critère ne s'applique pas à mon entreprise") {
+      newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
-      // Normal toggle behavior
-      newAnswers = currentAnswers.includes(value)
-        ? currentAnswers.filter(v => v !== value)
-        : [...currentAnswers, value];
+      newAnswers = currentAnswers.includes(label)
+        ? currentAnswers.filter(v => v !== label)
+        : [...currentAnswers.filter(v => v !== "Ce critère ne s'applique pas à mon entreprise"), label];
     }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
-    setFormState({ ...formState, ...updatedAnswers });
     
-    console.log('Updated answers:', updatedAnswers);
-    const isValid = Object.values(updatedAnswers).every(answer => answer.length > 0);
-    console.log('Form valid:', isValid);
-    onValidityChange(isValid);
+    // Update form state with the new answers
+    const formUpdates: Record<string, string[]> = {
+      [questionId]: newAnswers
+    };
+    
+    setFormState({ ...formState, ...formUpdates });
   };
 
   useEffect(() => {
     const isValid = Object.values(answers).every(answer => answer.length > 0);
-    console.log('Initial form validation:', isValid);
     onValidityChange(isValid);
-  }, [answers]);
+  }, [answers, onValidityChange]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">
@@ -60,7 +58,12 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
             key={question.id}
             question={question}
             answers={answers[question.id] || []}
-            onAnswerToggle={toggleAnswer}
+            onAnswerToggle={(questionId, value) => {
+              const option = question.options.find(opt => opt.value === value);
+              if (option) {
+                toggleAnswer(questionId, value, option.label);
+              }
+            }}
           />
         ))}
       </div>

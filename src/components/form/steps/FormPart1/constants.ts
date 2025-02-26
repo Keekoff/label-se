@@ -3,7 +3,7 @@ import { Question } from "./types";
 
 export const QUESTIONS: Question[] = [
   {
-    id: "diversite",
+    id: "diversity",
     title: "1 - Diversité",
     description: "Ensemble des personnes qui diffèrent les unes des autres par leur origine géographique, socio-culturelle ou religieuse, leur âge, leur sexe, leur orientation sexuelle, etc.",
     options: [
@@ -14,7 +14,7 @@ export const QUESTIONS: Question[] = [
     ]
   },
   {
-    id: "egalite",
+    id: "equality",
     title: "2 - Égalité",
     description: "Absence de toute discrimination entre les êtres humains sur le plan de leurs droits.",
     options: [
@@ -36,7 +36,7 @@ export const QUESTIONS: Question[] = [
     ]
   },
   {
-    id: "sante_bien_etre",
+    id: "health",
     title: "4 - Santé des salariés et bien-être au travail",
     description: "Équilibre global entre satisfaction professionnelle et épanouissement personnel.",
     options: [
@@ -47,7 +47,7 @@ export const QUESTIONS: Question[] = [
     ]
   },
   {
-    id: "parentalite",
+    id: "parentality",
     title: "5 - Parentalité",
     description: "Équilibre entre rôle de parent et vie professionnelle.",
     options: [
@@ -58,7 +58,7 @@ export const QUESTIONS: Question[] = [
     ]
   },
   {
-    id: "formation",
+    id: "training",
     title: "6 - Formation",
     description: "Adaptation technique, physique et psychologique des collaborateurs à leurs fonctions.",
     options: [
@@ -69,7 +69,7 @@ export const QUESTIONS: Question[] = [
     ]
   },
   {
-    id: "politique_rse",
+    id: "csr",
     title: "7 - Politique RSE",
     description: "Intégration des préoccupations sociales et environnementales dans les activités.",
     options: [
@@ -80,7 +80,7 @@ export const QUESTIONS: Question[] = [
     ]
   },
   {
-    id: "privacy_data",
+    id: "privacy",
     title: "8 - Privacy/data",
     description: "Protection des données des parties prenantes.",
     options: [
@@ -91,7 +91,7 @@ export const QUESTIONS: Question[] = [
     ]
   },
   {
-    id: "transports",
+    id: "transport",
     title: "9 - Transports",
     description: "Mobilité des collaborateurs et marchandises.",
     options: [
