@@ -12,7 +12,7 @@ interface Payment {
   id: string;
   created_at: string;
   payment_id: string;
-  company_name: string;
+  nom_entreprise: string;
   payment_status: string;
 }
 
@@ -31,7 +31,7 @@ const Payments = () => {
 
         const { data, error } = await supabase
           .from('label_submissions')
-          .select('id, created_at, payment_id, company_name, payment_status')
+          .select('id, created_at, payment_id, nom_entreprise, payment_status')
           .eq('user_id', session.user.id)
           .eq('payment_status', 'paid')
           .order('created_at', { ascending: false });
@@ -81,7 +81,7 @@ const Payments = () => {
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h3 className="font-semibold">{payment.company_name || 'Label Startup Engagée'}</h3>
+                  <h3 className="font-semibold">{payment.nom_entreprise || 'Label Startup Engagée'}</h3>
                   <p className="text-sm text-gray-500">
                     {format(new Date(payment.created_at), "dd MMMM yyyy", { locale: fr })}
                   </p>

@@ -29,14 +29,14 @@ const Dashboard = () => {
 
       const { data, error } = await supabase
         .from('label_submissions')
-        .select('id, first_name, status, payment_status')
+        .select('id, prenom, status, payment_status')
         .eq('user_id', session.user.id)
         .maybeSingle();
       
       if (error) throw error;
 
       if (data) {
-        setFirstName(data.first_name || '');
+        setFirstName(data.prenom || '');
         setSubmissionId(data.id);
         setHasSubmittedForm(data.status !== 'draft');
         setPaymentStatus(data.payment_status as PaymentStatus);
