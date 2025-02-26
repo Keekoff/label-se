@@ -8,3 +8,15 @@ export interface Question {
     label: string;
   }[];
 }
+
+export interface QuestionProps {
+  question: Question;
+  selectedAnswers: string[];
+  onAnswerToggle: (questionId: string, value: string) => void;
+}
+
+export interface FormPart3Props {
+  onValidityChange: (isValid: boolean) => void;
+  formState: Record<string, any>;
+  setFormState: (state: Record<string, any>) => void;
+}

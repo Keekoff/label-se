@@ -20,21 +20,18 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
     let newAnswers: string[];
 
     // Handle "Non applicable" option
-    if (label.includes("Non applicable")) {
+    if (label.includes("Ce critère ne s'applique pas à mon entreprise")) {
       newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
       // If selecting a regular option, remove "Non applicable" if present
       newAnswers = currentAnswers.includes(label)
         ? currentAnswers.filter(v => v !== label)
-        : [...currentAnswers.filter(v => !v.includes("Non applicable")), label];
+        : [...currentAnswers.filter(v => !v.includes("Ce critère ne s'applique pas à mon entreprise")), label];
     }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
     setFormState({ ...formState, ...updatedAnswers });
-
-    const isValid = Object.values(updatedAnswers).every(answer => answer.length > 0);
-    onValidityChange(isValid);
   };
 
   useEffect(() => {
@@ -57,8 +54,12 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
             key={question.id}
             question={question}
             selectedAnswers={answers[question.id] || []}
-            onAnswerToggle={(questionId, value) => toggleAnswer(questionId, value, 
-              question.options.find(opt => opt.value === value)?.label || value)}
+            onAnswerToggle={(questionId, value) => {
+              const option = question.options.find(opt => opt.value === value);
+              if (option) {
+                toggleAnswer(questionId, value, option.label);
+              }
+            }}
           />
         ))}
       </div>
