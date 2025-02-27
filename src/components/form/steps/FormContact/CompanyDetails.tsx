@@ -10,9 +10,10 @@ interface CompanyDetailsProps {
   formState: Record<string, any>;
   setFormState: (state: Record<string, any>) => void;
   onValidityChange: (isValid: boolean) => void;
+  readOnly?: boolean;
 }
 
-const CompanyDetails = ({ formState, setFormState, onValidityChange }: CompanyDetailsProps) => {
+const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = false }: CompanyDetailsProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -31,6 +32,8 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange }: CompanyDe
   }, [formState]);
 
   const handleChange = (field: string, value: any) => {
+    if (readOnly) return;
+    
     setFormState((prev: Record<string, any>) => ({
       ...prev,
       [field]: value
@@ -38,6 +41,8 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange }: CompanyDe
   };
 
   const toggleSector = (sector: string) => {
+    if (readOnly) return;
+    
     const currentSectors = formState?.sectors || [];
     const newSectors = currentSectors.includes(sector)
       ? currentSectors.filter((s: string) => s !== sector)
@@ -58,8 +63,9 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange }: CompanyDe
             id="companyName"
             value={formState?.companyName || ""}
             onChange={(e) => handleChange("companyName", e.target.value)}
+            className={readOnly ? "bg-gray-100" : ""}
+            readOnly={readOnly}
           />
-          {errors.companyName && <span className="text-sm text-red-500">{errors.companyName}</span>}
         </div>
 
         <div className="space-y-3">
@@ -73,6 +79,7 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange }: CompanyDe
                   id={`sector-${sector}`}
                   checked={(formState?.sectors || []).includes(sector)}
                   onCheckedChange={() => toggleSector(sector)}
+                  disabled={readOnly}
                 />
                 <Label htmlFor={`sector-${sector}`} className="text-sm">
                   {sector}
@@ -80,7 +87,6 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange }: CompanyDe
               </div>
             ))}
           </div>
-          {errors.sectors && <span className="text-sm text-red-500">{errors.sectors}</span>}
         </div>
 
         <div className="space-y-3">
@@ -90,17 +96,17 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange }: CompanyDe
           <RadioGroup
             value={formState?.legalForm || ""}
             onValueChange={(value) => handleChange("legalForm", value)}
+            disabled={readOnly}
           >
             <div className="grid grid-cols-2 gap-3">
               {LEGAL_FORMS.map((formType) => (
                 <div key={formType} className="flex items-center space-x-2">
-                  <RadioGroupItem value={formType} id={`legal-${formType}`} />
+                  <RadioGroupItem value={formType} id={`legal-${formType}`} disabled={readOnly} />
                   <Label htmlFor={`legal-${formType}`}>{formType}</Label>
                 </div>
               ))}
             </div>
           </RadioGroup>
-          {errors.legalForm && <span className="text-sm text-red-500">{errors.legalForm}</span>}
         </div>
       </div>
     </div>

@@ -7,9 +7,10 @@ interface AddressInformationProps {
   formState: Record<string, any>;
   setFormState: (state: Record<string, any>) => void;
   onValidityChange: (isValid: boolean) => void;
+  readOnly?: boolean;
 }
 
-const AddressInformation = ({ formState, setFormState, onValidityChange }: AddressInformationProps) => {
+const AddressInformation = ({ formState, setFormState, onValidityChange, readOnly = false }: AddressInformationProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -28,6 +29,8 @@ const AddressInformation = ({ formState, setFormState, onValidityChange }: Addre
   }, [formState]);
 
   const handleChange = (field: string, value: string) => {
+    if (readOnly) return;
+    
     setFormState((prev: Record<string, any>) => ({
       ...prev,
       [field]: value
@@ -48,8 +51,9 @@ const AddressInformation = ({ formState, setFormState, onValidityChange }: Addre
             placeholder="Numéro et nom de rue"
             value={formState?.streetAddress || ""}
             onChange={(e) => handleChange("streetAddress", e.target.value)}
+            className={readOnly ? "bg-gray-100" : ""}
+            readOnly={readOnly}
           />
-          {errors.streetAddress && <span className="text-sm text-red-500">{errors.streetAddress}</span>}
         </div>
 
         <div className="grid gap-4">
@@ -61,8 +65,9 @@ const AddressInformation = ({ formState, setFormState, onValidityChange }: Addre
               id="postalCode"
               value={formState?.postalCode || ""}
               onChange={(e) => handleChange("postalCode", e.target.value)}
+              className={readOnly ? "bg-gray-100" : ""}
+              readOnly={readOnly}
             />
-            {errors.postalCode && <span className="text-sm text-red-500">{errors.postalCode}</span>}
           </div>
 
           <div className="space-y-2">
@@ -73,8 +78,9 @@ const AddressInformation = ({ formState, setFormState, onValidityChange }: Addre
               id="city"
               value={formState?.city || ""}
               onChange={(e) => handleChange("city", e.target.value)}
+              className={readOnly ? "bg-gray-100" : ""}
+              readOnly={readOnly}
             />
-            {errors.city && <span className="text-sm text-red-500">{errors.city}</span>}
           </div>
         </div>
       </div>

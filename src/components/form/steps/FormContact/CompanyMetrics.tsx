@@ -9,9 +9,10 @@ interface CompanyMetricsProps {
   formState: Record<string, any>;
   setFormState: (state: Record<string, any>) => void;
   onValidityChange: (isValid: boolean) => void;
+  readOnly?: boolean;
 }
 
-const CompanyMetrics = ({ formState, setFormState, onValidityChange }: CompanyMetricsProps) => {
+const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = false }: CompanyMetricsProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -33,6 +34,8 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange }: CompanyMe
   }, [formState]);
 
   const handleChange = (field: string, value: string) => {
+    if (readOnly) return;
+    
     setFormState((prev: Record<string, any>) => ({
       ...prev,
       [field]: value
@@ -52,8 +55,9 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange }: CompanyMe
             id="foundingYear"
             value={formState?.foundingYear || ""}
             onChange={(e) => handleChange("foundingYear", e.target.value)}
+            className={readOnly ? "bg-gray-100" : ""}
+            readOnly={readOnly}
           />
-          {errors.foundingYear && <span className="text-sm text-red-500">{errors.foundingYear}</span>}
         </div>
 
         <div className="space-y-3">
@@ -63,17 +67,17 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange }: CompanyMe
           <RadioGroup
             value={formState?.employeeCount || ""}
             onValueChange={(value) => handleChange("employeeCount", value)}
+            disabled={readOnly}
           >
             <div className="grid gap-3">
               {EMPLOYEE_COUNTS.map((count) => (
                 <div key={count} className="flex items-center space-x-2">
-                  <RadioGroupItem value={count} id={`count-${count}`} />
+                  <RadioGroupItem value={count} id={`count-${count}`} disabled={readOnly} />
                   <Label htmlFor={`count-${count}`}>{count}</Label>
                 </div>
               ))}
             </div>
           </RadioGroup>
-          {errors.employeeCount && <span className="text-sm text-red-500">{errors.employeeCount}</span>}
         </div>
 
         <div className="space-y-4">
@@ -84,17 +88,17 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange }: CompanyMe
             <RadioGroup
               value={formState?.hasFunding || ""}
               onValueChange={(value) => handleChange("hasFunding", value)}
+              disabled={readOnly}
             >
               <div className="grid gap-3">
                 {FUNDING_OPTIONS.map((option) => (
                   <div key={option} className="flex items-center space-x-2">
-                    <RadioGroupItem value={option} id={`funding-${option}`} />
+                    <RadioGroupItem value={option} id={`funding-${option}`} disabled={readOnly} />
                     <Label htmlFor={`funding-${option}`}>{option}</Label>
                   </div>
                 ))}
               </div>
             </RadioGroup>
-            {errors.hasFunding && <span className="text-sm text-red-500">{errors.hasFunding}</span>}
           </div>
 
           {formState?.hasFunding === "Oui" && (
@@ -107,8 +111,9 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange }: CompanyMe
                 placeholder="Ex: Seed 500k€, Série A 2M€..."
                 value={formState?.fundingDetails || ""}
                 onChange={(e) => handleChange("fundingDetails", e.target.value)}
+                className={readOnly ? "bg-gray-100" : ""}
+                readOnly={readOnly}
               />
-              {errors.fundingDetails && <span className="text-sm text-red-500">{errors.fundingDetails}</span>}
             </div>
           )}
         </div>

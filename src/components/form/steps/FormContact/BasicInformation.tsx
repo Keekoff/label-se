@@ -7,9 +7,10 @@ interface BasicInformationProps {
   formState: Record<string, any>;
   setFormState: (state: Record<string, any>) => void;
   onValidityChange: (isValid: boolean) => void;
+  readOnly?: boolean;
 }
 
-const BasicInformation = ({ formState, setFormState, onValidityChange }: BasicInformationProps) => {
+const BasicInformation = ({ formState, setFormState, onValidityChange, readOnly = false }: BasicInformationProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validate = () => {
@@ -30,6 +31,8 @@ const BasicInformation = ({ formState, setFormState, onValidityChange }: BasicIn
   }, [formState]);
 
   const handleChange = (field: string, value: string) => {
+    if (readOnly) return;
+    
     setFormState((prev: Record<string, any>) => ({
       ...prev,
       [field]: value
@@ -48,8 +51,9 @@ const BasicInformation = ({ formState, setFormState, onValidityChange }: BasicIn
             id="firstName"
             value={formState.firstName || ""}
             onChange={(e) => handleChange("firstName", e.target.value)}
+            className={readOnly ? "bg-gray-100" : ""}
+            readOnly={readOnly}
           />
-          {errors.firstName && <span className="text-sm text-red-500">{errors.firstName}</span>}
         </div>
 
         <div className="space-y-2">
@@ -60,8 +64,9 @@ const BasicInformation = ({ formState, setFormState, onValidityChange }: BasicIn
             id="lastName"
             value={formState.lastName || ""}
             onChange={(e) => handleChange("lastName", e.target.value)}
+            className={readOnly ? "bg-gray-100" : ""}
+            readOnly={readOnly}
           />
-          {errors.lastName && <span className="text-sm text-red-500">{errors.lastName}</span>}
         </div>
 
         <div className="space-y-2">
@@ -73,8 +78,9 @@ const BasicInformation = ({ formState, setFormState, onValidityChange }: BasicIn
             type="email"
             value={formState.email || ""}
             onChange={(e) => handleChange("email", e.target.value)}
+            className={readOnly ? "bg-gray-100" : ""}
+            readOnly={readOnly}
           />
-          {errors.email && <span className="text-sm text-red-500">{errors.email}</span>}
         </div>
 
         <div className="space-y-2">
@@ -86,8 +92,9 @@ const BasicInformation = ({ formState, setFormState, onValidityChange }: BasicIn
             type="tel"
             value={formState.phone || ""}
             onChange={(e) => handleChange("phone", e.target.value)}
+            className={readOnly ? "bg-gray-100" : ""}
+            readOnly={readOnly}
           />
-          {errors.phone && <span className="text-sm text-red-500">{errors.phone}</span>}
         </div>
       </div>
     </div>
