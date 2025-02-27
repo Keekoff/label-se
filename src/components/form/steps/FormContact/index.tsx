@@ -38,6 +38,24 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
         }
 
         if (data) {
+          // Map is_mission_driven to relevant format if needed
+          let hasFunding = "Non";
+          if (data.has_funding === "yes") {
+            hasFunding = "Oui";
+          }
+
+          // Adapt employee count from eligibility to match the format in label form
+          let employeeCount = data.employee_count;
+          if (data.employee_count === "0-10") {
+            employeeCount = "0 à 10";
+          } else if (data.employee_count === "10-49") {
+            employeeCount = "11 à 49";
+          } else if (data.employee_count === "50-99") {
+            employeeCount = "50 à 99";
+          } else if (data.employee_count === "100 et plus") {
+            employeeCount = "100 et plus";
+          }
+
           // Populate form with eligibility data
           const updatedFormState = {
             ...formState,
@@ -50,8 +68,10 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
               ? data.sectors[0] 
               : formState.sector,
             legalForm: data.legal_form || formState.legalForm,
-            employeeCount: data.employee_count || formState.employeeCount,
+            employeeCount: employeeCount || formState.employeeCount,
             phone: data.phone || formState.phone,
+            hasFunding: hasFunding,
+            // Add other relevant fields
           };
           
           setFormState(updatedFormState);

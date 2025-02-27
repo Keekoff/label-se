@@ -1,14 +1,15 @@
 
 interface WelcomeHeaderProps {
   firstName: string;
+  companyName?: string;
 }
 
-export const WelcomeHeader = ({ firstName }: WelcomeHeaderProps) => {
+export const WelcomeHeader = ({ firstName, companyName }: WelcomeHeaderProps) => {
   return (
     <div>
       <h1 className="text-3xl font-bold">Bienvenue, {firstName}</h1>
       <p className="text-gray-500 mt-2">
-        Voici un aperçu de votre activité récente
+        {companyName ? `Votre entreprise : ${companyName}` : "Voici un aperçu de votre activité récente"}
       </p>
     </div>
   );

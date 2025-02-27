@@ -14,6 +14,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [firstName, setFirstName] = useState("");
+  const [companyName, setCompanyName] = useState("");
   const [hasSubmittedForm, setHasSubmittedForm] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
@@ -29,7 +30,7 @@ const Dashboard = () => {
 
       const { data, error } = await supabase
         .from('label_submissions')
-        .select('id, prenom, status, payment_status')
+        .select('id, prenom, nom_entreprise, status, payment_status')
         .eq('user_id', session.user.id)
         .maybeSingle();
       
@@ -37,9 +38,22 @@ const Dashboard = () => {
 
       if (data) {
         setFirstName(data.prenom || '');
+        setCompanyName(data.nom_entreprise || '');
         setSubmissionId(data.id);
         setHasSubmittedForm(data.status !== 'draft');
         setPaymentStatus(data.payment_status as PaymentStatus);
+      } else {
+        // If no label submission exists yet, try to get data from eligibility submission
+        const { data: eligibilityData, error: eligibilityError } = await supabase
+          .from('eligibility_submissions')
+          .select('first_name, company_name')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (!eligibilityError && eligibilityData) {
+          setFirstName(eligibilityData.first_name || '');
+          setCompanyName(eligibilityData.company_name || '');
+        }
       }
     } catch (error) {
       console.error('Error fetching submission details:', error);
@@ -117,7 +131,7 @@ const Dashboard = () => {
   if (hasSubmittedForm) {
     return (
       <div className="space-y-8 animate-fadeIn">
-        <WelcomeHeader firstName={firstName} />
+        <WelcomeHeader firstName={firstName} companyName={companyName} />
         <SubmissionCard 
           paymentStatus={paymentStatus}
           isLoading={isLoading}
@@ -130,7 +144,7 @@ const Dashboard = () => {
 
   return (
     <div className="space-y-8 animate-fadeIn">
-      <WelcomeHeader firstName={firstName} />
+      <WelcomeHeader firstName={firstName} companyName={companyName} />
       <WelcomeCard />
     </div>
   );
