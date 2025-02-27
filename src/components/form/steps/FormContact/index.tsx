@@ -45,12 +45,13 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
             lastName: data.last_name || formState.lastName,
             email: data.email || formState.email,
             companyName: data.company_name || formState.companyName,
-            // Map sectors if available
-            sectors: data.sectors || formState.sectors,
+            // Convert array to single value for sector
+            sector: Array.isArray(data.sectors) && data.sectors.length > 0 
+              ? data.sectors[0] 
+              : formState.sector,
             legalForm: data.legal_form || formState.legalForm,
             employeeCount: data.employee_count || formState.employeeCount,
             phone: data.phone || formState.phone,
-            // Add other fields if they exist in the eligibility form
           };
           
           setFormState(updatedFormState);
@@ -95,7 +96,7 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
           formState={formState}
           setFormState={setFormState}
           onValidityChange={setIsAddressValid}
-          readOnly={true}
+          readOnly={false}
         />
         <CompanyDetails
           formState={formState}
@@ -107,7 +108,7 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
           formState={formState}
           setFormState={setFormState}
           onValidityChange={setIsMetricsValid}
-          readOnly={true}
+          readOnly={false}
         />
       </div>
     </div>

@@ -2,8 +2,8 @@
 import { useState, useEffect } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Checkbox } from "@/components/ui/checkbox";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { SECTORS, LEGAL_FORMS } from './constants';
 
 interface CompanyDetailsProps {
@@ -19,7 +19,7 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
   const validate = () => {
     const newErrors: Record<string, string> = {};
     if (!formState?.companyName?.trim()) newErrors.companyName = "Le nom de la société est requis";
-    if (!formState?.sectors?.length) newErrors.sectors = "Au moins un secteur est requis";
+    if (!formState?.sector) newErrors.sector = "Le secteur est requis";
     if (!formState?.legalForm) newErrors.legalForm = "La forme juridique est requise";
 
     setErrors(newErrors);
@@ -40,16 +40,6 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
     }));
   };
 
-  const toggleSector = (sector: string) => {
-    if (readOnly) return;
-    
-    const currentSectors = formState?.sectors || [];
-    const newSectors = currentSectors.includes(sector)
-      ? currentSectors.filter((s: string) => s !== sector)
-      : [...currentSectors, sector];
-    handleChange('sectors', newSectors);
-  };
-
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium">Informations société</h3>
@@ -68,25 +58,26 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
           />
         </div>
 
-        <div className="space-y-3">
-          <Label>
+        <div className="space-y-2">
+          <Label htmlFor="sector">
             Quel est le secteur d'activité de l'entreprise ? <span className="text-red-500">*</span>
           </Label>
-          <div className="grid grid-cols-1 gap-3">
-            {SECTORS.map((sector) => (
-              <div key={sector} className="flex items-center space-x-2">
-                <Checkbox
-                  id={`sector-${sector}`}
-                  checked={(formState?.sectors || []).includes(sector)}
-                  onCheckedChange={() => toggleSector(sector)}
-                  disabled={readOnly}
-                />
-                <Label htmlFor={`sector-${sector}`} className="text-sm">
+          <Select
+            value={formState?.sector || ""}
+            onValueChange={(value) => handleChange("sector", value)}
+            disabled={readOnly}
+          >
+            <SelectTrigger className={readOnly ? "bg-gray-100" : ""}>
+              <SelectValue placeholder="Sélectionnez un secteur" />
+            </SelectTrigger>
+            <SelectContent>
+              {SECTORS.map((sector) => (
+                <SelectItem key={sector} value={sector}>
                   {sector}
-                </Label>
-              </div>
-            ))}
-          </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="space-y-3">

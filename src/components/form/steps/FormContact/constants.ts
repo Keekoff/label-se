@@ -1,10 +1,24 @@
 
 export const SECTORS = [
-  "Service",
-  "Commerce",
+  "Food",
+  "Agro-alimentaire",
+  "Mode/Beauté",
+  "Luxe",
   "Industrie",
-  "Construction",
-  "Agriculture"
+  "Santé/Pharma",
+  "Banque/Assurance",
+  "Environnement",
+  "Social",
+  "ESS",
+  "Data & IT",
+  "E-commerce",
+  "Legal",
+  "Finance",
+  "Marketing",
+  "Ressources Humaines",
+  "Agence",
+  "Cabinet de conseil",
+  "Autre"
 ];
 
 export const LEGAL_FORMS = [

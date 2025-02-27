@@ -34,7 +34,7 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = 
   }, [formState]);
 
   const handleChange = (field: string, value: string) => {
-    if (readOnly) return;
+    if (readOnly && field !== "foundingYear") return;
     
     setFormState((prev: Record<string, any>) => ({
       ...prev,
@@ -55,8 +55,6 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = 
             id="foundingYear"
             value={formState?.foundingYear || ""}
             onChange={(e) => handleChange("foundingYear", e.target.value)}
-            className={readOnly ? "bg-gray-100" : ""}
-            readOnly={readOnly}
           />
         </div>
 
@@ -67,12 +65,12 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = 
           <RadioGroup
             value={formState?.employeeCount || ""}
             onValueChange={(value) => handleChange("employeeCount", value)}
-            disabled={readOnly}
+            disabled={true}
           >
             <div className="grid gap-3">
               {EMPLOYEE_COUNTS.map((count) => (
                 <div key={count} className="flex items-center space-x-2">
-                  <RadioGroupItem value={count} id={`count-${count}`} disabled={readOnly} />
+                  <RadioGroupItem value={count} id={`count-${count}`} disabled={true} />
                   <Label htmlFor={`count-${count}`}>{count}</Label>
                 </div>
               ))}
@@ -88,12 +86,12 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = 
             <RadioGroup
               value={formState?.hasFunding || ""}
               onValueChange={(value) => handleChange("hasFunding", value)}
-              disabled={readOnly}
+              disabled={true}
             >
               <div className="grid gap-3">
                 {FUNDING_OPTIONS.map((option) => (
                   <div key={option} className="flex items-center space-x-2">
-                    <RadioGroupItem value={option} id={`funding-${option}`} disabled={readOnly} />
+                    <RadioGroupItem value={option} id={`funding-${option}`} disabled={true} />
                     <Label htmlFor={`funding-${option}`}>{option}</Label>
                   </div>
                 ))}
@@ -111,8 +109,8 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = 
                 placeholder="Ex: Seed 500k€, Série A 2M€..."
                 value={formState?.fundingDetails || ""}
                 onChange={(e) => handleChange("fundingDetails", e.target.value)}
-                className={readOnly ? "bg-gray-100" : ""}
-                readOnly={readOnly}
+                className="bg-gray-100"
+                readOnly={true}
               />
             </div>
           )}
