@@ -108,9 +108,13 @@ const DashboardLayout = () => {
     <div className="min-h-screen bg-background">
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
-          <span className="text-slate-50 text-base font-bold">
-            {sidebarOpen ? "Startup Engagée" : "SE"}
-          </span>
+          <div className="text-slate-50 text-base font-bold">
+            {sidebarOpen ? (
+              <img src="/lovable-uploads/de6325b8-2d80-4327-963c-d4a068f337fe.png" alt="Logo" className="h-10" />
+            ) : (
+              <img src="/lovable-uploads/de6325b8-2d80-4327-963c-d4a068f337fe.png" alt="Logo" className="h-6" />
+            )}
+          </div>
           <Button 
             variant="ghost" 
             size="icon" 
@@ -146,19 +150,22 @@ const DashboardLayout = () => {
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56" align="end" forceMount>
+              <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
                 <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/dashboard/profil")}>
                   <User className="mr-2 h-4 w-4" />
-                  <span>Profil</span>
+                  <span>Mon profil</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Paramètres</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600" onClick={() => navigate("/login")}>
+                <DropdownMenuItem className="text-red-600" onClick={async () => {
+                  await supabase.auth.signOut();
+                  navigate("/login");
+                }}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Se déconnecter</span>
                 </DropdownMenuItem>

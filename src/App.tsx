@@ -1,63 +1,42 @@
 
-import { RouterProvider, createBrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Index from "@/pages/Index";
 import Login from "@/pages/Login";
 import Signup from "@/pages/Signup";
 import NotFound from "@/pages/NotFound";
-import DashboardLayout from "@/components/DashboardLayout";
 import Dashboard from "@/pages/Dashboard";
-import Form from "@/pages/Dashboard/Form";
-import EligibilityForm from "@/pages/EligibilityForm";
-import Payments from "@/pages/Dashboard/Payments";
-import Justificatifs from "@/pages/Dashboard/Justificatifs";
-
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Index />,
-  },
-  {
-    path: "/login",
-    element: <Login />,
-  },
-  {
-    path: "/signup",
-    element: <Signup />,
-  },
-  {
-    path: "/dashboard",
-    element: <DashboardLayout />,
-    children: [
-      {
-        index: true,
-        element: <Dashboard />,
-      },
-      {
-        path: "form",
-        element: <Form />,
-      },
-      {
-        path: "eligibility",
-        element: <EligibilityForm />,
-      },
-      {
-        path: "payments",
-        element: <Payments />,
-      },
-      {
-        path: "justificatifs",
-        element: <Justificatifs />,
-      },
-    ],
-  },
-  {
-    path: "*",
-    element: <NotFound />,
-  },
-]);
+import DashboardLayout from "@/components/DashboardLayout";
+import EligibilityForm from "./pages/EligibilityForm";
+import Form from "./pages/Dashboard/Form";
+import Justificatifs from "./pages/Dashboard/Justificatifs";
+import Payments from "./pages/Dashboard/Payments";
+import Profil from "./pages/Dashboard/Profil";
+import { Toaster } from "@/components/ui/toaster";
+import { Toaster as SonnerToaster } from "sonner";
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Index />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
+        <Route path="/dashboard" element={<DashboardLayout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="eligibility" element={<EligibilityForm />} />
+          <Route path="form" element={<Form />} />
+          <Route path="justificatifs" element={<Justificatifs />} />
+          <Route path="payments" element={<Payments />} />
+          <Route path="profil" element={<Profil />} />
+          <Route path="settings" element={<div>Settings Page</div>} />
+        </Route>
+        <Route path="/404" element={<NotFound />} />
+        <Route path="*" element={<Navigate to="/404" replace />} />
+      </Routes>
+      <Toaster />
+      <SonnerToaster position="top-right" />
+    </BrowserRouter>
+  );
 }
 
 export default App;
