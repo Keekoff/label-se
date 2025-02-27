@@ -38,12 +38,10 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
         }
 
         if (data) {
-          // Map is_mission_driven to relevant format if needed
+          // The eligibility form doesn't have a direct has_funding field
+          // Let's set a default value - we can adjust based on other fields if needed
           let hasFunding = "Non";
-          if (data.has_funding === "yes") {
-            hasFunding = "Oui";
-          }
-
+          
           // Adapt employee count from eligibility to match the format in label form
           let employeeCount = data.employee_count;
           if (data.employee_count === "0-10") {
