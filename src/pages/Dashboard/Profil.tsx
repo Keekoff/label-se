@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { User, Building, Mail, Phone } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Button } from "@/components/ui/button";
 
 interface UserProfile {
   prenom: string;
@@ -104,16 +105,22 @@ const Profil = () => {
         Vos informations personnelles
       </p>
       
-      <Card>
+      <Card className="shadow-md">
         <CardHeader>
           <CardTitle>Informations personnelles</CardTitle>
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="flex items-start gap-4">
             <User className="h-6 w-6 text-gray-500 mt-1" />
-            <div>
-              <h3 className="font-medium text-lg">Nom et prénom</h3>
-              <p className="text-gray-600">{profile?.prenom} {profile?.nom || ''}</p>
+            <div className="space-y-3">
+              <div>
+                <h3 className="font-medium text-lg">Prénom</h3>
+                <p className="text-gray-600">{profile?.prenom}</p>
+              </div>
+              <div>
+                <h3 className="font-medium text-lg">Nom</h3>
+                <p className="text-gray-600">{profile?.nom || '-'}</p>
+              </div>
             </div>
           </div>
           
@@ -146,6 +153,12 @@ const Profil = () => {
           )}
         </CardContent>
       </Card>
+
+      <div className="text-center">
+        <Button variant="secondary" className="mt-4">
+          Vous souhaitez modifier ces informations ? Contactez-nous
+        </Button>
+      </div>
     </div>
   );
 };
