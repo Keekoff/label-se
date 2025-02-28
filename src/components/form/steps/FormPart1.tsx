@@ -47,7 +47,7 @@ const QUESTIONS: Question[] = [
     ]
   },
   {
-    id: "disability",
+    id: "handicap",
     title: "3 - Handicap",
     description: "Limitation d'activité ou restriction de participation à la vie de l'entreprise.",
     options: [
@@ -136,27 +136,40 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
     return initialAnswers;
   });
 
+  // Fonction améliorée pour basculer les réponses tout en gardant la cohérence
   const toggleAnswer = (questionId: string, value: string, label: string) => {
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
+    // Si "Ce critère ne s'applique pas à mon entreprise" est sélectionné, déselectionner toutes les autres réponses
     if (label.includes("Ce critère ne s'applique pas à mon entreprise")) {
       newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
+      // Si une réponse normale est sélectionnée, supprimer "Ce critère ne s'applique pas" s'il est présent
       newAnswers = currentAnswers.includes(label)
         ? currentAnswers.filter(v => v !== label)
         : [...currentAnswers.filter(v => !v.includes("Ce critère ne s'applique pas à mon entreprise")), label];
     }
     
+    // Mettre à jour l'état local et propager au formulaire parent
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
-    setFormState({ ...formState, ...updatedAnswers });
+    
+    // Debug pour vérifier ce qui est transmis au formulaire parent
+    console.log(`Mise à jour du champ ${questionId} avec:`, newAnswers);
+    
+    // Mettre à jour le formulaire parent avec toutes les réponses
+    setFormState({ ...formState, [questionId]: newAnswers });
   };
 
+  // Vérifier la validité du formulaire à chaque changement des réponses
   useEffect(() => {
     const isValid = Object.values(answers).every(answer => answer.length > 0);
     onValidityChange(isValid);
-  }, [answers]);
+    
+    // Journaliser l'état actuel des réponses pour le débogage
+    console.log("État actuel des réponses:", answers);
+  }, [answers, onValidityChange]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">

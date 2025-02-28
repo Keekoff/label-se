@@ -37,13 +37,14 @@ export const useFormSubmission = (
   }, [navigate, toast]);
 
   // Fonction d'aide pour s'assurer que les réponses sont correctement formatées
+  // et transformées pour correspondre correctement aux champs de la base de données
   const formatResponses = (responses: string[] | undefined): string[] => {
     // Si les réponses existent et ne sont pas vides, les retourner telles quelles
     if (responses && Array.isArray(responses) && responses.length > 0) {
       return responses;
     }
     
-    // Ne PAS ajouter de valeur par défaut si l'utilisateur n'a rien sélectionné
+    // Si aucune réponse n'est fournie, retourner un tableau vide
     return [];
   };
 
@@ -61,10 +62,10 @@ export const useFormSubmission = (
     }
 
     // Vérifier et enregistrer toutes les réponses pour le débogage
-    console.log("== DEBUG - Toutes les réponses ==");
+    console.log("== DEBUG - Toutes les réponses avant formatage ==");
     console.log("diversity:", data.diversity);
     console.log("equality:", data.equality);
-    console.log("handicap:", data.handicap);
+    console.log("handicap:", data.handicap); 
     console.log("health:", data.health);
     console.log("parentality:", data.parentality);
     console.log("training:", data.training);
@@ -85,11 +86,11 @@ export const useFormSubmission = (
     console.log("wasteManagement:", data.wasteManagement);
     console.log("responsiblePurchasing:", data.responsiblePurchasing);
 
-    // Formater les données en conservant uniquement les réponses réellement sélectionnées
+    // Correction: S'assurer que les champs de données correspondent exactement aux champs de la base de données
     const formattedData = {
       user_id: user.id,
       prenom: data.firstName || "",
-      courriel: userEmail || user.email || "", // Utiliser l'email de l'utilisateur connecté
+      courriel: userEmail || user.email || "",
       nom_entreprise: data.companyName || "",
       secteurs_activite: Array.isArray(data.sectors) ? data.sectors : [],
       forme_juridique: data.legalForm || "",
@@ -104,7 +105,7 @@ export const useFormSubmission = (
       current_step: status === 'submitted' ? 6 : data.currentStep || 1,
       disclaimer_accepted: !!data.disclaimerAccepted,
       
-      // Partie 1 - conserver uniquement les réponses sélectionnées
+      // Partie 1 - Correspondance exacte entre les noms de champs du formulaire et ceux de la BDD
       diversite: formatResponses(data.diversity),
       egalite: formatResponses(data.equality),
       situation_handicap: formatResponses(data.handicap),
@@ -115,7 +116,7 @@ export const useFormSubmission = (
       confidentialite_donnees: formatResponses(data.privacy),
       mobilite: formatResponses(data.transport),
       
-      // Partie 2 et 3 - conserver uniquement les réponses sélectionnées
+      // Partie 2 et 3 - Correspondance exacte entre les noms de champs du formulaire et ceux de la BDD
       contribution_associative: formatResponses(data.associativeContribution),
       numerique_responsable: formatResponses(data.responsibleDigital),
       communication_transparente: formatResponses(data.communication),
@@ -131,13 +132,13 @@ export const useFormSubmission = (
       achats_responsables: formatResponses(data.responsiblePurchasing)
     };
 
-    // Journaliser les données formatées pour le débogage
-    console.log('== Formatted submission data ==', formattedData);
+    // Vérifier les données formatées pour le débogage
+    console.log('== DEBUG - Données formatées avant envoi à la BDD ==', formattedData);
     
     return formattedData;
   };
 
-  // Fonction pour créer les justificatifs uniquement pour les réponses réellement sélectionnées
+  // Fonction pour créer les justificatifs pour toutes les réponses
   const createJustificatifs = async (submissionUuid: string) => {
     try {
       const { data: submission } = await supabase
@@ -178,7 +179,7 @@ export const useFormSubmission = (
       
       console.log("Création des justificatifs pour la soumission:", submissionUuid);
       
-      // Pour chaque champ du formulaire, traiter uniquement s'il y a des réponses
+      // Pour chaque champ du formulaire
       for (const field of formFields) {
         const responses = submission[field.dbField] as string[];
         console.log(`Champ ${field.name}:`, responses);
@@ -211,8 +212,6 @@ export const useFormSubmission = (
           console.log(`Pas de réponses pour ${field.name}, aucun justificatif n'est créé`);
         }
       }
-      
-      console.log("Création des justificatifs terminée");
     } catch (error) {
       console.error('Erreur lors de la création des justificatifs:', error);
     }
