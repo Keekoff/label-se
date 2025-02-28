@@ -11,6 +11,7 @@ export const useFormSubmission = (
 ) => {
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -20,7 +21,9 @@ export const useFormSubmission = (
       const { data: { session } } = await supabase.auth.getSession();
       setIsAuthenticated(!!session);
       
-      if (!session) {
+      if (session) {
+        setUserEmail(session.user.email);
+      } else {
         toast({
           title: "Authentification requise",
           description: "Veuillez vous connecter pour continuer.",
@@ -46,11 +49,12 @@ export const useFormSubmission = (
       throw new Error("User must be authenticated to submit form");
     }
 
+    // Utiliser l'email de la session au lieu de celui du formulaire
     // Map form data to correctly renamed database fields
     const formattedData = {
       user_id: user.id,
       prenom: data.firstName || "",
-      courriel: data.email || "",
+      courriel: userEmail || user.email || "", // Utiliser l'email de l'utilisateur connecté
       nom_entreprise: data.companyName || "",
       secteurs_activite: Array.isArray(data.sectors) ? data.sectors : [],
       forme_juridique: data.legalForm || "",
@@ -89,6 +93,22 @@ export const useFormSubmission = (
       gestion_dechets: Array.isArray(data.wasteManagement) ? data.wasteManagement : [],
       achats_responsables: Array.isArray(data.responsiblePurchasing) ? data.responsiblePurchasing : []
     };
+
+    // Après avoir soumis le formulaire, associer les justificatifs
+    if (status === 'submitted') {
+      try {
+        // Appeler la fonction PostgreSQL pour associer les justificatifs
+        const { error } = await supabase.rpc('link_justificatifs_to_submission', {
+          submission_uuid: submissionId
+        });
+
+        if (error) {
+          console.error('Erreur lors de l\'association des justificatifs:', error);
+        }
+      } catch (err) {
+        console.error('Erreur lors de l\'appel à la fonction RPC:', err);
+      }
+    }
 
     // Log the formatted data for debugging
     console.log('Formatted submission data:', formattedData);
