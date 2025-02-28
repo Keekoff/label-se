@@ -8,6 +8,7 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
   const [answers, setAnswers] = useState<Record<string, string[]>>(() => {
     const initialAnswers: Record<string, string[]> = {};
     QUESTIONS.forEach(question => {
+      // Initialiser avec les valeurs existantes du formState
       initialAnswers[question.id] = Array.isArray(formState[question.id]) 
         ? formState[question.id] 
         : [];
@@ -19,25 +20,80 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
-    // Handle "Ce critère ne s'applique pas à mon entreprise" option
+    // Gestion de l'option "Ce critère ne s'applique pas à mon entreprise"
     if (label.includes("Ce critère ne s'applique pas à mon entreprise")) {
       newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
-      // If selecting a regular option, remove "Ce critère ne s'applique pas à mon entreprise" if present
+      // Si sélection d'une option normale, supprimer "Ce critère ne s'applique pas" si présent
       newAnswers = currentAnswers.includes(label)
         ? currentAnswers.filter(v => v !== label)
         : [...currentAnswers.filter(v => !v.includes("Ce critère ne s'applique pas à mon entreprise")), label];
     }
     
+    // Mettre à jour les réponses et adapter le nom du champ pour correspondre à la base de données
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
-    setFormState({ ...formState, ...updatedAnswers });
+    
+    // Correction du mappage des champs avec la base de données
+    let dbFieldName = questionId;
+    
+    // Mappage des noms de champs du formulaire aux noms de colonnes dans la base de données
+    const fieldMapping: Record<string, string> = {
+      'wasteManagement': 'gestion_dechets',
+      'ecoDesign': 'eco_conception',
+      'continuousEvaluation': 'evaluation_continue',
+      'energyManagement': 'gestion_energie',
+      'carbonEmissions': 'emissions_carbone', // Correction de emission_carbonne à emissions_carbone
+      'circularEconomy': 'economie_circulaire'
+    };
+    
+    // Si le champ a un mappage spécial, utiliser ce nom pour la BD
+    if (fieldMapping[questionId]) {
+      dbFieldName = fieldMapping[questionId];
+      console.log(`Mappage du champ ${questionId} vers ${dbFieldName} dans la base de données`);
+    }
+    
+    // Mettre à jour le formState parent en utilisant le nom de champ correct
+    setFormState({ 
+      ...formState, 
+      [questionId]: newAnswers, // Pour conserver la cohérence dans le formulaire React
+      [dbFieldName]: newAnswers  // Pour assurer le bon mappage avec la BD
+    });
+    
+    console.log(`Mise à jour du champ ${questionId} (${dbFieldName} en BD) avec:`, newAnswers);
   };
 
   useEffect(() => {
     const isValid = Object.values(answers).every(answer => answer.length > 0);
     onValidityChange(isValid);
-  }, [answers]);
+    
+    // Journaliser l'état actuel des réponses pour débogage
+    console.log("État actuel des réponses pour la Partie 3:", answers);
+    
+    // S'assurer que toutes les réponses sont également mises à jour dans le formState
+    // en utilisant le bon mappage des champs
+    const updatedFormState = { ...formState };
+    
+    Object.entries(answers).forEach(([key, value]) => {
+      updatedFormState[key] = value;
+      
+      // Mappage pour la base de données
+      const fieldMapping: Record<string, string> = {
+        'wasteManagement': 'gestion_dechets',
+        'ecoDesign': 'eco_conception',
+        'continuousEvaluation': 'evaluation_continue',
+        'energyManagement': 'gestion_energie',
+        'carbonEmissions': 'emissions_carbone',
+        'circularEconomy': 'economie_circulaire'
+      };
+      
+      if (fieldMapping[key]) {
+        updatedFormState[fieldMapping[key]] = value;
+      }
+    });
+    
+    setFormState(updatedFormState);
+  }, [answers, onValidityChange]);
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">

@@ -4,76 +4,89 @@ import { Question } from "./types";
 export const QUESTIONS: Question[] = [
   {
     id: "production",
-    title: "1 - Production : énergie et matériaux utilisés",
-    description: "Optimisation des ressources et réduction des polluants.",
+    title: "1 - Contribution à la production durable",
+    description: "Les activités productives qui utilisent les processus et systèmes non polluants, qui préservent l'énergie et les ressources naturelles.",
     options: [
-      { value: "A", label: "Lutte contre le gaspillage des ressources" },
-      { value: "B", label: "Utilisation de matériaux recyclés/localisés" },
-      { value: "C", label: "Collaboration avec fournisseurs écoresponsables certifiés" },
+      { value: "A", label: "Avoir conscience de l'impact des activités et faire en sorte de les minimiser" },
+      { value: "B", label: "Utiliser exclusivement des ressources renouvelables" },
+      { value: "C", label: "Produire de façon à réduire de 50% sa consommation de ressources" },
       { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
-    id: "recyclage_gestion_dechets",
+    id: "wasteManagement",
     title: "2 - Recyclage et gestion des déchets",
-    description: "Traitement des déchets pour réintégration dans de nouveaux cycles.",
+    description: "Organisation et mise en œuvre des moyens de collecte, tri, transport et traitement des déchets.",
     options: [
-      { value: "A", label: "Tri sélectif et sensibilisation au recyclage" },
-      { value: "B", label: "Prestataire dédié au tri/recyclage" },
-      { value: "C", label: "Politique zéro déchet (limitation des impressions, suppression des monodoses)" },
+      { value: "A", label: "Adopter les pratiques de gestion des déchets, tri, recyclage" },
+      { value: "B", label: "Collecter et trier tous les déchets du bureau" },
+      { value: "C", label: "Mise en place du zéro déchet (plastique, papier)" },
       { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
-    id: "eco_conception",
+    id: "ecoDesign",
     title: "3 - Éco-conception",
-    description: "Intégration des impacts environnementaux dans le cycle de vie des produits.",
+    description: "Intégration systématique des aspects environnementaux dès la conception et le développement de produits.",
     options: [
-      { value: "A", label: "Pratique de l'éco-design et processus à impact réduit" },
-      { value: "B", label: "Développement de produits durables via l'éco-conception" },
-      { value: "C", label: "Conformité à la norme ISO 14062 ou directive européenne" },
+      { value: "A", label: "Recherche de l'optimisation des ressources utilisées" },
+      { value: "B", label: "Choix explicite de solutions avec un moindre impact environnemental" },
+      { value: "C", label: "Conception orientée 'impact positif' du début à la fin" },
       { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
-    id: "evaluation_permanente",
+    id: "continuousEvaluation",
     title: "4 - Évaluation permanente",
-    description: "Amélioration continue des produits/services.",
+    description: "Vérification continuelle des résultats, opportunités d'amélioration, et engagement dans une démarche d'amélioration continue.",
     options: [
-      { value: "A", label: "Audit annuel des impacts via retours clients" },
-      { value: "B", label: "Surcyclage pour une meilleure efficacité énergétique" },
-      { value: "C", label: "Production de matériaux réutilisables/recyclables" },
+      { value: "A", label: "Mesure régulière des performances RSE" },
+      { value: "B", label: "Utilisation d'outils de mesure d'impact" },
+      { value: "C", label: "Obtention d'un label ou certification" },
       { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
-    id: "maitrise_ressources_energetiques",
+    id: "energyManagement",
     title: "5 - Maîtrise des ressources énergétiques",
-    description: "Réduction de la consommation énergétique.",
+    description: "Gestion intelligente de la consommation d'énergie dans toutes les activités.",
     options: [
-      { value: "A", label: "Extinction des appareils électriques en fin de journée" },
-      { value: "B", label: "Énergies vertes et thermostats numériques" },
-      { value: "C", label: "Ce critère ne s'applique pas à mon entreprise" }
+      { value: "A", label: "Mise en place d'un système d'extinction automatique des équipements" },
+      { value: "B", label: "Utilisation exclusive d'énergies renouvelables" },
+      { value: "C", label: "Optimisation complète de la consommation d'énergie" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
-    id: "plan_controle_emissions_carbones",
+    id: "carbonEmissions",
     title: "6 - Plan de contrôle des émissions carbones",
-    description: "Mesure et réduction de l'empreinte carbone.",
+    description: "Maîtrise et réduction des émissions de gaz à effet de serre liées aux activités.",
     options: [
-      { value: "A", label: "Bilan carbone annuel ou prévu sous 2 ans" },
-      { value: "B", label: "Label Bas Carbone ou compensation des émissions" },
-      { value: "C", label: "Ce critère ne s'applique pas à mon entreprise" }
+      { value: "A", label: "Calcul de l'empreinte carbone" },
+      { value: "B", label: "Mise en place d'un plan de réduction des émissions" },
+      { value: "C", label: "Engagement à diminuer de 50% les gaz à effet de serre" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
-    id: "gestion_participative_economie_circulaire",
+    id: "circularEconomy",
     title: "7 - Gestion participative & économie circulaire",
-    description: "Création de cycles de vie positifs pour les produits.",
+    description: "Modèle économique d'échange et de production qui vise à augmenter l'efficacité de l'utilisation des ressources.",
     options: [
-      { value: "A", label: "Implication des collaborateurs dans l'économie circulaire" },
-      { value: "B", label: "Partage de bonnes pratiques avec l'écosystème" },
-      { value: "C", label: "Développement de produits intégrés à une logique circulaire" },
+      { value: "A", label: "Sensibilisation et implication de toutes les parties prenantes" },
+      { value: "B", label: "Partenariats avec acteurs de l'économie circulaire/sociale et solidaire" },
+      { value: "C", label: "Offre de produits reconditionnés ou revalorisation de fin de vie" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
+    ]
+  },
+  {
+    id: "responsiblePurchasing",
+    title: "8 - Achats responsables",
+    description: "Intégration de critères sociaux, sociétaux et environnementaux aux processus d'achat.",
+    options: [
+      { value: "A", label: "Utilisation de critères sociaux et environnementaux pour les achats" },
+      { value: "B", label: "Fournisseurs locaux privilégiés dans la chaîne d'approvisionnement" },
+      { value: "C", label: "Politique d'achats responsables formalisée et communiquée" },
       { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   }

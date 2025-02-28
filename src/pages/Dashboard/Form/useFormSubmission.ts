@@ -86,6 +86,15 @@ export const useFormSubmission = (
     console.log("wasteManagement:", data.wasteManagement);
     console.log("responsiblePurchasing:", data.responsiblePurchasing);
 
+    // Vérifier explicitement les champs problématiques de la Partie 3
+    console.log("== Vérification spécifique des champs de la Partie 3 ==");
+    console.log("wasteManagement (gestion_dechets):", data.wasteManagement);
+    console.log("ecoDesign (eco_conception):", data.ecoDesign);
+    console.log("continuousEvaluation (evaluation_continue):", data.continuousEvaluation);
+    console.log("energyManagement (gestion_energie):", data.energyManagement);
+    console.log("carbonEmissions (emissions_carbone):", data.carbonEmissions);
+    console.log("circularEconomy (economie_circulaire):", data.circularEconomy);
+
     // Correction: S'assurer que les champs de données correspondent exactement aux champs de la base de données
     const formattedData = {
       user_id: user.id,
