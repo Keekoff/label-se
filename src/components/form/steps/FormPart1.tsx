@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -28,10 +29,10 @@ const QUESTIONS: Question[] = [
     title: "1 - Diversité",
     description: "Ensemble des personnes qui diffèrent les unes des autres par leur origine géographique, socio-culturelle ou religieuse, leur âge, leur sexe, leur orientation sexuelle, etc.",
     options: [
-      { value: "A", label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression en cas de non-respect de la diversité." },
-      { value: "B", label: "L'entreprise possède et communique une charte sociale auprès de tous ses collaborateurs." },
-      { value: "C", label: "La lutte contre les discriminations est intégrée aux processus RH." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression en cas de non-respect de la diversité" },
+      { value: "B", label: "L'entreprise possède et communique une charte sociale auprès de tous ses collaborateurs" },
+      { value: "C", label: "La lutte contre les discriminations est intégrée aux processus RH" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
@@ -39,10 +40,10 @@ const QUESTIONS: Question[] = [
     title: "2 - Égalité",
     description: "Absence de toute discrimination entre les êtres humains sur le plan de leurs droits.",
     options: [
-      { value: "A", label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils contre les propos sexistes/discriminatoires." },
-      { value: "B", label: "L'entreprise communique publiquement un code éthique." },
-      { value: "C", label: "Égalité salariale et de traitement strictement appliquée." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils contre les propos sexistes/discriminatoires" },
+      { value: "B", label: "L'entreprise communique publiquement un code éthique" },
+      { value: "C", label: "Égalité salariale et de traitement strictement appliquée" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
@@ -50,10 +51,10 @@ const QUESTIONS: Question[] = [
     title: "3 - Handicap",
     description: "Limitation d'activité ou restriction de participation à la vie de l'entreprise.",
     options: [
-      { value: "A", label: "Postes ouverts aux personnes en situation de handicap dans les offres d'emploi." },
-      { value: "B", label: "Communication et actions concrètes pour l'inclusion des travailleurs handicapés." },
-      { value: "C", label: "Quota de 6 % de salariés en situation de handicap respecté (si ≥20 salariés)." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "Postes ouverts aux personnes en situation de handicap dans les offres d'emploi" },
+      { value: "B", label: "Communication et actions concrètes pour l'inclusion des travailleurs handicapés" },
+      { value: "C", label: "Quota de 6 % de salariés en situation de handicap respecté (si ≥20 salariés)" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
@@ -61,10 +62,10 @@ const QUESTIONS: Question[] = [
     title: "4 - Santé des salariés et bien-être au travail",
     description: "Équilibre global entre satisfaction professionnelle et épanouissement personnel.",
     options: [
-      { value: "A", label: "Actions pour limiter les communications hors horaires de travail." },
-      { value: "B", label: "Mobilier ergonomique et réunions organisées pour favoriser la concentration." },
-      { value: "C", label: "Politique QVT/HSE déployée avec plans d'action collaboratifs." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "Actions pour limiter les communications hors horaires de travail" },
+      { value: "B", label: "Mobilier ergonomique et réunions organisées pour favoriser la concentration" },
+      { value: "C", label: "Politique QVT/HSE déployée avec plans d'action collaboratifs" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
@@ -72,10 +73,10 @@ const QUESTIONS: Question[] = [
     title: "5 - Parentalité",
     description: "Équilibre entre rôle de parent et vie professionnelle.",
     options: [
-      { value: "A", label: "Facilitation du retour après congés maternité/paternité." },
-      { value: "B", label: "Télétravail facilité." },
-      { value: "C", label: "Congé paternité étendu proposé." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "Facilitation du retour après congés maternité/paternité" },
+      { value: "B", label: "Télétravail facilité" },
+      { value: "C", label: "Congé paternité étendu proposé" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
@@ -83,10 +84,10 @@ const QUESTIONS: Question[] = [
     title: "6 - Formation",
     description: "Adaptation technique, physique et psychologique des collaborateurs à leurs fonctions.",
     options: [
-      { value: "A", label: "Sessions d'information et formations régulières." },
-      { value: "B", label: "Développement de l'employabilité hors GPEC." },
-      { value: "C", label: "Formations personnalisées selon les besoins individuels." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "Sessions d'information et formations régulières" },
+      { value: "B", label: "Développement de l'employabilité hors GPEC" },
+      { value: "C", label: "Formations personnalisées selon les besoins individuels" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
@@ -94,10 +95,10 @@ const QUESTIONS: Question[] = [
     title: "7 - Politique RSE",
     description: "Intégration des préoccupations sociales et environnementales dans les activités.",
     options: [
-      { value: "A", label: "Sensibilisation aux enjeux RSE et actions concrètes." },
-      { value: "B", label: "Volonté de recruter un responsable RSE dans les 2 ans." },
-      { value: "C", label: "Responsable RSE désigné et politique RSE active." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "Sensibilisation aux enjeux RSE et actions concrètes" },
+      { value: "B", label: "Volonté de recruter un responsable RSE dans les 2 ans" },
+      { value: "C", label: "Responsable RSE désigné et politique RSE active" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
@@ -105,10 +106,10 @@ const QUESTIONS: Question[] = [
     title: "8 - Privacy/data",
     description: "Protection des données des parties prenantes.",
     options: [
-      { value: "A", label: "Respect de la vie privée des salariés." },
-      { value: "B", label: "Outils et processus pour la confidentialité des données." },
-      { value: "C", label: "DPO désigné et conformité RGPD." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "Respect de la vie privée des salariés" },
+      { value: "B", label: "Outils et processus pour la confidentialité des données" },
+      { value: "C", label: "DPO désigné et conformité RGPD" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   },
   {
@@ -116,10 +117,10 @@ const QUESTIONS: Question[] = [
     title: "9 - Transports",
     description: "Mobilité des collaborateurs et marchandises.",
     options: [
-      { value: "A", label: "Sensibilisation aux mobilités douces." },
-      { value: "B", label: "Transports en commun privilégiés pour les déplacements courts." },
-      { value: "C", label: "Co-financement de modes de transport doux (vélo/trottinette)." },
-      { value: "D", label: "Non applicable." }
+      { value: "A", label: "Sensibilisation aux mobilités douces" },
+      { value: "B", label: "Transports en commun privilégiés pour les déplacements courts" },
+      { value: "C", label: "Co-financement de modes de transport doux (vélo/trottinette)" },
+      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
     ]
   }
 ];
@@ -139,12 +140,12 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
-    if (label.includes("Non applicable")) {
+    if (label.includes("Ce critère ne s'applique pas à mon entreprise")) {
       newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
       newAnswers = currentAnswers.includes(label)
         ? currentAnswers.filter(v => v !== label)
-        : [...currentAnswers.filter(v => !v.includes("Non applicable")), label];
+        : [...currentAnswers.filter(v => !v.includes("Ce critère ne s'applique pas à mon entreprise")), label];
     }
     
     const updatedAnswers = { ...answers, [questionId]: newAnswers };

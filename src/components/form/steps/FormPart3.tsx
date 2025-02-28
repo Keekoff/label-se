@@ -19,11 +19,11 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
-    // Handle "Non applicable" option
+    // Handle "Ce critère ne s'applique pas à mon entreprise" option
     if (label.includes("Ce critère ne s'applique pas à mon entreprise")) {
       newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
-      // If selecting a regular option, remove "Non applicable" if present
+      // If selecting a regular option, remove "Ce critère ne s'applique pas à mon entreprise" if present
       newAnswers = currentAnswers.includes(label)
         ? currentAnswers.filter(v => v !== label)
         : [...currentAnswers.filter(v => !v.includes("Ce critère ne s'applique pas à mon entreprise")), label];
