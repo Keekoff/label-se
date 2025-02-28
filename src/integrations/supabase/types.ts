@@ -256,7 +256,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      link_justificatifs_to_submission: {
+        Args: {
+          submission_uuid: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
