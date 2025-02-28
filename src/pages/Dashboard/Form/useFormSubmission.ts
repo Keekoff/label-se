@@ -37,7 +37,6 @@ export const useFormSubmission = (
   }, [navigate, toast]);
 
   // Fonction d'aide pour s'assurer que les réponses sont correctement formatées
-  // et transformées pour correspondre correctement aux champs de la base de données
   const formatResponses = (responses: string[] | undefined): string[] => {
     // Si les réponses existent et ne sont pas vides, les retourner telles quelles
     if (responses && Array.isArray(responses) && responses.length > 0) {
@@ -147,85 +146,6 @@ export const useFormSubmission = (
     return formattedData;
   };
 
-  // Fonction pour créer les justificatifs pour toutes les réponses
-  const createJustificatifs = async (submissionUuid: string) => {
-    try {
-      const { data: submission } = await supabase
-        .from('label_submissions')
-        .select('*')
-        .eq('id', submissionUuid)
-        .single();
-      
-      if (!submission) {
-        console.error("Aucune soumission trouvée avec l'ID:", submissionUuid);
-        return;
-      }
-      
-      const formFields = [
-        { dbField: 'diversite', name: 'diversite' },
-        { dbField: 'egalite', name: 'egalite' },
-        { dbField: 'situation_handicap', name: 'situation_handicap' },
-        { dbField: 'sante_bien_etre', name: 'sante_bien_etre' },
-        { dbField: 'parentalite', name: 'parentalite' },
-        { dbField: 'formation', name: 'formation' },
-        { dbField: 'politique_rse', name: 'politique_rse' },
-        { dbField: 'confidentialite_donnees', name: 'confidentialite_donnees' },
-        { dbField: 'mobilite', name: 'mobilite' },
-        { dbField: 'contribution_associative', name: 'contribution_associative' },
-        { dbField: 'achats_responsables', name: 'achats_responsables' },
-        { dbField: 'numerique_responsable', name: 'numerique_responsable' },
-        { dbField: 'communication_transparente', name: 'communication_transparente' },
-        { dbField: 'relations_fournisseurs', name: 'relations_fournisseurs' },
-        { dbField: 'impact_social', name: 'impact_social' },
-        { dbField: 'production_durable', name: 'production_durable' },
-        { dbField: 'gestion_dechets', name: 'gestion_dechets' },
-        { dbField: 'eco_conception', name: 'eco_conception' },
-        { dbField: 'evaluation_continue', name: 'evaluation_continue' },
-        { dbField: 'gestion_energie', name: 'gestion_energie' },
-        { dbField: 'emissions_carbone', name: 'emissions_carbone' },
-        { dbField: 'economie_circulaire', name: 'economie_circulaire' }
-      ];
-      
-      console.log("Création des justificatifs pour la soumission:", submissionUuid);
-      
-      // Pour chaque champ du formulaire
-      for (const field of formFields) {
-        const responses = submission[field.dbField] as string[];
-        console.log(`Champ ${field.name}:`, responses);
-        
-        // Ne créer des justificatifs que s'il y a des réponses
-        if (responses && Array.isArray(responses) && responses.length > 0) {
-          // Pour chaque réponse dans ce champ
-          for (const response of responses) {
-            // Vérifier si un justificatif existe déjà pour cette réponse et cette question
-            const { data: existingJustificatif } = await supabase
-              .from('justificatifs')
-              .select('*')
-              .eq('questions', field.name)
-              .eq('reponses', response)
-              .eq('submission_id', submissionUuid);
-            
-            // Si aucun justificatif n'existe, en créer un
-            if (!existingJustificatif || existingJustificatif.length === 0) {
-              console.log(`Création d'un justificatif pour ${field.name}: "${response}"`);
-              await supabase.from('justificatifs').insert([{
-                questions: field.name,
-                reponses: response,
-                submission_id: submissionUuid
-              }]);
-            } else {
-              console.log(`Justificatif existant pour ${field.name}: "${response}"`);
-            }
-          }
-        } else {
-          console.log(`Pas de réponses pour ${field.name}, aucun justificatif n'est créé`);
-        }
-      }
-    } catch (error) {
-      console.error('Erreur lors de la création des justificatifs:', error);
-    }
-  };
-
   const handleSave = async () => {
     if (!isAuthenticated) {
       toast({
@@ -317,25 +237,6 @@ export const useFormSubmission = (
         }
         finalSubmissionId = data.id;
         setSubmissionId(data.id);
-      }
-
-      // Associer les justificatifs existants à la soumission
-      if (finalSubmissionId) {
-        try {
-          // Appeler la fonction PostgreSQL pour associer les justificatifs
-          const { error } = await supabase.rpc('link_justificatifs_to_submission', {
-            submission_uuid: finalSubmissionId
-          });
-
-          if (error) {
-            console.error('Erreur lors de l\'association des justificatifs:', error);
-          }
-
-          // Créer des justificatifs pour toutes les réponses
-          await createJustificatifs(finalSubmissionId);
-        } catch (err) {
-          console.error('Erreur lors de l\'appel à la fonction RPC:', err);
-        }
       }
 
       setCurrentStep(6);

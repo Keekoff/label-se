@@ -29,20 +29,33 @@ const Justificatifs = () => {
           return;
         }
 
-        const { data, error } = await supabase.functions.invoke('get-admission-documents', {
-          headers: {
-            Authorization: `Bearer ${session.access_token}`,
+        // Cette partie sera améliorée plus tard - pour l'instant, nous utilisons des données factices
+        // pour montrer la structure de la page
+        const mockDocuments = [
+          {
+            id: "1",
+            identifier: "Politique d'inclusion",
+            response: "Diversité",
+            document: "Charte de diversité",
+            status: 'pending' as const
           },
-        });
+          {
+            id: "2",
+            identifier: "Économie d'énergie",
+            response: "Gestion énergétique",
+            document: "Rapport de consommation énergétique",
+            status: 'pending' as const
+          },
+          {
+            id: "3",
+            identifier: "Achats responsables",
+            response: "Charte fournisseurs",
+            document: "Liste de fournisseurs certifiés",
+            status: 'pending' as const
+          }
+        ];
 
-        if (error) throw error;
-
-        const docsWithStatus = data.map((doc: any) => ({
-          ...doc,
-          status: 'pending' as const
-        }));
-
-        setDocuments(docsWithStatus);
+        setDocuments(mockDocuments);
       } catch (error) {
         console.error('Error fetching documents:', error);
         toast.error("Erreur lors du chargement des documents");
