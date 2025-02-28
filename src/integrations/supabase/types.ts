@@ -75,6 +75,44 @@ export type Database = {
         }
         Relationships: []
       }
+      justificatifs: {
+        Row: {
+          created_at: string | null
+          id: string
+          justificatifs: string | null
+          questions: string
+          reponses: string
+          submission_id: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          justificatifs?: string | null
+          questions: string
+          reponses: string
+          submission_id?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          justificatifs?: string | null
+          questions?: string
+          reponses?: string
+          submission_id?: string | null
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "justificatifs_submission_id_fkey"
+            columns: ["submission_id"]
+            isOneToOne: false
+            referencedRelation: "label_submissions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       label_submissions: {
         Row: {
           a_financements: string | null
