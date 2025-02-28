@@ -38,13 +38,17 @@ export const useFormSubmission = (
 
   // Fonction d'aide pour s'assurer que les réponses sont correctement formatées
   const formatResponses = (responses: string[] | undefined): string[] => {
-    if (!responses || !Array.isArray(responses)) return [];
-    
-    // S'assurer que les réponses vides sont remplacées par "Ce critère ne s'applique pas à mon entreprise"
-    if (responses.length === 0) {
+    if (!responses || !Array.isArray(responses)) {
+      console.log("Réponse vide ou non-tableau, remplacée par 'Ce critère ne s'applique pas à mon entreprise'");
       return ["Ce critère ne s'applique pas à mon entreprise"];
     }
     
+    if (responses.length === 0) {
+      console.log("Tableau vide, remplacé par 'Ce critère ne s'applique pas à mon entreprise'");
+      return ["Ce critère ne s'applique pas à mon entreprise"];
+    }
+    
+    console.log("Réponses formatées:", responses);
     return responses;
   };
 
@@ -61,8 +65,33 @@ export const useFormSubmission = (
       throw new Error("User must be authenticated to submit form");
     }
 
+    // Vérifier et enregistrer toutes les réponses pour le débogage
+    console.log("== DEBUG - Toutes les réponses ==");
+    console.log("diversity:", data.diversity);
+    console.log("equality:", data.equality);
+    console.log("handicap:", data.handicap);
+    console.log("health:", data.health);
+    console.log("parentality:", data.parentality);
+    console.log("training:", data.training);
+    console.log("csr:", data.csr);
+    console.log("privacy:", data.privacy);
+    console.log("transport:", data.transport);
+    console.log("associativeContribution:", data.associativeContribution);
+    console.log("responsibleDigital:", data.responsibleDigital);
+    console.log("communication:", data.communication);
+    console.log("supplierRelations:", data.supplierRelations);
+    console.log("socialImpact:", data.socialImpact);
+    console.log("production:", data.production);
+    console.log("ecoDesign:", data.ecoDesign);
+    console.log("continuousEvaluation:", data.continuousEvaluation);
+    console.log("energyManagement:", data.energyManagement);
+    console.log("carbonEmissions:", data.carbonEmissions);
+    console.log("circularEconomy:", data.circularEconomy);
+    console.log("wasteManagement:", data.wasteManagement);
+    console.log("responsiblePurchasing:", data.responsiblePurchasing);
+
+    // Forcer les réponses manquantes ou vides à utiliser la valeur par défaut
     // S'assurer que chaque champ de réponse est correctement formaté
-    // Utiliser l'email de la session au lieu de celui du formulaire
     const formattedData = {
       user_id: user.id,
       prenom: data.firstName || "",
@@ -81,7 +110,7 @@ export const useFormSubmission = (
       current_step: status === 'submitted' ? 6 : data.currentStep || 1,
       disclaimer_accepted: !!data.disclaimerAccepted,
       
-      // Part 1 fields with updated French names - assurer que "Ce critère ne s'applique pas à mon entreprise" est inclus
+      // Part 1 fields with updated French names - assurer que toutes les réponses sont incluses
       diversite: formatResponses(data.diversity),
       egalite: formatResponses(data.equality),
       situation_handicap: formatResponses(data.handicap),
@@ -92,7 +121,7 @@ export const useFormSubmission = (
       confidentialite_donnees: formatResponses(data.privacy),
       mobilite: formatResponses(data.transport),
       
-      // Part 2 and 3 fields with updated French names - assurer que "Ce critère ne s'applique pas à mon entreprise" est inclus
+      // Part 2 and 3 fields with updated French names - assurer que toutes les réponses sont incluses
       contribution_associative: formatResponses(data.associativeContribution),
       numerique_responsable: formatResponses(data.responsibleDigital),
       communication_transparente: formatResponses(data.communication),
@@ -109,13 +138,13 @@ export const useFormSubmission = (
     };
 
     // Log the formatted data for debugging
-    console.log('Formatted submission data:', formattedData);
+    console.log('== Formatted submission data ==', formattedData);
     
     return formattedData;
   };
 
-  // Fonction pour créer les justificatifs manquants pour les réponses "Ce critère ne s'applique pas à mon entreprise"
-  const createDefaultJustificatifs = async (submissionUuid: string) => {
+  // Fonction pour créer les justificatifs pour toutes les réponses
+  const createJustificatifs = async (submissionUuid: string) => {
     try {
       const { data: submission } = await supabase
         .from('label_submissions')
@@ -123,7 +152,10 @@ export const useFormSubmission = (
         .eq('id', submissionUuid)
         .single();
       
-      if (!submission) return;
+      if (!submission) {
+        console.error("Aucune soumission trouvée avec l'ID:", submissionUuid);
+        return;
+      }
       
       const formFields = [
         { dbField: 'diversite', name: 'diversite' },
@@ -150,34 +182,50 @@ export const useFormSubmission = (
         { dbField: 'economie_circulaire', name: 'economie_circulaire' }
       ];
       
+      console.log("Création des justificatifs pour la soumission:", submissionUuid);
+      
       // Pour chaque champ du formulaire
       for (const field of formFields) {
         const responses = submission[field.dbField] as string[];
+        console.log(`Champ ${field.name}:`, responses);
         
-        // Si "Ce critère ne s'applique pas à mon entreprise" est une réponse
-        if (responses && responses.some(r => r === "Ce critère ne s'applique pas à mon entreprise")) {
+        if (!responses || !Array.isArray(responses) || responses.length === 0) {
+          console.log(`Pas de réponses pour ${field.name}, création d'un justificatif par défaut`);
+          await supabase.from('justificatifs').insert([{
+            questions: field.name,
+            reponses: "Ce critère ne s'applique pas à mon entreprise",
+            submission_id: submissionUuid
+          }]);
+          continue;
+        }
+        
+        // Pour chaque réponse dans ce champ
+        for (const response of responses) {
           // Vérifier si un justificatif existe déjà pour cette réponse et cette question
           const { data: existingJustificatif } = await supabase
             .from('justificatifs')
             .select('*')
             .eq('questions', field.name)
-            .eq('reponses', "Ce critère ne s'applique pas à mon entreprise")
+            .eq('reponses', response)
             .eq('submission_id', submissionUuid);
           
           // Si aucun justificatif n'existe, en créer un
           if (!existingJustificatif || existingJustificatif.length === 0) {
-            await supabase
-              .from('justificatifs')
-              .insert([{
-                questions: field.name,
-                reponses: "Ce critère ne s'applique pas à mon entreprise",
-                submission_id: submissionUuid
-              }]);
+            console.log(`Création d'un justificatif pour ${field.name}: "${response}"`);
+            await supabase.from('justificatifs').insert([{
+              questions: field.name,
+              reponses: response,
+              submission_id: submissionUuid
+            }]);
+          } else {
+            console.log(`Justificatif existant pour ${field.name}: "${response}"`);
           }
         }
       }
+      
+      console.log("Création des justificatifs terminée");
     } catch (error) {
-      console.error('Erreur lors de la création des justificatifs par défaut:', error);
+      console.error('Erreur lors de la création des justificatifs:', error);
     }
   };
 
@@ -286,8 +334,8 @@ export const useFormSubmission = (
             console.error('Erreur lors de l\'association des justificatifs:', error);
           }
 
-          // Créer des justificatifs pour les réponses "Ce critère ne s'applique pas à mon entreprise"
-          await createDefaultJustificatifs(finalSubmissionId);
+          // Créer des justificatifs pour toutes les réponses
+          await createJustificatifs(finalSubmissionId);
         } catch (err) {
           console.error('Erreur lors de l\'appel à la fonction RPC:', err);
         }
