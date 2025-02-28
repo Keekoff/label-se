@@ -38,18 +38,13 @@ export const useFormSubmission = (
 
   // Fonction d'aide pour s'assurer que les réponses sont correctement formatées
   const formatResponses = (responses: string[] | undefined): string[] => {
-    if (!responses || !Array.isArray(responses)) {
-      console.log("Réponse vide ou non-tableau, remplacée par 'Ce critère ne s'applique pas à mon entreprise'");
-      return ["Ce critère ne s'applique pas à mon entreprise"];
+    // Si les réponses existent et ne sont pas vides, les retourner telles quelles
+    if (responses && Array.isArray(responses) && responses.length > 0) {
+      return responses;
     }
     
-    if (responses.length === 0) {
-      console.log("Tableau vide, remplacé par 'Ce critère ne s'applique pas à mon entreprise'");
-      return ["Ce critère ne s'applique pas à mon entreprise"];
-    }
-    
-    console.log("Réponses formatées:", responses);
-    return responses;
+    // Ne PAS ajouter de valeur par défaut si l'utilisateur n'a rien sélectionné
+    return [];
   };
 
   const formatSubmissionData = async (data: FormState, status: 'draft' | 'submitted') => {
@@ -90,8 +85,7 @@ export const useFormSubmission = (
     console.log("wasteManagement:", data.wasteManagement);
     console.log("responsiblePurchasing:", data.responsiblePurchasing);
 
-    // Forcer les réponses manquantes ou vides à utiliser la valeur par défaut
-    // S'assurer que chaque champ de réponse est correctement formaté
+    // Formater les données en conservant uniquement les réponses réellement sélectionnées
     const formattedData = {
       user_id: user.id,
       prenom: data.firstName || "",
@@ -110,7 +104,7 @@ export const useFormSubmission = (
       current_step: status === 'submitted' ? 6 : data.currentStep || 1,
       disclaimer_accepted: !!data.disclaimerAccepted,
       
-      // Part 1 fields with updated French names - assurer que toutes les réponses sont incluses
+      // Partie 1 - conserver uniquement les réponses sélectionnées
       diversite: formatResponses(data.diversity),
       egalite: formatResponses(data.equality),
       situation_handicap: formatResponses(data.handicap),
@@ -121,7 +115,7 @@ export const useFormSubmission = (
       confidentialite_donnees: formatResponses(data.privacy),
       mobilite: formatResponses(data.transport),
       
-      // Part 2 and 3 fields with updated French names - assurer que toutes les réponses sont incluses
+      // Partie 2 et 3 - conserver uniquement les réponses sélectionnées
       contribution_associative: formatResponses(data.associativeContribution),
       numerique_responsable: formatResponses(data.responsibleDigital),
       communication_transparente: formatResponses(data.communication),
@@ -137,13 +131,13 @@ export const useFormSubmission = (
       achats_responsables: formatResponses(data.responsiblePurchasing)
     };
 
-    // Log the formatted data for debugging
+    // Journaliser les données formatées pour le débogage
     console.log('== Formatted submission data ==', formattedData);
     
     return formattedData;
   };
 
-  // Fonction pour créer les justificatifs pour toutes les réponses
+  // Fonction pour créer les justificatifs uniquement pour les réponses réellement sélectionnées
   const createJustificatifs = async (submissionUuid: string) => {
     try {
       const { data: submission } = await supabase
@@ -184,42 +178,37 @@ export const useFormSubmission = (
       
       console.log("Création des justificatifs pour la soumission:", submissionUuid);
       
-      // Pour chaque champ du formulaire
+      // Pour chaque champ du formulaire, traiter uniquement s'il y a des réponses
       for (const field of formFields) {
         const responses = submission[field.dbField] as string[];
         console.log(`Champ ${field.name}:`, responses);
         
-        if (!responses || !Array.isArray(responses) || responses.length === 0) {
-          console.log(`Pas de réponses pour ${field.name}, création d'un justificatif par défaut`);
-          await supabase.from('justificatifs').insert([{
-            questions: field.name,
-            reponses: "Ce critère ne s'applique pas à mon entreprise",
-            submission_id: submissionUuid
-          }]);
-          continue;
-        }
-        
-        // Pour chaque réponse dans ce champ
-        for (const response of responses) {
-          // Vérifier si un justificatif existe déjà pour cette réponse et cette question
-          const { data: existingJustificatif } = await supabase
-            .from('justificatifs')
-            .select('*')
-            .eq('questions', field.name)
-            .eq('reponses', response)
-            .eq('submission_id', submissionUuid);
-          
-          // Si aucun justificatif n'existe, en créer un
-          if (!existingJustificatif || existingJustificatif.length === 0) {
-            console.log(`Création d'un justificatif pour ${field.name}: "${response}"`);
-            await supabase.from('justificatifs').insert([{
-              questions: field.name,
-              reponses: response,
-              submission_id: submissionUuid
-            }]);
-          } else {
-            console.log(`Justificatif existant pour ${field.name}: "${response}"`);
+        // Ne créer des justificatifs que s'il y a des réponses
+        if (responses && Array.isArray(responses) && responses.length > 0) {
+          // Pour chaque réponse dans ce champ
+          for (const response of responses) {
+            // Vérifier si un justificatif existe déjà pour cette réponse et cette question
+            const { data: existingJustificatif } = await supabase
+              .from('justificatifs')
+              .select('*')
+              .eq('questions', field.name)
+              .eq('reponses', response)
+              .eq('submission_id', submissionUuid);
+            
+            // Si aucun justificatif n'existe, en créer un
+            if (!existingJustificatif || existingJustificatif.length === 0) {
+              console.log(`Création d'un justificatif pour ${field.name}: "${response}"`);
+              await supabase.from('justificatifs').insert([{
+                questions: field.name,
+                reponses: response,
+                submission_id: submissionUuid
+              }]);
+            } else {
+              console.log(`Justificatif existant pour ${field.name}: "${response}"`);
+            }
           }
+        } else {
+          console.log(`Pas de réponses pour ${field.name}, aucun justificatif n'est créé`);
         }
       }
       
