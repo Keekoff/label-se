@@ -17,5 +17,4 @@ export const getJustificatifsForPart2 = (questionId: string, response: string): 
   return option.justificatifs || [];
 };
 
-// Export FormPart2 by default
 export { default } from "../FormPart2";
