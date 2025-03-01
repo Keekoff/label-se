@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -258,8 +259,8 @@ export const useFormSubmission = (
       gestion_energie: formatResponses(data.energyManagement),
       emissions_carbone: formatResponses(data.carbonEmissions),
       economie_circulaire: formatResponses(data.circularEconomy),
-      gestion_dechets: formatResponses(data.wasteManagement),
-      achats_responsables: formatResponses(data.responsiblePurchasing)
+      gestion_dechets: formatResponses(data.wasteManagement)
+      // Removed duplicate property
     };
 
     // Vérifier les données formatées pour le débogage
