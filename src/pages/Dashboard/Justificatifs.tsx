@@ -22,6 +22,7 @@ const Justificatifs = () => {
   const [justificatifs, setJustificatifs] = useState<Justificatif[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [submissionId, setSubmissionId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchJustificatifs = async () => {
@@ -37,7 +38,7 @@ const Justificatifs = () => {
         // Récupérer la dernière soumission de l'utilisateur
         const { data: submissions, error: submissionError } = await supabase
           .from('label_submissions')
-          .select('id')
+          .select('id, status, payment_status')
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false })
           .limit(1);
@@ -55,14 +56,23 @@ const Justificatifs = () => {
           return;
         }
 
-        const submissionId = submissions[0].id;
-        console.log("Found submission ID:", submissionId);
+        const latestSubmission = submissions[0];
+        console.log("Found submission:", latestSubmission);
+        setSubmissionId(latestSubmission.id);
+
+        // Vérifier si la soumission est dans un état approprié
+        if (latestSubmission.status !== 'submitted' && latestSubmission.payment_status !== 'paid') {
+          console.log("Submission not in appropriate state for justificatifs");
+          setSubmitError("Votre soumission n'est pas encore finalisée ou payée");
+          setIsLoading(false);
+          return;
+        }
 
         // Récupérer les justificatifs associés à cette soumission
         const { data: justificatifsData, error: justificatifsError } = await supabase
           .from('form_justificatifs')
           .select('*')
-          .eq('submission_id', submissionId);
+          .eq('submission_id', latestSubmission.id);
 
         if (justificatifsError) {
           console.error('Error fetching justificatifs:', justificatifsError);
@@ -96,13 +106,18 @@ const Justificatifs = () => {
 
   const handleFileUpload = async (justificatifId: string, file: File) => {
     try {
+      if (!submissionId) {
+        toast.error("Aucune soumission active trouvée");
+        return;
+      }
+
       const justificatif = justificatifs.find(j => j.id === justificatifId);
       if (!justificatif) throw new Error("Justificatif non trouvé");
 
       const fileExt = file.name.split('.').pop();
-      const fileName = `${justificatif.question_identifier.toLowerCase().replace(/ /g, '-')}-${Date.now()}.${fileExt}`;
+      const fileName = `${justificatifId}-${Date.now()}.${fileExt}`;
       
-      // Ensure bucket exists before uploading
+      // S'assurer que le bucket existe avant de télécharger
       try {
         const { data: buckets } = await supabase.storage.listBuckets();
         const justificatifsBucket = buckets?.find(b => b.name === 'justificatifs');
@@ -118,13 +133,31 @@ const Justificatifs = () => {
         console.error('Error checking/creating bucket:', bucketError);
       }
       
+      // Créer un chemin qui inclut l'ID de soumission
+      const filePath = `${submissionId}/${fileName}`;
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('justificatifs')
-        .upload(fileName, file);
+        .upload(filePath, file);
 
       if (uploadError) throw uploadError;
 
       console.log('File uploaded successfully:', uploadData);
+
+      // Mettre à jour le statut du justificatif dans la base de données
+      const { error: updateError } = await supabase
+        .from('form_justificatifs')
+        .update({ 
+          file_path: filePath,
+          file_name: file.name,
+          status: 'uploaded'
+        })
+        .eq('id', justificatifId);
+
+      if (updateError) {
+        console.error('Error updating justificatif status:', updateError);
+        throw updateError;
+      }
 
       setJustificatifs(docs => 
         docs.map(doc => 
@@ -149,33 +182,8 @@ const Justificatifs = () => {
     );
   }
 
-  // Si aucun justificatif n'est trouvé, afficher des données d'exemple
+  // Si aucun justificatif n'est trouvé, afficher un message d'erreur ou des données d'exemple
   if (justificatifs.length === 0) {
-    // Utilisation de données fictives pour le moment
-    const mockJustificatifs: Justificatif[] = [
-      {
-        id: "1",
-        question_identifier: "Diversité",
-        response: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression",
-        justificatifs: ["Affichage dans les locaux", "Messages diffusés à tous les collaborateurs"],
-        status: 'pending'
-      },
-      {
-        id: "2",
-        question_identifier: "Égalité",
-        response: "L'entreprise possède et communique sur un code éthique / charte sociale",
-        justificatifs: ["Code éthique", "Charte sociale", "Affichage dans les locaux"],
-        status: 'pending'
-      },
-      {
-        id: "3",
-        question_identifier: "Handicap",
-        response: "L'entreprise précise dans ses offres de stages et d'emploi que les postes sont ouverts aux personnes en situation de handicap",
-        justificatifs: ["Publication des offres d'emploi et de stages"],
-        status: 'pending'
-      }
-    ];
-    
     return (
       <div className="space-y-6 animate-fadeIn">
         <div>
@@ -195,62 +203,17 @@ const Justificatifs = () => {
         </div>
 
         <Card className="p-6">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Critère</TableHead>
-                <TableHead>Réponse</TableHead>
-                <TableHead>Justificatifs demandés</TableHead>
-                <TableHead className="text-right">Action</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {mockJustificatifs.map((doc) => (
-                <TableRow key={doc.id}>
-                  <TableCell className="font-medium">{doc.question_identifier}</TableCell>
-                  <TableCell>
-                    <div className="max-w-md">
-                      {doc.response}
-                    </div>
-                  </TableCell>
-                  <TableCell>
-                    <ul className="list-disc pl-5 text-sm">
-                      {doc.justificatifs.map((justificatif, index) => (
-                        <li key={index}>{justificatif}</li>
-                      ))}
-                    </ul>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <div className="flex items-center justify-end gap-2">
-                      {doc.status === 'uploaded' && (
-                        <span className="text-sm text-green-600 mr-2">
-                          ✓ Téléchargé
-                        </span>
-                      )}
-                      <label>
-                        <input
-                          type="file"
-                          className="hidden"
-                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                          onChange={(e) => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFileUpload(doc.id, file);
-                          }}
-                        />
-                        <Button 
-                          variant={doc.status === 'uploaded' ? "outline" : "default"}
-                          className={`hover:bg-gray-100 ${doc.status !== 'uploaded' ? 'bg-#35DA56 hover:bg-#27017F' : ''}`}
-                        >
-                          <Upload className="mr-2 h-4 w-4" />
-                          {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
-                        </Button>
-                      </label>
-                    </div>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <div className="text-center p-8">
+            <p className="text-lg text-gray-600">
+              Vous devez d'abord compléter et soumettre le formulaire de labellisation.
+            </p>
+            <Button 
+              className="mt-4 bg-[#35DA56] hover:bg-[#27017F]"
+              onClick={() => window.location.href = "/dashboard/form"}
+            >
+              Aller au formulaire
+            </Button>
+          </div>
         </Card>
       </div>
     );
@@ -307,12 +270,13 @@ const Justificatifs = () => {
                           const file = e.target.files?.[0];
                           if (file) handleFileUpload(doc.id, file);
                         }}
+                        aria-label="Télécharger un justificatif"
                       />
                       <Button 
                         variant={doc.status === 'uploaded' ? "outline" : "default"}
-                        className={`hover:bg-gray-100 ${doc.status !== 'uploaded' ? 'bg-#35DA56 hover:bg-#27017F' : ''}`}
+                        className={`${doc.status !== 'uploaded' ? 'bg-[#35DA56] hover:bg-[#27017F]' : ''} hover:bg-gray-100`}
                       >
-                        <Upload className="mr-2 h-4 w-4" />
+                        <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
                         {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
                       </Button>
                     </label>
@@ -328,3 +292,4 @@ const Justificatifs = () => {
 };
 
 export default Justificatifs;
+
