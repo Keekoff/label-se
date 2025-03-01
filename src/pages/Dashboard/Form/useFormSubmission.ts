@@ -1,10 +1,10 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { FormState } from "./types";
 import { useNavigate } from "react-router-dom";
 import { getJustificatifs } from "@/components/form/steps/FormPart1";
+import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2";
 import { getJustificatifsForPart3 } from "@/components/form/steps/FormPart3";
 
 export const useFormSubmission = (
@@ -53,7 +53,7 @@ export const useFormSubmission = (
     try {
       console.log("Starting to save justificatifs for submission:", submissionId);
       
-      // All questions that might have justificatifs
+      // Toutes les questions qui pourraient avoir des justificatifs
       const questionsWithJustificatifs = [
         // Partie 1
         { id: "diversity", dbName: "diversite", displayName: "Diversité", part: 1 },
@@ -68,6 +68,7 @@ export const useFormSubmission = (
         
         // Partie 2
         { id: "associativeContribution", dbName: "contribution_associative", displayName: "Contribution associative", part: 2 },
+        { id: "responsiblePurchasing", dbName: "achats_responsables", displayName: "Politique d'achats responsables", part: 2 },
         { id: "responsibleDigital", dbName: "numerique_responsable", displayName: "Numérique responsable", part: 2 },
         { id: "communication", dbName: "communication_transparente", displayName: "Communication", part: 2 },
         { id: "supplierRelations", dbName: "relations_fournisseurs", displayName: "Relation fournisseurs et prestataires", part: 2 },
@@ -81,10 +82,9 @@ export const useFormSubmission = (
         { id: "carbonEmissions", dbName: "emissions_carbone", displayName: "Plan de contrôle / limite des émissions carbones", part: 3 },
         { id: "circularEconomy", dbName: "economie_circulaire", displayName: "Gestion participative & économie circulaire", part: 3 },
         { id: "wasteManagement", dbName: "gestion_dechets", displayName: "Recyclage & gestion des déchets", part: 3 },
-        { id: "responsiblePurchasing", dbName: "achats_responsables", displayName: "Politique d'achats responsables", part: 3 },
       ];
       
-      // Préparation des données à insérer
+      // Préparation pour l'upsert
       const formJustificatifsData: Array<{
         submission_id: string;
         question_identifier: string;
@@ -100,7 +100,7 @@ export const useFormSubmission = (
         
         // Pour chaque réponse sélectionnée
         for (const response of responses) {
-          // Skip "Ne s'applique pas" responses as they don't need justificatifs
+          // Ignorer les réponses "Ne s'applique pas" car elles n'ont pas besoin de justificatifs
           if (response.includes("Ce critère ne s'applique pas")) {
             console.log(`Skipping justificatifs for "${response}" as it's a N/A response`);
             continue;
@@ -114,16 +114,15 @@ export const useFormSubmission = (
             if (question.part === 1) {
               justificatifs = getJustificatifs(question.id, response);
               console.log(`Got justificatifs for part 1 ${question.id}/${response}:`, justificatifs);
+            } else if (question.part === 2) {
+              justificatifs = getJustificatifsForPart2(question.id, response);
+              console.log(`Got justificatifs for part 2 ${question.id}/${response}:`, justificatifs);
             } else if (question.part === 3) {
               justificatifs = getJustificatifsForPart3(question.id, response);
               console.log(`Got justificatifs for part 3 ${question.id}/${response}:`, justificatifs);
-            } else if (question.part === 2) {
-              // Pour la partie 2, on devrait avoir une fonction similaire
-              // En attendant, on utilise des justificatifs par défaut
-              justificatifs = ["Documentation justificative pour cette réponse"];
-              console.log(`Using default justificatifs for part 2 ${question.id}/${response}:`, justificatifs);
             }
             
+            // N'ajouter les données de justificatifs que si des justificatifs existent
             if (justificatifs && justificatifs.length > 0) {
               formJustificatifsData.push({
                 submission_id: submissionId,
@@ -136,7 +135,7 @@ export const useFormSubmission = (
             }
           } catch (error) {
             console.error(`Error getting justificatifs for ${question.id}/${response}:`, error);
-            // Continue with other responses instead of failing completely
+            // Continuer avec d'autres réponses au lieu d'échouer complètement
           }
         }
       }
@@ -145,26 +144,29 @@ export const useFormSubmission = (
       if (formJustificatifsData.length > 0) {
         console.log("Saving justificatifs data:", formJustificatifsData);
         
-        // Utiliser la structure de paramètres correcte pour upsert
-        const { error } = await supabase
-          .from('form_justificatifs')
-          .upsert(formJustificatifsData, { 
-            onConflict: 'submission_id,question_identifier,response'
-          });
-        
-        if (error) {
-          console.error("Erreur lors de la sauvegarde des justificatifs:", error);
-          throw error;
+        // Upsert chaque justificatif individuellement pour éviter les problèmes avec le format
+        for (const justifData of formJustificatifsData) {
+          const { error } = await supabase
+            .from('form_justificatifs')
+            .upsert([justifData], { 
+              onConflict: 'submission_id,question_identifier,response' 
+            });
+          
+          if (error) {
+            console.error(`Erreur lors de la sauvegarde du justificatif ${justifData.question_identifier}/${justifData.response}:`, error);
+          } else {
+            console.log(`Justificatif ${justifData.question_identifier}/${justifData.response} sauvegardé avec succès`);
+          }
         }
         
-        console.log("Justificatifs saved successfully!");
+        console.log("Tous les justificatifs ont été traités!");
       } else {
-        console.log("No justificatifs data to save");
+        console.log("Aucune donnée de justificatifs à sauvegarder");
       }
     } catch (error) {
       console.error("Erreur lors de la sauvegarde des justificatifs:", error);
-      // Instead of throwing and failing the form submission, we'll just log the error
-      // and let the user know there was an issue with justificatifs
+      // Au lieu de lancer une erreur et d'échouer la soumission du formulaire, nous nous contenterons de journaliser l'erreur
+      // et d'informer l'utilisateur qu'il y a eu un problème avec les justificatifs
       toast({
         title: "Attention",
         description: "Le formulaire a été envoyé mais nous avons rencontré un problème lors de l'enregistrement des justificatifs.",
@@ -198,6 +200,7 @@ export const useFormSubmission = (
     console.log("privacy:", data.privacy);
     console.log("transport:", data.transport);
     console.log("associativeContribution:", data.associativeContribution);
+    console.log("responsiblePurchasing:", data.responsiblePurchasing);
     console.log("responsibleDigital:", data.responsibleDigital);
     console.log("communication:", data.communication);
     console.log("supplierRelations:", data.supplierRelations);
@@ -209,16 +212,6 @@ export const useFormSubmission = (
     console.log("carbonEmissions:", data.carbonEmissions);
     console.log("circularEconomy:", data.circularEconomy);
     console.log("wasteManagement:", data.wasteManagement);
-    console.log("responsiblePurchasing:", data.responsiblePurchasing);
-
-    // Vérifier explicitement les champs problématiques de la Partie 3
-    console.log("== Vérification spécifique des champs de la Partie 3 ==");
-    console.log("wasteManagement (gestion_dechets):", data.wasteManagement);
-    console.log("ecoDesign (eco_conception):", data.ecoDesign);
-    console.log("continuousEvaluation (evaluation_continue):", data.continuousEvaluation);
-    console.log("energyManagement (gestion_energie):", data.energyManagement);
-    console.log("carbonEmissions (emissions_carbone):", data.carbonEmissions);
-    console.log("circularEconomy (economie_circulaire):", data.circularEconomy);
 
     // Correction: S'assurer que les champs de données correspondent exactement aux champs de la base de données
     const formattedData = {
@@ -250,12 +243,15 @@ export const useFormSubmission = (
       confidentialite_donnees: formatResponses(data.privacy),
       mobilite: formatResponses(data.transport),
       
-      // Partie 2 et 3 - Correspondance exacte entre les noms de champs du formulaire et ceux de la BDD
+      // Partie 2 - Correspondance exacte entre les noms de champs du formulaire et ceux de la BDD
       contribution_associative: formatResponses(data.associativeContribution),
+      achats_responsables: formatResponses(data.responsiblePurchasing),
       numerique_responsable: formatResponses(data.responsibleDigital),
       communication_transparente: formatResponses(data.communication),
       relations_fournisseurs: formatResponses(data.supplierRelations),
       impact_social: formatResponses(data.socialImpact),
+      
+      // Partie 3 - Correspondance exacte entre les noms de champs du formulaire et ceux de la BDD
       production_durable: formatResponses(data.production),
       eco_conception: formatResponses(data.ecoDesign),
       evaluation_continue: formatResponses(data.continuousEvaluation),

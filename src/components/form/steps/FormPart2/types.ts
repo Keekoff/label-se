@@ -6,13 +6,14 @@ export interface Question {
   options: {
     value: string;
     label: string;
+    justificatifs?: string[];
   }[];
 }
 
 export interface QuestionProps {
   question: Question;
-  answers: string[];
-  onAnswerToggle: (questionId: string, value: string, clearOthers?: boolean) => void;
+  selectedAnswers: string[];
+  onAnswerToggle: (questionId: string, value: string) => void;
 }
 
 export interface FormPart2Props {
