@@ -4,6 +4,17 @@ import { QUESTIONS } from "./constants";
 import QuestionCard from "./QuestionCard";
 import { FormPart1Props } from "./types";
 
+// Helper function to get justificatifs from label
+export const getJustificatifs = (questionId: string, optionLabel: string): string[] => {
+  const question = QUESTIONS.find(q => q.id === questionId);
+  if (!question) return [];
+  
+  const option = question.options.find(o => o.label === optionLabel);
+  if (!option || !option.justificatifs) return [];
+  
+  return option.justificatifs;
+};
+
 const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props) => {
   const [answers, setAnswers] = useState<Record<string, string[]>>(() => {
     const initialAnswers: Record<string, string[]> = {};
@@ -15,32 +26,50 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
     return initialAnswers;
   });
 
-  const toggleAnswer = (questionId: string, value: string, label: string) => {
+  // Function to toggle answers with improved handling of exclusive options
+  const toggleAnswer = (questionId: string, label: string, forceState?: boolean) => {
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
-    if (label === "Ce critère ne s'applique pas à mon entreprise") {
-      newAnswers = currentAnswers.includes(label) ? [] : [label];
+    // Handle "Ce critère ne s'applique pas" option specially
+    if (label.includes("Ce critère ne s'applique pas")) {
+      if (forceState !== undefined) {
+        newAnswers = forceState ? [label] : [];
+      } else {
+        newAnswers = currentAnswers.includes(label) ? [] : [label];
+      }
     } else {
-      newAnswers = currentAnswers.includes(label)
-        ? currentAnswers.filter(v => v !== label)
-        : [...currentAnswers.filter(v => v !== "Ce critère ne s'applique pas à mon entreprise"), label];
+      // For other options
+      if (forceState !== undefined) {
+        newAnswers = forceState
+          ? [...currentAnswers.filter(a => !a.includes("Ce critère ne s'applique pas")), label]
+          : currentAnswers.filter(a => a !== label);
+      } else {
+        // Toggle behavior
+        newAnswers = currentAnswers.includes(label)
+          ? currentAnswers.filter(a => a !== label)
+          : [...currentAnswers.filter(a => !a.includes("Ce critère ne s'applique pas")), label];
+      }
     }
     
+    // Update local state and parent form state
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
     
     // Update form state with the new answers
-    const formUpdates: Record<string, string[]> = {
-      [questionId]: newAnswers
-    };
+    setFormState({ ...formState, [questionId]: newAnswers });
     
-    setFormState({ ...formState, ...formUpdates });
+    // Debug logging
+    console.log(`Updated ${questionId} answers:`, newAnswers);
   };
 
+  // Check form validity whenever answers change
   useEffect(() => {
     const isValid = Object.values(answers).every(answer => answer.length > 0);
     onValidityChange(isValid);
+    
+    // Log current answers state for debugging
+    console.log("Current form answers state:", answers);
   }, [answers, onValidityChange]);
 
   return (
@@ -58,12 +87,7 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
             key={question.id}
             question={question}
             answers={answers[question.id] || []}
-            onAnswerToggle={(questionId, value) => {
-              const option = question.options.find(opt => opt.value === value);
-              if (option) {
-                toggleAnswer(questionId, value, option.label);
-              }
-            }}
+            onAnswerToggle={toggleAnswer}
           />
         ))}
       </div>

@@ -12,28 +12,35 @@ import { QuestionProps } from "./types";
 
 const QuestionCard = ({ question, answers, onAnswerToggle }: QuestionProps) => {
   const handleOptionClick = (value: string) => {
-    if (value === "D") {
-      // If clicking "Non applicable", clear other selections
-      if (!answers.includes("D")) {
-        onAnswerToggle(question.id, value, true);
-      } else {
-        onAnswerToggle(question.id, value, false);
-      }
+    // Find the label for this value
+    const option = question.options.find(opt => opt.value === value);
+    if (!option) return;
+    
+    if (option.label.includes("Ce critère ne s'applique pas à mon entreprise")) {
+      // If clicking "Non applicable", toggle clear mode
+      const isAlreadySelected = answers.includes(option.label);
+      onAnswerToggle(question.id, option.label, !isAlreadySelected);
     } else {
-      // If clicking other option, remove "Non applicable" if present
-      if (answers.includes("D")) {
-        onAnswerToggle(question.id, "D", false);
+      // If clicking other option, make sure to remove "Non applicable" if present
+      const nonApplicableOption = question.options.find(o => 
+        o.label.includes("Ce critère ne s'applique pas à mon entreprise")
+      );
+      
+      if (nonApplicableOption && answers.includes(nonApplicableOption.label)) {
+        onAnswerToggle(question.id, nonApplicableOption.label, false);
       }
-      onAnswerToggle(question.id, value);
+      
+      // Toggle the selected option
+      onAnswerToggle(question.id, option.label);
     }
   };
 
   return (
     <div className="space-y-4 pb-6 border-b last:border-0">
       <div>
-        <h3 className="text-lg font-medium flex items-center gap-1">
+        <h3 className="text-lg font-medium flex items-start gap-1">
           {question.title}
-          <span className="text-red-500 ml-1">*</span>
+          <span className="text-red-500">*</span>
         </h3>
         <p className="text-gray-600 mt-1 text-sm">{question.description}</p>
       </div>
@@ -60,7 +67,7 @@ const QuestionCard = ({ question, answers, onAnswerToggle }: QuestionProps) => {
                   key={option.value}
                   value={option.value}
                   label={option.label}
-                  isSelected={answers?.includes(option.value)}
+                  isSelected={answers?.includes(option.label)}
                   onClick={() => handleOptionClick(option.value)}
                 />
               ))}
