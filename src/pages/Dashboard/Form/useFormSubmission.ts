@@ -4,6 +4,7 @@ import { useToast } from "@/components/ui/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { FormState } from "./types";
 import { useNavigate } from "react-router-dom";
+import { getJustificatifs } from "@/components/form/steps/FormPart1";
 
 export const useFormSubmission = (
   formState: FormState,
@@ -45,6 +46,54 @@ export const useFormSubmission = (
     
     // Si aucune réponse n'est fournie, retourner un tableau vide
     return [];
+  };
+
+  const saveFormJustificatifs = async (submissionId: string) => {
+    try {
+      // Obtenir les questions qui ont des justificatifs
+      const questionsWithJustificatifs = [
+        { id: "diversity", displayName: "Diversité" },
+        { id: "equality", displayName: "Égalité" },
+        { id: "handicap", displayName: "Handicap" },
+      ];
+      
+      const formJustificatifsData = [];
+      
+      // Pour chaque question avec justificatifs
+      for (const question of questionsWithJustificatifs) {
+        const responses = formState[question.id] || [];
+        
+        // Pour chaque réponse sélectionnée
+        for (const response of responses) {
+          // Obtenir les justificatifs associés à cette réponse
+          const justificatifs = getJustificatifs(question.id, response);
+          
+          if (justificatifs.length > 0) {
+            formJustificatifsData.push({
+              submission_id: submissionId,
+              question_identifier: question.displayName,
+              response: response,
+              justificatifs: justificatifs
+            });
+          }
+        }
+      }
+      
+      // Si des données de justificatifs existent, les insérer dans la base de données
+      if (formJustificatifsData.length > 0) {
+        const { error } = await supabase
+          .from('form_justificatifs')
+          .upsert(formJustificatifsData, { onConflict: 'submission_id,question_identifier,response' });
+        
+        if (error) {
+          console.error("Erreur lors de la sauvegarde des justificatifs:", error);
+          throw error;
+        }
+      }
+    } catch (error) {
+      console.error("Erreur lors de la sauvegarde des justificatifs:", error);
+      throw error;
+    }
   };
 
   const formatSubmissionData = async (data: FormState, status: 'draft' | 'submitted') => {
@@ -160,6 +209,8 @@ export const useFormSubmission = (
       const submissionData = await formatSubmissionData(formState, 'draft');
       console.log('Saving draft with data:', submissionData);
 
+      let finalSubmissionId = submissionId;
+
       if (submissionId) {
         const { error } = await supabase
           .from('label_submissions')
@@ -181,7 +232,13 @@ export const useFormSubmission = (
           console.error('Supabase insert error:', error);
           throw error;
         }
+        finalSubmissionId = data.id;
         setSubmissionId(data.id);
+      }
+
+      // Sauvegarder les justificatifs
+      if (finalSubmissionId) {
+        await saveFormJustificatifs(finalSubmissionId);
       }
 
       toast({
@@ -237,6 +294,11 @@ export const useFormSubmission = (
         }
         finalSubmissionId = data.id;
         setSubmissionId(data.id);
+      }
+
+      // Sauvegarder les justificatifs
+      if (finalSubmissionId) {
+        await saveFormJustificatifs(finalSubmissionId);
       }
 
       setCurrentStep(6);

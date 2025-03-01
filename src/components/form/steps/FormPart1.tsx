@@ -20,7 +20,7 @@ interface Question {
   id: string;
   title: string;
   description: string;
-  options: { value: string; label: string }[];
+  options: { value: string; label: string; justificatifs?: string[] }[];
 }
 
 const QUESTIONS: Question[] = [
@@ -29,10 +29,36 @@ const QUESTIONS: Question[] = [
     title: "1 - Diversité",
     description: "Ensemble des personnes qui diffèrent les unes des autres par leur origine géographique, socio-culturelle ou religieuse, leur âge, leur sexe, leur orientation sexuelle, etc.",
     options: [
-      { value: "A", label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression en cas de non-respect de la diversité" },
-      { value: "B", label: "L'entreprise possède et communique une charte sociale auprès de tous ses collaborateurs" },
-      { value: "C", label: "La lutte contre les discriminations est intégrée aux processus RH" },
-      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
+      { 
+        value: "A", 
+        label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression en cas de non-respect de la diversité, propos racistes, stigmatisants ou discriminatoires (âge, genre, orientation sexuelle, religion, croyances...)",
+        justificatifs: [
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)"
+        ]
+      },
+      { 
+        value: "B", 
+        label: "L'entreprise possède et communique sur un code éthique / charte sociale auprès de tous ses collaborateurs et publiquement",
+        justificatifs: [
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)"
+        ]
+      },
+      { 
+        value: "C", 
+        label: "La lutte contre les discriminations est intégrée au processus des RH",
+        justificatifs: [
+          "Présence dans la feuille de route stratégique des RH",
+          "Actions menées par les RH sur le sujet (événement, messages aux collaborateurs)",
+          "Présence dans les questionnaires d'entretien annuel"
+        ]
+      },
+      { 
+        value: "D", 
+        label: "Ce critère ne s'applique pas à mon entreprise",
+        justificatifs: ["N/A"]
+      }
     ]
   },
   {
@@ -40,10 +66,40 @@ const QUESTIONS: Question[] = [
     title: "2 - Égalité",
     description: "Absence de toute discrimination entre les êtres humains sur le plan de leurs droits.",
     options: [
-      { value: "A", label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils contre les propos sexistes/discriminatoires" },
-      { value: "B", label: "L'entreprise communique publiquement un code éthique" },
-      { value: "C", label: "Égalité salariale et de traitement strictement appliquée" },
-      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
+      { 
+        value: "A", 
+        label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression en cas de non-respect de l'égalité, propos mysogynes ou discriminatoires de toute sorte",
+        justificatifs: [
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)"
+        ]
+      },
+      { 
+        value: "B", 
+        label: "L'entreprise possède et communique sur un code éthique / charte sociale auprès de tous ses collaborateurs et publiquement",
+        justificatifs: [
+          "Code éthique",
+          "Charte sociale",
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)",
+          "Règlement intérieur",
+          "Présence sur le site web",
+          "Messages diffusés à l'externe (réseaux sociaux, vidéo, articles de blog, tribunes, communiqués de toutes sortes...)"
+        ]
+      },
+      { 
+        value: "C", 
+        label: "L'entreprise veille à une stricte égalité salariale et de traitement entre ses collaborateurs, ceci est intégré au processus des RH",
+        justificatifs: [
+          "Existence d'une grille salariale et accessible aux collaborateurs",
+          "Actions menées par les RH pour promouvoir une culture d'égalité salariale"
+        ]
+      },
+      { 
+        value: "D", 
+        label: "Ce critère ne s'applique pas à mon entreprise",
+        justificatifs: ["N/A"]
+      }
     ]
   },
   {
@@ -51,10 +107,32 @@ const QUESTIONS: Question[] = [
     title: "3 - Handicap",
     description: "Limitation d'activité ou restriction de participation à la vie de l'entreprise.",
     options: [
-      { value: "A", label: "Postes ouverts aux personnes en situation de handicap dans les offres d'emploi" },
-      { value: "B", label: "Communication et actions concrètes pour l'inclusion des travailleurs handicapés" },
-      { value: "C", label: "Quota de 6 % de salariés en situation de handicap respecté (si ≥20 salariés)" },
-      { value: "D", label: "Ce critère ne s'applique pas à mon entreprise" }
+      { 
+        value: "A", 
+        label: "L'entreprise précise dans ses offres de stages et d'emploi que les postes sont ouverts aux personnes en situation de handicap",
+        justificatifs: [
+          "Publication des offres d'emploi et de stages précisant l'ouverture du poste aux personnes en situation de handicap"
+        ]
+      },
+      { 
+        value: "B", 
+        label: "L'entreprise communique sur son engagement en faveur de l'inclusion des personnes en situation de handicap et met tout en oeuvre pour que les postes de travail et les accès aux infrastructures soient adaptés",
+        justificatifs: [
+          "Postes de travail et locaux accessibles aux personnes en situation de handicap (ergonomie, accès PMR etc...)"
+        ]
+      },
+      { 
+        value: "C", 
+        label: "L'entreprise a plus de 20 salariés et répond positivement à l'obligation d'emploi de travailleurs handicapés (OETH). Les salariés handicapés représentent bien 6 % de l'effectif de l'entreprise",
+        justificatifs: [
+          "Preuve administrative de la réponse positive à l'OETH"
+        ]
+      },
+      { 
+        value: "D", 
+        label: "Ce critère ne s'applique pas à mon entreprise",
+        justificatifs: ["N/A"]
+      }
     ]
   },
   {
@@ -124,6 +202,17 @@ const QUESTIONS: Question[] = [
     ]
   }
 ];
+
+// Fonction utilitaire pour obtenir les justificatifs d'une question et option
+export const getJustificatifs = (questionId: string, optionLabel: string): string[] => {
+  const question = QUESTIONS.find(q => q.id === questionId);
+  if (!question) return [];
+  
+  const option = question.options.find(o => o.label === optionLabel);
+  if (!option || !option.justificatifs) return [];
+  
+  return option.justificatifs;
+};
 
 const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props) => {
   const [answers, setAnswers] = useState<Record<string, string[]>>(() => {
