@@ -11,7 +11,7 @@ export const DashboardCharts = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 overflow-hidden">
+      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
         <TieredBarChart 
           title="Gouvernance juste et inclusive" 
           data={chartData}
@@ -29,7 +29,7 @@ export const DashboardCharts = () => {
         />
       </Card>
 
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 overflow-hidden">
+      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
         <TieredBarChart 
           title="Développement d'impact social positif" 
           data={chartData}
@@ -47,7 +47,7 @@ export const DashboardCharts = () => {
         />
       </Card>
 
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 overflow-hidden">
+      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
         <TieredBarChart 
           title="Maitrise d'impact environnemental et développement durable" 
           data={chartData}
@@ -65,7 +65,7 @@ export const DashboardCharts = () => {
         />
       </Card>
 
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 overflow-hidden">
+      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
         <TieredBarChart 
           title="Moyenne des labellisés" 
           data={chartData}

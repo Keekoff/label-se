@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Line, Bar, Pie, LineChart as RechartsLineChart, BarChart as RechartsBarChart, PieChart as RechartsPieChart, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, ReferenceLine, Legend } from "recharts"
 import { ChartContainer, ChartTooltip } from "./chart-primitives"
@@ -96,9 +97,9 @@ export const TieredBarChart = ({
   tierLabels?: TierLabels;
 }) => {
   return (
-    <div className="space-y-2 w-full h-full">
-      <h3 className="text-lg font-semibold">{title}</h3>
-      <div className="flex flex-wrap gap-2 text-sm justify-center mb-2">
+    <div className="flex flex-col h-full w-full">
+      <h3 className="text-lg font-semibold mb-2">{title}</h3>
+      <div className="flex flex-wrap gap-2 text-sm justify-center mb-4">
         {tiers.tier1 !== undefined && (
           <div className="flex items-center">
             <div className="w-4 h-0.5 bg-green-500 mx-1 border-dashed border-t-2 border-green-500"></div>
@@ -122,7 +123,7 @@ export const TieredBarChart = ({
           <span>Résultats</span>
         </div>
       </div>
-      <div className="w-full" style={{ height: 'calc(100% - 80px)', minHeight: '250px' }}>
+      <div className="flex-grow w-full h-[240px]">
         <ResponsiveContainer width="100%" height="100%">
           <RechartsBarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
