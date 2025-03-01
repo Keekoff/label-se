@@ -7,10 +7,16 @@ import { FormPart1Props } from "./types";
 // Helper function to get justificatifs from label
 export const getJustificatifs = (questionId: string, optionLabel: string): string[] => {
   const question = QUESTIONS.find(q => q.id === questionId);
-  if (!question) return [];
+  if (!question) {
+    console.warn(`Question not found with id: ${questionId}`);
+    return [];
+  }
   
   const option = question.options.find(o => o.label === optionLabel);
-  if (!option || !option.justificatifs) return [];
+  if (!option || !option.justificatifs) {
+    console.warn(`Option not found with label "${optionLabel}" for question "${questionId}" or it has no justificatifs`);
+    return [];
+  }
   
   return option.justificatifs;
 };

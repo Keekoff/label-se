@@ -55,6 +55,12 @@ export const useFormSubmission = (
         { id: "diversity", displayName: "Diversité" },
         { id: "equality", displayName: "Égalité" },
         { id: "handicap", displayName: "Handicap" },
+        { id: "health", displayName: "Santé des salariés/bien-être au travail" },
+        { id: "parentality", displayName: "Parentalité" },
+        { id: "training", displayName: "Formation" },
+        { id: "csr", displayName: "Politique RSE" },
+        { id: "privacy", displayName: "Privacy/Data" },
+        { id: "transport", displayName: "Transports" },
       ];
       
       const formJustificatifsData = [];
@@ -68,7 +74,7 @@ export const useFormSubmission = (
           // Obtenir les justificatifs associés à cette réponse
           const justificatifs = getJustificatifs(question.id, response);
           
-          if (justificatifs.length > 0) {
+          if (justificatifs && justificatifs.length > 0) {
             formJustificatifsData.push({
               submission_id: submissionId,
               question_identifier: question.displayName,
@@ -81,6 +87,8 @@ export const useFormSubmission = (
       
       // Si des données de justificatifs existent, les insérer dans la base de données
       if (formJustificatifsData.length > 0) {
+        console.log("Saving justificatifs data:", formJustificatifsData);
+        
         const { error } = await supabase
           .from('form_justificatifs')
           .upsert(formJustificatifsData, { onConflict: 'submission_id,question_identifier,response' });
@@ -89,6 +97,8 @@ export const useFormSubmission = (
           console.error("Erreur lors de la sauvegarde des justificatifs:", error);
           throw error;
         }
+      } else {
+        console.log("No justificatifs data to save");
       }
     } catch (error) {
       console.error("Erreur lors de la sauvegarde des justificatifs:", error);
@@ -298,7 +308,16 @@ export const useFormSubmission = (
 
       // Sauvegarder les justificatifs
       if (finalSubmissionId) {
-        await saveFormJustificatifs(finalSubmissionId);
+        try {
+          await saveFormJustificatifs(finalSubmissionId);
+        } catch (justificatifsError) {
+          console.error('Error saving justificatifs:', justificatifsError);
+          // Continue with form submission even if justificatifs fail
+          toast({
+            title: "Attention",
+            description: "Le formulaire a été envoyé mais une erreur est survenue lors de l'enregistrement des justificatifs.",
+          });
+        }
       }
 
       setCurrentStep(6);
