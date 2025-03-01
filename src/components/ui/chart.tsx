@@ -118,9 +118,7 @@ export const SustainabilityRadarChart = ({
                 fontSize: 10, 
                 fill: "#4B5563",
                 dy: 3
-              }} 
-              cx="50%" 
-              cy="50%" 
+              }}
             />
             <PolarRadiusAxis 
               angle={30} 
