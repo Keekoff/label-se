@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -15,6 +14,7 @@ export const useFormSubmission = (
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -127,12 +127,23 @@ export const useFormSubmission = (
       if (formJustificatifsData.length > 0) {
         console.log("Saving justificatifs data:", formJustificatifsData);
         
+        // First, clear existing justificatifs for this submission to avoid duplicates
+        const { error: clearError } = await supabase
+          .from('form_justificatifs')
+          .delete()
+          .eq('submission_id', submissionId);
+        
+        if (clearError) {
+          console.error("Error clearing existing justificatifs:", clearError);
+        } else {
+          console.log("Successfully cleared existing justificatifs");
+        }
+        
+        // Now insert all the new justificatifs
         for (const justifData of formJustificatifsData) {
           const { error } = await supabase
             .from('form_justificatifs')
-            .upsert([justifData], { 
-              onConflict: 'submission_id,question_identifier,response' 
-            });
+            .insert([justifData]);
           
           if (error) {
             console.error(`Erreur lors de la sauvegarde du justificatif ${justifData.question_identifier}/${justifData.response}:`, error);

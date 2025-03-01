@@ -21,6 +21,7 @@ type Justificatif = {
 const Justificatifs = () => {
   const [justificatifs, setJustificatifs] = useState<Justificatif[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchJustificatifs = async () => {
@@ -31,6 +32,8 @@ const Justificatifs = () => {
           return;
         }
 
+        console.log("Fetching justificatifs for user:", session.user.id);
+
         // Récupérer la dernière soumission de l'utilisateur
         const { data: submissions, error: submissionError } = await supabase
           .from('label_submissions')
@@ -39,13 +42,21 @@ const Justificatifs = () => {
           .order('created_at', { ascending: false })
           .limit(1);
 
-        if (submissionError || !submissions?.length) {
+        if (submissionError) {
           console.error('Error fetching submissions:', submissionError);
+          setSubmitError("Erreur lors de la récupération des soumissions");
+          setIsLoading(false);
+          return;
+        }
+
+        if (!submissions?.length) {
+          console.log("No submissions found for user");
           setIsLoading(false);
           return;
         }
 
         const submissionId = submissions[0].id;
+        console.log("Found submission ID:", submissionId);
 
         // Récupérer les justificatifs associés à cette soumission
         const { data: justificatifsData, error: justificatifsError } = await supabase
@@ -59,6 +70,8 @@ const Justificatifs = () => {
           setIsLoading(false);
           return;
         }
+
+        console.log("Fetched justificatifs data:", justificatifsData);
 
         // Transformer les données pour l'affichage
         const mappedJustificatifs = justificatifsData.map(item => ({
@@ -89,11 +102,29 @@ const Justificatifs = () => {
       const fileExt = file.name.split('.').pop();
       const fileName = `${justificatif.question_identifier.toLowerCase().replace(/ /g, '-')}-${Date.now()}.${fileExt}`;
       
+      // Ensure bucket exists before uploading
+      try {
+        const { data: buckets } = await supabase.storage.listBuckets();
+        const justificatifsBucket = buckets?.find(b => b.name === 'justificatifs');
+        
+        if (!justificatifsBucket) {
+          console.log('Creating justificatifs bucket...');
+          await supabase.storage.createBucket('justificatifs', {
+            public: false,
+            fileSizeLimit: 10485760, // 10MB limit
+          });
+        }
+      } catch (bucketError) {
+        console.error('Error checking/creating bucket:', bucketError);
+      }
+      
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('justificatifs')
         .upload(fileName, file);
 
       if (uploadError) throw uploadError;
+
+      console.log('File uploaded successfully:', uploadData);
 
       setJustificatifs(docs => 
         docs.map(doc => 
@@ -118,7 +149,7 @@ const Justificatifs = () => {
     );
   }
 
-  // Si aucun justificatif n'est trouvé, afficher des données fictives
+  // Si aucun justificatif n'est trouvé, afficher des données d'exemple
   if (justificatifs.length === 0) {
     // Utilisation de données fictives pour le moment
     const mockJustificatifs: Justificatif[] = [
@@ -152,9 +183,15 @@ const Justificatifs = () => {
           <p className="text-gray-500 mt-2">
             Veuillez télécharger les documents demandés ci-dessous pour compléter votre dossier.
           </p>
-          <p className="text-sm text-amber-600 mt-2">
-            Note: Pour l'instant, cet écran affiche des données d'exemple. La fonctionnalité de téléchargement sera pleinement implémentée prochainement.
-          </p>
+          {submitError ? (
+            <p className="text-sm text-red-600 mt-2">
+              {submitError}
+            </p>
+          ) : (
+            <p className="text-sm text-amber-600 mt-2">
+              Aucun justificatif trouvé pour votre dernière soumission. Veuillez soumettre le formulaire complet ou contacter l'administrateur.
+            </p>
+          )}
         </div>
 
         <Card className="p-6">
@@ -202,7 +239,7 @@ const Justificatifs = () => {
                         />
                         <Button 
                           variant={doc.status === 'uploaded' ? "outline" : "default"}
-                          className="hover:bg-gray-100"
+                          className={`hover:bg-gray-100 ${doc.status !== 'uploaded' ? 'bg-#35DA56 hover:bg-#27017F' : ''}`}
                         >
                           <Upload className="mr-2 h-4 w-4" />
                           {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
@@ -273,7 +310,7 @@ const Justificatifs = () => {
                       />
                       <Button 
                         variant={doc.status === 'uploaded' ? "outline" : "default"}
-                        className="hover:bg-gray-100"
+                        className={`hover:bg-gray-100 ${doc.status !== 'uploaded' ? 'bg-#35DA56 hover:bg-#27017F' : ''}`}
                       >
                         <Upload className="mr-2 h-4 w-4" />
                         {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
