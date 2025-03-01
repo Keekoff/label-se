@@ -4,6 +4,23 @@ import { QUESTIONS } from "./FormPart3/constants";
 import QuestionCard from "./FormPart3/QuestionCard";
 import { FormPart3Props } from "./FormPart3/types";
 
+// Helper function to get justificatifs for FormPart3
+export const getJustificatifsForPart3 = (questionId: string, optionLabel: string): string[] => {
+  const question = QUESTIONS.find(q => q.id === questionId);
+  if (!question) {
+    console.warn(`Question not found with id: ${questionId}`);
+    return [];
+  }
+  
+  const option = question.options.find(o => o.label === optionLabel);
+  if (!option || !option.justificatifs) {
+    console.warn(`Option not found with label "${optionLabel}" for question "${questionId}" or it has no justificatifs`);
+    return [];
+  }
+  
+  return option.justificatifs;
+};
+
 const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props) => {
   const [answers, setAnswers] = useState<Record<string, string[]>>(() => {
     const initialAnswers: Record<string, string[]> = {};
@@ -21,13 +38,13 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
     let newAnswers: string[];
 
     // Gestion de l'option "Ce critère ne s'applique pas à mon entreprise"
-    if (label.includes("Ce critère ne s'applique pas à mon entreprise")) {
+    if (label.includes("Ce critère ne s'applique pas")) {
       newAnswers = currentAnswers.includes(label) ? [] : [label];
     } else {
       // Si sélection d'une option normale, supprimer "Ce critère ne s'applique pas" si présent
       newAnswers = currentAnswers.includes(label)
         ? currentAnswers.filter(v => v !== label)
-        : [...currentAnswers.filter(v => !v.includes("Ce critère ne s'applique pas à mon entreprise")), label];
+        : [...currentAnswers.filter(v => !v.includes("Ce critère ne s'applique pas")), label];
     }
     
     // Mettre à jour les réponses et adapter le nom du champ pour correspondre à la base de données
@@ -43,7 +60,7 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
       'ecoDesign': 'eco_conception',
       'continuousEvaluation': 'evaluation_continue',
       'energyManagement': 'gestion_energie',
-      'carbonEmissions': 'emissions_carbone', // Correction de emission_carbonne à emissions_carbone
+      'carbonEmissions': 'emissions_carbone',
       'circularEconomy': 'economie_circulaire'
     };
     

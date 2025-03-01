@@ -5,6 +5,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { FormState } from "./types";
 import { useNavigate } from "react-router-dom";
 import { getJustificatifs } from "@/components/form/steps/FormPart1";
+import { getJustificatifsForPart3 } from "@/components/form/steps/FormPart3";
 
 export const useFormSubmission = (
   formState: FormState,
@@ -55,35 +56,41 @@ export const useFormSubmission = (
       // All questions that might have justificatifs
       const questionsWithJustificatifs = [
         // Partie 1
-        { id: "diversity", dbName: "diversite", displayName: "Diversité" },
-        { id: "equality", dbName: "egalite", displayName: "Égalité" },
-        { id: "handicap", dbName: "situation_handicap", displayName: "Handicap" },
-        { id: "health", dbName: "sante_bien_etre", displayName: "Santé des salariés/bien-être au travail" },
-        { id: "parentality", dbName: "parentalite", displayName: "Parentalité" },
-        { id: "training", dbName: "formation", displayName: "Formation" },
-        { id: "csr", dbName: "politique_rse", displayName: "Politique RSE" },
-        { id: "privacy", dbName: "confidentialite_donnees", displayName: "Privacy/Data" },
-        { id: "transport", dbName: "mobilite", displayName: "Transports" },
+        { id: "diversity", dbName: "diversite", displayName: "Diversité", part: 1 },
+        { id: "equality", dbName: "egalite", displayName: "Égalité", part: 1 },
+        { id: "handicap", dbName: "situation_handicap", displayName: "Handicap", part: 1 },
+        { id: "health", dbName: "sante_bien_etre", displayName: "Santé des salariés/bien-être au travail", part: 1 },
+        { id: "parentality", dbName: "parentalite", displayName: "Parentalité", part: 1 },
+        { id: "training", dbName: "formation", displayName: "Formation", part: 1 },
+        { id: "csr", dbName: "politique_rse", displayName: "Politique RSE", part: 1 },
+        { id: "privacy", dbName: "confidentialite_donnees", displayName: "Privacy/Data", part: 1 },
+        { id: "transport", dbName: "mobilite", displayName: "Transports", part: 1 },
         
         // Partie 2
-        { id: "associativeContribution", dbName: "contribution_associative", displayName: "Contribution associative" },
-        { id: "responsibleDigital", dbName: "numerique_responsable", displayName: "Numérique responsable" },
-        { id: "communication", dbName: "communication_transparente", displayName: "Communication transparente" },
-        { id: "supplierRelations", dbName: "relations_fournisseurs", displayName: "Relations avec les fournisseurs" },
-        { id: "socialImpact", dbName: "impact_social", displayName: "Impact social" },
+        { id: "associativeContribution", dbName: "contribution_associative", displayName: "Contribution associative", part: 2 },
+        { id: "responsibleDigital", dbName: "numerique_responsable", displayName: "Numérique responsable", part: 2 },
+        { id: "communication", dbName: "communication_transparente", displayName: "Communication", part: 2 },
+        { id: "supplierRelations", dbName: "relations_fournisseurs", displayName: "Relation fournisseurs et prestataires", part: 2 },
+        { id: "socialImpact", dbName: "impact_social", displayName: "Prise en compte de l'impact social", part: 2 },
         
         // Partie 3
-        { id: "production", dbName: "production_durable", displayName: "Production durable" },
-        { id: "ecoDesign", dbName: "eco_conception", displayName: "Éco-conception" },
-        { id: "continuousEvaluation", dbName: "evaluation_continue", displayName: "Évaluation continue" },
-        { id: "energyManagement", dbName: "gestion_energie", displayName: "Gestion de l'énergie" },
-        { id: "carbonEmissions", dbName: "emissions_carbone", displayName: "Émissions carbone" },
-        { id: "circularEconomy", dbName: "economie_circulaire", displayName: "Économie circulaire" },
-        { id: "wasteManagement", dbName: "gestion_dechets", displayName: "Gestion des déchets" },
-        { id: "responsiblePurchasing", dbName: "achats_responsables", displayName: "Achats responsables" },
+        { id: "production", dbName: "production_durable", displayName: "Production : énergie & matériaux utilisés", part: 3 },
+        { id: "ecoDesign", dbName: "eco_conception", displayName: "Éco-conception", part: 3 },
+        { id: "continuousEvaluation", dbName: "evaluation_continue", displayName: "Évaluation permanente", part: 3 },
+        { id: "energyManagement", dbName: "gestion_energie", displayName: "Maîtrise et optimisation de la consommation de ressources énergétiques", part: 3 },
+        { id: "carbonEmissions", dbName: "emissions_carbone", displayName: "Plan de contrôle / limite des émissions carbones", part: 3 },
+        { id: "circularEconomy", dbName: "economie_circulaire", displayName: "Gestion participative & économie circulaire", part: 3 },
+        { id: "wasteManagement", dbName: "gestion_dechets", displayName: "Recyclage & gestion des déchets", part: 3 },
+        { id: "responsiblePurchasing", dbName: "achats_responsables", displayName: "Politique d'achats responsables", part: 3 },
       ];
       
-      const formJustificatifsData = [];
+      // Préparation des données à insérer
+      const formJustificatifsData: Array<{
+        submission_id: string;
+        question_identifier: string;
+        response: string;
+        justificatifs: string[];
+      }> = [];
       
       // Pour chaque question avec justificatifs
       for (const question of questionsWithJustificatifs) {
@@ -100,19 +107,21 @@ export const useFormSubmission = (
           }
           
           try {
-            // Obtenir les justificatifs associés à cette réponse pour Partie 1
+            // Obtenir les justificatifs associés à cette réponse
             let justificatifs: string[] = [];
             
-            // Use getJustificatifs for Partie 1 questions
-            if (["diversity", "equality", "handicap", "health", "parentality", "training", "csr", "privacy", "transport"].includes(question.id)) {
+            // Utiliser la fonction appropriée selon la partie du formulaire
+            if (question.part === 1) {
               justificatifs = getJustificatifs(question.id, response);
-              console.log(`Got justificatifs for ${question.id}/${response}:`, justificatifs);
-            } else {
-              // For Partie 2 and 3, we don't have a specific function
-              // This would need to be implemented properly based on your data structure
-              // For now, adding a placeholder justificatif to demonstrate it works
-              justificatifs = ["Documentation supporting this answer"];
-              console.log(`Using placeholder justificatifs for ${question.id}/${response}:`, justificatifs);
+              console.log(`Got justificatifs for part 1 ${question.id}/${response}:`, justificatifs);
+            } else if (question.part === 3) {
+              justificatifs = getJustificatifsForPart3(question.id, response);
+              console.log(`Got justificatifs for part 3 ${question.id}/${response}:`, justificatifs);
+            } else if (question.part === 2) {
+              // Pour la partie 2, on devrait avoir une fonction similaire
+              // En attendant, on utilise des justificatifs par défaut
+              justificatifs = ["Documentation justificative pour cette réponse"];
+              console.log(`Using default justificatifs for part 2 ${question.id}/${response}:`, justificatifs);
             }
             
             if (justificatifs && justificatifs.length > 0) {
@@ -136,7 +145,7 @@ export const useFormSubmission = (
       if (formJustificatifsData.length > 0) {
         console.log("Saving justificatifs data:", formJustificatifsData);
         
-        // Corrigé: Utiliser la structure de paramètres correcte pour upsert
+        // Utiliser la structure de paramètres correcte pour upsert
         const { error } = await supabase
           .from('form_justificatifs')
           .upsert(formJustificatifsData, { 
@@ -159,7 +168,7 @@ export const useFormSubmission = (
       toast({
         title: "Attention",
         description: "Le formulaire a été envoyé mais nous avons rencontré un problème lors de l'enregistrement des justificatifs.",
-        variant: "destructive" // Fixed: Changed from "warning" to "destructive"
+        variant: "destructive" 
       });
     }
   };
@@ -374,7 +383,7 @@ export const useFormSubmission = (
           toast({
             title: "Attention",
             description: "Le formulaire a été envoyé mais une erreur est survenue lors de l'enregistrement des justificatifs.",
-            variant: "destructive" // Fixed: Changed from "warning" to "destructive"
+            variant: "destructive"
           });
         }
       }

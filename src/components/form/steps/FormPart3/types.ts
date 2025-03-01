@@ -6,6 +6,7 @@ export interface Question {
   options: {
     value: string;
     label: string;
+    justificatifs?: string[];
   }[];
 }
 

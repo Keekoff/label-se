@@ -9,34 +9,27 @@ export const QUESTIONS: Question[] = [
     options: [
       {
         value: "option1",
-        label: "L'entreprise valorise la diversité et sensibilise ses collaborateurs sur le sujet",
+        label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression en cas de non-respect de la diversité, propos racistes, stigmatisants ou discriminatoires (âge, genre, orientation sexuelle, religion, croyances...)",
         justificatifs: [
-          "Code éthique", 
-          "Charte sociale", 
-          "Affichage dans les locaux", 
-          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)",
-          "Règlement intérieur",
-          "Présence sur le site web",
-          "Messages diffusés à l'externe (réseaux sociaux, vidéo, articles de blog, tribunes, communiqués de toutes sortes...)"
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)"
         ]
       },
       {
         value: "option2",
-        label: "L'entreprise a établi une liste de tous les types possibles de diversités au sein de son organisation et a initié une démarche pour y répondre",
+        label: "L'entreprise possède et communique sur un code éthique / charte sociale auprès de tous ses collaborateurs et publiquement",
         justificatifs: [
-          "Existence d'un comité dédié à la diversité",
-          "Mesures d'accompagnement pour les publics concernés",
-          "Actions de sensibilisation particulières, par exemple lors des journées dédiées comme la journée de la femme, de la lutte contre les violences..."
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)"
         ]
       },
       {
         value: "option3",
-        label: "L'entreprise a mis en place des processus de recrutement sans discrimination, des programmes d'intégration ou dispositifs pour prévenir les stéréotypes et a identifié une personne de référence ou une personne de confiance sur le sujet",
+        label: "La lutte contre les discriminations est intégrée au processus des RH",
         justificatifs: [
-          "Guide d'entretien d'embauche ou documents relatifs au processus de recrutement de l'entreprise",
-          "Identification d'un référent diversité",
-          "Plan d'action diversité",
-          "Exemple de processus de recrutement non discriminant comme les CV anonymes"
+          "Présence dans la feuille de route stratégique des RH",
+          "Actions menées par les RH sur le sujet (événement, messages aux collaborateurs)",
+          "Présence dans les questionnaires d'entretien annuel"
         ]
       },
       {
@@ -53,29 +46,31 @@ export const QUESTIONS: Question[] = [
     options: [
       {
         value: "option1",
-        label: "L'entreprise respecte l'égalité salariale",
+        label: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression en cas de non-respect de l'égalité, propos mysogynes ou discriminatoires de toute sorte",
         justificatifs: [
-          "Mesure de l'égalité salariale",
-          "Lettre d'engagement",
-          "Politique de rémunération"
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)"
         ]
       },
       {
         value: "option2",
-        label: "L'entreprise a analysé et corrigé les inégalités de genre dans les avantages en nature et les autres avantages sociaux-économiques",
+        label: "L'entreprise possède et communique sur un code éthique / charte sociale auprès de tous ses collaborateurs et publiquement",
         justificatifs: [
-          "Analyse globale des salaires",
-          "Analyse chiffrée par poste",
-          "Liste des avantages en nature proposés aux salarié.e.s et politique d'octroi"
+          "Code éthique",
+          "Charte sociale",
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)",
+          "Règlement intérieur",
+          "Présence sur le site web",
+          "Messages diffusés à l'externe (réseaux sociaux, vidéo, articles de blog, tribunes, communiqués de toutes sortes...)"
         ]
       },
       {
         value: "option3",
-        label: "L'entreprise veille à la parité dans sa gouvernance et dans ses équipes de management",
+        label: "L'entreprise veille à une stricte égalité salariale et de traitement entre ses collaborateurs, ceci est intégré au processus des RH",
         justificatifs: [
-          "Rapport sur la parité",
-          "Organigramme avec répartition H/F/NB",
-          "Index égalité ou autre mesure"
+          "Existence d'une grille salariale et accessible aux collaborateurs",
+          "Actions menées par les RH pour promouvoir une culture d'égalité salariale"
         ]
       },
       {
@@ -92,33 +87,23 @@ export const QUESTIONS: Question[] = [
     options: [
       {
         value: "option1",
-        label: "L'entreprise sensibilise l'ensemble de ses collaborateurs aux questions autour du handicap",
+        label: "L'entreprise précise dans ses offres de stages et d'emploi que les postes sont ouverts aux personnes en situation de handicap",
         justificatifs: [
-          "Code éthique", 
-          "Charte sociale", 
-          "Affichage dans les locaux", 
-          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)",
-          "Règlement intérieur",
-          "Présence sur le site web",
-          "Messages diffusés à l'externe (réseaux sociaux, vidéo, articles de blog, tribunes, communiqués de toutes sortes...)"
+          "Publication des offres d'emploi et de stages précisant l'ouverture du poste aux personnes en situation de handicap"
         ]
       },
       {
         value: "option2",
-        label: "L'entreprise s'engage à prendre en compte le handicap dans ses process de recrutement et adapte ses locaux pour faciliter l'accueil des personnes en situation de handicap",
+        label: "L'entreprise communique sur son engagement en faveur de l'inclusion des personnes en situation de handicap et met tout en oeuvre pour que les postes de travail et les accès aux infrastructures soient adaptés",
         justificatifs: [
-          "Guide d'entretien d'embauche ou documents relatifs au processus de recrutement de l'entreprise",
-          "Photographie des locaux aménagés pour l'accueil des personnes en situation de handicap"
+          "Postes de travail et locaux accessibles aux personnes en situation de handicap (ergonomie, accès PMR etc...)"
         ]
       },
       {
         value: "option3",
-        label: "L'entreprise alloue des moyens humains et financiers importants pour intégrer les personnes en situation de handicap et aller au-delà de ses obligations légales d'emploi",
+        label: "L'entreprise a plus de 20 salariés et répond positivement à l'obligation d'emploi de travailleurs handicapés (OETH). Les salariés handicapés représentent bien 6 % de l'effectif de l'entreprise",
         justificatifs: [
-          "Preuve de la création d'un poste dédié (ex : chef de projet Handicap, responsable de mission Handicap)",
-          "Procédure de maintien des salariés en situation de handicap dans l'emploi",
-          "Taux d'emploi des personnes en situation de handicap",
-          "Mesures d'accompagnement pour les publics concernés"
+          "Preuve administrative de la réponse positive à l'OETH"
         ]
       },
       {
