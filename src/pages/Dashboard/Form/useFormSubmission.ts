@@ -136,7 +136,7 @@ export const useFormSubmission = (
       if (formJustificatifsData.length > 0) {
         console.log("Saving justificatifs data:", formJustificatifsData);
         
-        // Fixed: Use correct parameter structure for upsert
+        // Corrigé: Utiliser la structure de paramètres correcte pour upsert
         const { error } = await supabase
           .from('form_justificatifs')
           .upsert(formJustificatifsData, { 
