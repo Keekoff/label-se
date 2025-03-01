@@ -136,11 +136,11 @@ export const useFormSubmission = (
       if (formJustificatifsData.length > 0) {
         console.log("Saving justificatifs data:", formJustificatifsData);
         
-        const { data, error } = await supabase
+        // Fixed: Use correct parameter structure for upsert
+        const { error } = await supabase
           .from('form_justificatifs')
           .upsert(formJustificatifsData, { 
-            onConflict: 'submission_id,question_identifier,response',
-            returning: 'minimal'
+            onConflict: 'submission_id,question_identifier,response'
           });
         
         if (error) {
@@ -159,7 +159,7 @@ export const useFormSubmission = (
       toast({
         title: "Attention",
         description: "Le formulaire a été envoyé mais nous avons rencontré un problème lors de l'enregistrement des justificatifs.",
-        variant: "warning"
+        variant: "destructive" // Fixed: Changed from "warning" to "destructive"
       });
     }
   };
@@ -374,7 +374,7 @@ export const useFormSubmission = (
           toast({
             title: "Attention",
             description: "Le formulaire a été envoyé mais une erreur est survenue lors de l'enregistrement des justificatifs.",
-            variant: "warning"
+            variant: "destructive" // Fixed: Changed from "warning" to "destructive"
           });
         }
       }
