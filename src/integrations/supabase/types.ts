@@ -78,28 +78,37 @@ export type Database = {
       form_justificatifs: {
         Row: {
           created_at: string | null
+          file_name: string | null
+          file_path: string | null
           id: string
           justificatifs: string[]
           question_identifier: string
           response: string
+          status: string | null
           submission_id: string | null
           updated_at: string | null
         }
         Insert: {
           created_at?: string | null
+          file_name?: string | null
+          file_path?: string | null
           id?: string
           justificatifs: string[]
           question_identifier: string
           response: string
+          status?: string | null
           submission_id?: string | null
           updated_at?: string | null
         }
         Update: {
           created_at?: string | null
+          file_name?: string | null
+          file_path?: string | null
           id?: string
           justificatifs?: string[]
           question_identifier?: string
           response?: string
+          status?: string | null
           submission_id?: string | null
           updated_at?: string | null
         }

@@ -14,7 +14,8 @@ type Justificatif = {
   question_identifier: string;
   response: string;
   justificatifs: string[];
-  file?: File | null;
+  file_path?: string;
+  file_name?: string;
   status: JustificatifStatus;
 };
 
@@ -33,7 +34,7 @@ const Justificatifs = () => {
           return;
         }
 
-        console.log("Fetching justificatifs for user:", session.user.id);
+        console.log("Récupération des justificatifs pour l'utilisateur:", session.user.id);
 
         // Récupérer la dernière soumission de l'utilisateur
         const { data: submissions, error: submissionError } = await supabase
@@ -44,25 +45,25 @@ const Justificatifs = () => {
           .limit(1);
 
         if (submissionError) {
-          console.error('Error fetching submissions:', submissionError);
+          console.error('Erreur lors de la récupération des soumissions:', submissionError);
           setSubmitError("Erreur lors de la récupération des soumissions");
           setIsLoading(false);
           return;
         }
 
         if (!submissions?.length) {
-          console.log("No submissions found for user");
+          console.log("Aucune soumission trouvée pour l'utilisateur");
           setIsLoading(false);
           return;
         }
 
         const latestSubmission = submissions[0];
-        console.log("Found submission:", latestSubmission);
+        console.log("Soumission trouvée:", latestSubmission);
         setSubmissionId(latestSubmission.id);
 
         // Vérifier si la soumission est dans un état approprié
         if (latestSubmission.status !== 'submitted' && latestSubmission.payment_status !== 'paid') {
-          console.log("Submission not in appropriate state for justificatifs");
+          console.log("La soumission n'est pas dans un état approprié pour les justificatifs");
           setSubmitError("Votre soumission n'est pas encore finalisée ou payée");
           setIsLoading(false);
           return;
@@ -75,13 +76,13 @@ const Justificatifs = () => {
           .eq('submission_id', latestSubmission.id);
 
         if (justificatifsError) {
-          console.error('Error fetching justificatifs:', justificatifsError);
+          console.error('Erreur lors du chargement des justificatifs:', justificatifsError);
           toast.error("Erreur lors du chargement des justificatifs");
           setIsLoading(false);
           return;
         }
 
-        console.log("Fetched justificatifs data:", justificatifsData);
+        console.log("Données des justificatifs récupérées:", justificatifsData);
 
         // Transformer les données pour l'affichage
         const mappedJustificatifs = justificatifsData.map(item => ({
@@ -89,12 +90,14 @@ const Justificatifs = () => {
           question_identifier: item.question_identifier,
           response: item.response,
           justificatifs: item.justificatifs,
-          status: 'pending' as JustificatifStatus
+          file_path: item.file_path,
+          file_name: item.file_name,
+          status: (item.status as JustificatifStatus) || 'pending'
         }));
 
         setJustificatifs(mappedJustificatifs);
       } catch (error) {
-        console.error('Error fetching justificatifs:', error);
+        console.error('Erreur lors du chargement des justificatifs:', error);
         toast.error("Erreur lors du chargement des justificatifs");
       } finally {
         setIsLoading(false);
@@ -123,14 +126,14 @@ const Justificatifs = () => {
         const justificatifsBucket = buckets?.find(b => b.name === 'justificatifs');
         
         if (!justificatifsBucket) {
-          console.log('Creating justificatifs bucket...');
+          console.log('Création du bucket justificatifs...');
           await supabase.storage.createBucket('justificatifs', {
             public: false,
             fileSizeLimit: 10485760, // 10MB limit
           });
         }
       } catch (bucketError) {
-        console.error('Error checking/creating bucket:', bucketError);
+        console.error('Erreur lors de la vérification/création du bucket:', bucketError);
       }
       
       // Créer un chemin qui inclut l'ID de soumission
@@ -142,7 +145,7 @@ const Justificatifs = () => {
 
       if (uploadError) throw uploadError;
 
-      console.log('File uploaded successfully:', uploadData);
+      console.log('Fichier téléchargé avec succès:', uploadData);
 
       // Mettre à jour le statut du justificatif dans la base de données
       const { error: updateError } = await supabase
@@ -155,21 +158,21 @@ const Justificatifs = () => {
         .eq('id', justificatifId);
 
       if (updateError) {
-        console.error('Error updating justificatif status:', updateError);
+        console.error('Erreur lors de la mise à jour du statut du justificatif:', updateError);
         throw updateError;
       }
 
       setJustificatifs(docs => 
         docs.map(doc => 
           doc.id === justificatifId 
-            ? { ...doc, file, status: 'uploaded' as JustificatifStatus }
+            ? { ...doc, file_path: filePath, file_name: file.name, status: 'uploaded' as JustificatifStatus }
             : doc
         )
       );
 
       toast.success(`Le fichier ${file.name} a été téléchargé avec succès`);
     } catch (error) {
-      console.error('Upload error:', error);
+      console.error('Erreur de téléchargement:', error);
       toast.error("Une erreur est survenue lors du téléchargement");
     }
   };
@@ -292,4 +295,3 @@ const Justificatifs = () => {
 };
 
 export default Justificatifs;
-
