@@ -7,13 +7,15 @@ import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 
+type JustificatifStatus = 'pending' | 'uploaded' | 'validated';
+
 type Justificatif = {
   id: string;
   question_identifier: string;
   response: string;
   justificatifs: string[];
   file?: File | null;
-  status: 'pending' | 'uploaded' | 'validated';
+  status: JustificatifStatus;
 };
 
 const Justificatifs = () => {
@@ -64,7 +66,7 @@ const Justificatifs = () => {
           question_identifier: item.question_identifier,
           response: item.response,
           justificatifs: item.justificatifs,
-          status: 'pending' as const
+          status: 'pending' as JustificatifStatus
         }));
 
         setJustificatifs(mappedJustificatifs);
@@ -96,7 +98,7 @@ const Justificatifs = () => {
       setJustificatifs(docs => 
         docs.map(doc => 
           doc.id === justificatifId 
-            ? { ...doc, file, status: 'uploaded' }
+            ? { ...doc, file, status: 'uploaded' as JustificatifStatus }
             : doc
         )
       );
@@ -119,27 +121,27 @@ const Justificatifs = () => {
   // Si aucun justificatif n'est trouvé, afficher des données fictives
   if (justificatifs.length === 0) {
     // Utilisation de données fictives pour le moment
-    const mockJustificatifs = [
+    const mockJustificatifs: Justificatif[] = [
       {
         id: "1",
         question_identifier: "Diversité",
         response: "L'entreprise fournit un espace de travail non-discriminant et offre des outils d'expression",
         justificatifs: ["Affichage dans les locaux", "Messages diffusés à tous les collaborateurs"],
-        status: 'pending' as const
+        status: 'pending'
       },
       {
         id: "2",
         question_identifier: "Égalité",
         response: "L'entreprise possède et communique sur un code éthique / charte sociale",
         justificatifs: ["Code éthique", "Charte sociale", "Affichage dans les locaux"],
-        status: 'pending' as const
+        status: 'pending'
       },
       {
         id: "3",
         question_identifier: "Handicap",
         response: "L'entreprise précise dans ses offres de stages et d'emploi que les postes sont ouverts aux personnes en situation de handicap",
         justificatifs: ["Publication des offres d'emploi et de stages"],
-        status: 'pending' as const
+        status: 'pending'
       }
     ];
     
