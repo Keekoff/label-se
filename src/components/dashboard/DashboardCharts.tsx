@@ -1,63 +1,62 @@
 
 import { Card } from "@/components/ui/card";
-import { LineChart, BarChart, PieChart } from "@/components/ui/chart";
+import { TieredBarChart } from "@/components/ui/chart";
 
 export const DashboardCharts = () => {
+  // Données d'exemple - à remplacer par les vraies données plus tard
+  const chartData = [
+    { name: 'Vos résultats', value: 75 },
+    { name: 'Moyenne globale', value: 65 }
+  ];
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-        <h3 className="text-lg font-semibold mb-4">Impact Environnemental</h3>
-        <div className="h-64">
-          <LineChart 
-            data={[
-              { name: 'Jan', value: 400 },
-              { name: 'Fév', value: 300 },
-              { name: 'Mar', value: 600 },
-              { name: 'Avr', value: 500 },
-            ]}
-          />
-        </div>
+        <TieredBarChart 
+          title="Impact Environnemental" 
+          data={chartData}
+          tiers={{
+            tier1: 80,
+            tier2: 60,
+            tier3: 40
+          }}
+        />
       </Card>
 
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-        <h3 className="text-lg font-semibold mb-4">Répartition RSE</h3>
-        <div className="h-64">
-          <PieChart 
-            data={[
-              { name: 'Social', value: 35 },
-              { name: 'Environnement', value: 40 },
-              { name: 'Gouvernance', value: 25 },
-            ]}
-          />
-        </div>
+        <TieredBarChart 
+          title="Répartition RSE" 
+          data={chartData}
+          tiers={{
+            tier1: 85,
+            tier2: 65,
+            tier3: 45
+          }}
+        />
       </Card>
 
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-        <h3 className="text-lg font-semibold mb-4">Progression Mensuelle</h3>
-        <div className="h-64">
-          <BarChart 
-            data={[
-              { name: 'T1', value: 65 },
-              { name: 'T2', value: 75 },
-              { name: 'T3', value: 85 },
-              { name: 'T4', value: 90 },
-            ]}
-          />
-        </div>
+        <TieredBarChart 
+          title="Progression Mensuelle" 
+          data={chartData}
+          tiers={{
+            tier1: 90,
+            tier2: 70,
+            tier3: 50
+          }}
+        />
       </Card>
 
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1">
-        <h3 className="text-lg font-semibold mb-4">Objectifs Atteints</h3>
-        <div className="h-64">
-          <BarChart 
-            data={[
-              { name: 'Obj 1', value: 90 },
-              { name: 'Obj 2', value: 75 },
-              { name: 'Obj 3', value: 85 },
-              { name: 'Obj 4', value: 95 },
-            ]}
-          />
-        </div>
+        <TieredBarChart 
+          title="Objectifs Atteints" 
+          data={chartData}
+          tiers={{
+            tier1: 95,
+            tier2: 75,
+            tier3: 55
+          }}
+        />
       </Card>
     </div>
   );
