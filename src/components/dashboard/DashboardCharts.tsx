@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
@@ -19,6 +18,7 @@ export const DashboardCharts = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
+  const [error, setError] = useState<string | null>(null);
 
   // Récupérer le nom de l'entreprise depuis Supabase
   useEffect(() => {
@@ -37,6 +37,9 @@ export const DashboardCharts = () => {
         
         if (data && data.nom_entreprise) {
           setCompanyName(data.nom_entreprise);
+          console.log(`Nom d'entreprise récupéré: ${data.nom_entreprise}`);
+        } else {
+          console.log('Aucun nom d\'entreprise trouvé');
         }
       } catch (error) {
         console.error('Error fetching company name:', error);
@@ -57,6 +60,8 @@ export const DashboardCharts = () => {
       if (!companyName) return;
       
       setIsLoading(true);
+      setError(null);
+      
       try {
         console.log(`Fetching Airtable data for company: ${companyName}`);
         
@@ -64,15 +69,24 @@ export const DashboardCharts = () => {
           body: { companyName }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Supabase function invocation error:', error);
+          throw new Error(`Erreur d'invocation: ${error.message}`);
+        }
+        
+        if (data.error) {
+          console.error('Airtable error from function:', data.error, data.details || '');
+          throw new Error(data.error);
+        }
         
         console.log('Airtable data received:', data);
         setCompanyData(data);
       } catch (error) {
         console.error('Error fetching Airtable data:', error);
+        setError(error.message || "Impossible de récupérer vos données depuis Airtable");
         toast({
           title: "Erreur",
-          description: "Impossible de récupérer vos données depuis Airtable",
+          description: "Impossible de récupérer vos données depuis Airtable. Veuillez contacter l'administration.",
           variant: "destructive"
         });
       } finally {
@@ -82,6 +96,8 @@ export const DashboardCharts = () => {
 
     if (companyName) {
       fetchAirtableData();
+    } else {
+      setIsLoading(false);
     }
   }, [companyName, toast]);
 
@@ -170,7 +186,7 @@ export const DashboardCharts = () => {
     { subject: 'Économie circulaire', myScore: 70, maxScore: 95 },
   ];
 
-  // Afficher un message de chargement 
+  // Afficher un message de chargement ou d'erreur
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -183,6 +199,97 @@ export const DashboardCharts = () => {
     );
   }
 
+  // Afficher un message d'erreur si nécessaire
+  if (error) {
+    return (
+      <div className="grid grid-cols-1 gap-6">
+        <Card className="p-6 transition-all duration-200 h-[200px] flex items-center justify-center">
+          <div className="text-center space-y-2">
+            <div className="text-red-500 font-medium text-lg">Erreur de récupération des données</div>
+            <p className="text-gray-600">{error}</p>
+            <p className="text-gray-500 text-sm mt-4">Veuillez vérifier votre connexion à Airtable ou contacter l'assistance.</p>
+          </div>
+        </Card>
+        
+        {/* Afficher les graphiques avec données par défaut même en cas d'erreur */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
+            <TieredBarChart 
+              title="Gouvernance juste et inclusive" 
+              data={defaultChartData}
+              tiers={{
+                tier1: 80,
+                tier2: 60,
+                tier3: 40
+              }}
+              barColor="#8985FF"
+              tierLabels={{
+                tier1: "Échelon 1",
+                tier2: "Échelon 2",
+                tier3: "Échelon 3"
+              }}
+            />
+          </Card>
+          
+          <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
+            <TieredBarChart 
+              title="Développement d'impact social positif" 
+              data={defaultChartData}
+              tiers={{
+                tier1: 85,
+                tier2: 65,
+                tier3: 45
+              }}
+              barColor="#8985FF"
+              tierLabels={{
+                tier1: "Échelon 1",
+                tier2: "Échelon 2",
+                tier3: "Échelon 3"
+              }}
+            />
+          </Card>
+
+          <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
+            <TieredBarChart 
+              title="Maitrise d'impact environnemental et développement durable" 
+              data={defaultChartData}
+              tiers={{
+                tier1: 90,
+                tier2: 70,
+                tier3: 50
+              }}
+              barColor="#8985FF"
+              tierLabels={{
+                tier1: "Échelon 1",
+                tier2: "Échelon 2",
+                tier3: "Échelon 3"
+              }}
+            />
+          </Card>
+
+          <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
+            <TieredBarChart 
+              title="Moyenne des labellisés" 
+              data={defaultChartData}
+              tiers={{
+                tier1: 95,
+                tier2: 75,
+                tier3: 55
+              }}
+              barColor="#35DA56"
+              tierLabels={{
+                tier1: "Échelon 1",
+                tier2: "Échelon 2",
+                tier3: "Échelon 3"
+              }}
+            />
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  // Si tout va bien, afficher les graphiques avec les données réelles
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
