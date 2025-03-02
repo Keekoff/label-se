@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
@@ -20,6 +19,7 @@ export const DashboardCharts = () => {
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [companyName, setCompanyName] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
 
   // Récupérer le nom de l'entreprise depuis Supabase
   useEffect(() => {
@@ -62,6 +62,7 @@ export const DashboardCharts = () => {
       
       setIsLoading(true);
       setError(null);
+      setErrorDetails(null);
       
       try {
         console.log(`Fetching Airtable data for company: ${companyName}`);
@@ -77,6 +78,7 @@ export const DashboardCharts = () => {
         
         if (data.error) {
           console.error('Airtable error from function:', data.error, data.details || '');
+          setErrorDetails(data.details || 'Aucun détail disponible');
           throw new Error(data.error);
         }
         
@@ -204,11 +206,27 @@ export const DashboardCharts = () => {
   if (error) {
     return (
       <div className="grid grid-cols-1 gap-6">
-        <Card className="p-6 transition-all duration-200 h-[200px] flex items-center justify-center">
-          <div className="text-center space-y-2">
+        <Card className="p-6 transition-all duration-200 h-auto flex flex-col items-center justify-center">
+          <div className="text-center space-y-4 max-w-2xl p-4">
             <div className="text-red-500 font-medium text-lg">Erreur de récupération des données</div>
             <p className="text-gray-600">{error}</p>
-            <p className="text-gray-500 text-sm mt-4">Veuillez vérifier votre connexion à Airtable ou contacter l'assistance.</p>
+            
+            {errorDetails && (
+              <div className="mt-4 bg-gray-50 p-4 rounded-md border border-gray-200 text-left overflow-auto max-h-60 w-full">
+                <p className="text-sm font-medium text-gray-700 mb-2">Détails de l'erreur:</p>
+                <pre className="text-xs text-gray-600 whitespace-pre-wrap">{errorDetails}</pre>
+              </div>
+            )}
+            
+            <div className="flex flex-col gap-2 mt-6">
+              <p className="text-gray-500 text-sm">Informations de débogage:</p>
+              <ul className="text-left text-xs text-gray-500 list-disc list-inside">
+                <li>Base Airtable ID: app7al7op0zAJYssh</li>
+                <li>Table: Company Data</li>
+                <li>Nom d'entreprise utilisé: {companyName || "Non défini"}</li>
+              </ul>
+              <p className="text-gray-500 text-sm mt-4">Veuillez vérifier votre connexion à Airtable ou contacter l'assistance.</p>
+            </div>
           </div>
         </Card>
         

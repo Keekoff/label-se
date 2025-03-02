@@ -45,12 +45,12 @@ Deno.serve(async (req) => {
     
     // Mise à jour avec les bons IDs de base Airtable
     // ID de base et nom de table récupérés de l'URL Airtable
-    const baseId = 'appJkbdvhP9HUu82h'; 
+    const baseId = 'app7al7op0zAJYssh'; // Mise à jour avec le bon ID de base
     const tableName = 'Company%20Data'; // Nom de la table encodé
     
     // Construction de l'URL de l'API Airtable
     const url = `https://api.airtable.com/v0/${baseId}/${tableName}?filterByFormula=FIND("${encodedCompanyName}",{Entreprise})`;
-    console.log(`URL de l'API Airtable: ${url.replace(/Bearer [^\s]+/g, 'Bearer ***')}`);
+    console.log(`URL de l'API Airtable: ${url}`);
 
     // Envoi de la requête à Airtable
     const response = await fetch(url, {
