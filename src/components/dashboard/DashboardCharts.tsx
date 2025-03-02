@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
@@ -12,6 +11,46 @@ type CompanyData = {
   environmentalScore?: number;
   socialImpactScore?: number;
   averageScore?: number;
+  echelonTexte?: string;
+  totalScore?: number;
+  logoUrl?: string;
+};
+
+// Certification Box component
+const CertificationBox = ({ data }: { data: CompanyData | null }) => {
+  if (!data || !data.echelonTexte || !data.totalScore) {
+    return null;
+  }
+
+  return (
+    <Card className="p-6 mb-6 transition-all duration-200 hover:shadow-lg">
+      <div className="flex flex-col md:flex-row justify-between items-center">
+        <div className="space-y-3 mb-4 md:mb-0">
+          <h3 className="text-lg font-medium">Certification : Label Startup Engagée</h3>
+          <div className="space-y-1">
+            <div className="flex items-center">
+              <span className="text-gray-600">Niveau :</span>
+              <span className="ml-2 font-semibold">{data.echelonTexte}</span>
+            </div>
+            <div className="flex items-center">
+              <span className="text-gray-600">Score :</span>
+              <span className="ml-2 font-semibold">{data.totalScore}%</span>
+            </div>
+          </div>
+        </div>
+        {data.logoUrl && (
+          <div className="flex justify-center">
+            <img 
+              src={data.logoUrl} 
+              alt="Label Startup Engagée" 
+              className="max-h-28 object-contain" 
+              aria-label="Logo du Label Startup Engagée"
+            />
+          </div>
+        )}
+      </div>
+    </Card>
+  );
 };
 
 export const DashboardCharts = () => {
@@ -224,7 +263,7 @@ export const DashboardCharts = () => {
               <p className="text-gray-500 text-sm">Informations de débogage:</p>
               <ul className="text-left text-xs text-gray-500 list-disc list-inside">
                 <li>Base Airtable ID: app7al7op0zAJYssh</li>
-                <li>Table: Company Data</li>
+                <li>Table: Entreprises</li>
                 <li>Nom d'entreprise utilisé: {companyName || "Non défini"}</li>
               </ul>
               <p className="text-gray-500 text-sm mt-4">Veuillez vérifier votre connexion à Airtable ou contacter l'assistance.</p>
@@ -312,88 +351,93 @@ export const DashboardCharts = () => {
 
   // Si tout va bien, afficher les graphiques avec les données réelles
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
-        <TieredBarChart 
-          title="Gouvernance juste et inclusive" 
-          data={getGovernanceChartData()}
-          tiers={{
-            tier1: 80,
-            tier2: 60,
-            tier3: 40
-          }}
-          barColor="#8985FF"
-          tierLabels={{
-            tier1: "Échelon 1",
-            tier2: "Échelon 2",
-            tier3: "Échelon 3"
-          }}
-        />
-      </Card>
+    <div className="space-y-6">
+      {/* Certification Box - Only visible if we have the required data */}
+      <CertificationBox data={companyData} />
 
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
-        <TieredBarChart 
-          title="Développement d'impact social positif" 
-          data={getSocialImpactChartData()}
-          tiers={{
-            tier1: 85,
-            tier2: 65,
-            tier3: 45
-          }}
-          barColor="#8985FF"
-          tierLabels={{
-            tier1: "Échelon 1",
-            tier2: "Échelon 2",
-            tier3: "Échelon 3"
-          }}
-        />
-      </Card>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
+          <TieredBarChart 
+            title="Gouvernance juste et inclusive" 
+            data={getGovernanceChartData()}
+            tiers={{
+              tier1: 80,
+              tier2: 60,
+              tier3: 40
+            }}
+            barColor="#8985FF"
+            tierLabels={{
+              tier1: "Échelon 1",
+              tier2: "Échelon 2",
+              tier3: "Échelon 3"
+            }}
+          />
+        </Card>
 
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
-        <TieredBarChart 
-          title="Maitrise d'impact environnemental et développement durable" 
-          data={getEnvironmentalChartData()}
-          tiers={{
-            tier1: 90,
-            tier2: 70,
-            tier3: 50
-          }}
-          barColor="#8985FF"
-          tierLabels={{
-            tier1: "Échelon 1",
-            tier2: "Échelon 2",
-            tier3: "Échelon 3"
-          }}
-        />
-      </Card>
+        <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
+          <TieredBarChart 
+            title="Développement d'impact social positif" 
+            data={getSocialImpactChartData()}
+            tiers={{
+              tier1: 85,
+              tier2: 65,
+              tier3: 45
+            }}
+            barColor="#8985FF"
+            tierLabels={{
+              tier1: "Échelon 1",
+              tier2: "Échelon 2",
+              tier3: "Échelon 3"
+            }}
+          />
+        </Card>
 
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
-        <TieredBarChart 
-          title="Moyenne des labellisés" 
-          data={getAverageChartData()}
-          tiers={{
-            tier1: 95,
-            tier2: 75,
-            tier3: 55
-          }}
-          barColor="#35DA56"
-          tierLabels={{
-            tier1: "Échelon 1",
-            tier2: "Échelon 2",
-            tier3: "Échelon 3"
-          }}
-        />
-      </Card>
+        <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
+          <TieredBarChart 
+            title="Maitrise d'impact environnemental et développement durable" 
+            data={getEnvironmentalChartData()}
+            tiers={{
+              tier1: 90,
+              tier2: 70,
+              tier3: 50
+            }}
+            barColor="#8985FF"
+            tierLabels={{
+              tier1: "Échelon 1",
+              tier2: "Échelon 2",
+              tier3: "Échelon 3"
+            }}
+          />
+        </Card>
 
-      {/* Radar Chart */}
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[600px] md:col-span-2">
-        <SustainabilityRadarChart 
-          title="Analyse comparative des critères de durabilité" 
-          data={radarData} 
-          myScoreColor="#0EA5E9" 
-          maxScoreColor="#35DA56" 
-        />
-      </Card>
+        <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
+          <TieredBarChart 
+            title="Moyenne des labellisés" 
+            data={getAverageChartData()}
+            tiers={{
+              tier1: 95,
+              tier2: 75,
+              tier3: 55
+            }}
+            barColor="#35DA56"
+            tierLabels={{
+              tier1: "Échelon 1",
+              tier2: "Échelon 2",
+              tier3: "Échelon 3"
+            }}
+          />
+        </Card>
+
+        {/* Radar Chart */}
+        <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[600px] md:col-span-2">
+          <SustainabilityRadarChart 
+            title="Analyse comparative des critères de durabilité" 
+            data={radarData} 
+            myScoreColor="#0EA5E9" 
+            maxScoreColor="#35DA56" 
+          />
+        </Card>
+      </div>
     </div>
   );
 };
