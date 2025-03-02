@@ -43,13 +43,13 @@ Deno.serve(async (req) => {
     // Encodage du nom de l'entreprise pour l'URL
     const encodedCompanyName = encodeURIComponent(companyName);
     
-    // Mise à jour avec les bons IDs de base Airtable
-    // ID de base et nom de table récupérés de l'URL Airtable
-    const baseId = 'app7al7op0zAJYssh'; // Mise à jour avec le bon ID de base
-    const tableName = 'Company%20Data'; // Nom de la table encodé
+    // Mise à jour avec les bons IDs de base Airtable et le nom de table correct
+    const baseId = 'app7al7op0zAJYssh';
+    const tableName = 'Entreprises'; // Mise à jour avec le nom de table correct
+    const encodedTableName = encodeURIComponent(tableName);
     
     // Construction de l'URL de l'API Airtable
-    const url = `https://api.airtable.com/v0/${baseId}/${tableName}?filterByFormula=FIND("${encodedCompanyName}",{Entreprise})`;
+    const url = `https://api.airtable.com/v0/${baseId}/${encodedTableName}?filterByFormula=FIND("${encodedCompanyName}",{Entreprise})`;
     console.log(`URL de l'API Airtable: ${url}`);
 
     // Envoi de la requête à Airtable
