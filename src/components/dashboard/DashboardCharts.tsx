@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
@@ -85,8 +86,8 @@ export const DashboardCharts = () => {
         console.error('Error fetching Airtable data:', error);
         setError(error.message || "Impossible de récupérer vos données depuis Airtable");
         toast({
-          title: "Erreur",
-          description: "Impossible de récupérer vos données depuis Airtable. Veuillez contacter l'administration.",
+          title: "Erreur de connexion à Airtable",
+          description: "Problème de connexion à la base de données. Veuillez vérifier les autorisations et identifiants Airtable.",
           variant: "destructive"
         });
       } finally {

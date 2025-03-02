@@ -1,7 +1,7 @@
 
 import { corsHeaders } from '../_shared/cors.ts'
 
-// Define types for our data
+// Définition des types pour nos données
 type AirtableResponse = {
   records: Array<{
     id: string;
@@ -18,14 +18,14 @@ type CompanyData = {
 };
 
 Deno.serve(async (req) => {
-  // Handle CORS preflight requests
+  // Gestion des requêtes CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
     const { companyName } = await req.json();
-    console.log(`Fetching data for company: ${companyName}`);
+    console.log(`Recherche des données pour l'entreprise: ${companyName}`);
 
     if (!companyName) {
       return new Response(
@@ -34,32 +34,25 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Get the Airtable API key from Supabase secrets
-    const AIRTABLE_API_KEY = Deno.env.get('AIRTABLE_API_KEY');
+    // Utilisation de la clé API fournie directement pour déboguer
+    // Note: Dans un environnement de production, utilisez toujours Deno.env.get
+    const AIRTABLE_API_KEY = "patTdMAtQE60dFXlO.06084a9769e60b4732dd2cc3459092d54194dcb13cb73c4fd1f59768d4ec6a66";
     
-    if (!AIRTABLE_API_KEY) {
-      console.error('AIRTABLE_API_KEY not found in environment variables');
-      return new Response(
-        JSON.stringify({ error: 'Configuration de l\'API Airtable manquante' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-      );
-    }
+    console.log(`Utilisation de la clé API Airtable: ${AIRTABLE_API_KEY.substring(0, 10)}...`);
 
-    // Encode the company name for the URL - ensure proper encoding for special characters
+    // Encodage du nom de l'entreprise pour l'URL
     const encodedCompanyName = encodeURIComponent(companyName);
     
-    // Update with your correct Airtable Base ID and table name
-    // Note: Double-check these values with your Airtable account
+    // Mise à jour avec les bons IDs de base Airtable
+    // ID de base et nom de table récupérés de l'URL Airtable
     const baseId = 'appJkbdvhP9HUu82h'; 
-    const tableName = 'Company%20Data'; // URL encoded table name
+    const tableName = 'Company%20Data'; // Nom de la table encodé
     
-    // Log the API key (first few characters for debugging)
-    console.log(`Using Airtable API Key: ${AIRTABLE_API_KEY.substring(0, 5)}...`);
-    
-    // Fetch data from Airtable - use the correct API URL format
+    // Construction de l'URL de l'API Airtable
     const url = `https://api.airtable.com/v0/${baseId}/${tableName}?filterByFormula=FIND("${encodedCompanyName}",{Entreprise})`;
-    console.log(`Fetching from Airtable URL: ${url}`);
+    console.log(`URL de l'API Airtable: ${url.replace(/Bearer [^\s]+/g, 'Bearer ***')}`);
 
+    // Envoi de la requête à Airtable
     const response = await fetch(url, {
       headers: {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
@@ -67,26 +60,29 @@ Deno.serve(async (req) => {
       }
     });
 
+    // Affichage détaillé du statut de la réponse pour le débogage
+    console.log(`Statut de la réponse Airtable: ${response.status} ${response.statusText}`);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Airtable API error: ${response.status} ${errorText}`);
+      console.error(`Erreur API Airtable: ${response.status} ${errorText}`);
       
-      // Return more detailed error information
+      // Retourne des informations d'erreur détaillées
       return new Response(
         JSON.stringify({ 
           error: `Erreur Airtable: ${response.status}`, 
           details: errorText,
-          requestUrl: url.replace(AIRTABLE_API_KEY, '[REDACTED]') // Don't expose the full API key
+          requestUrl: url.replace(AIRTABLE_API_KEY, '[MASQUÉ]')
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
       );
     }
 
     const data: AirtableResponse = await response.json();
-    console.log(`Received ${data.records.length} records from Airtable`);
+    console.log(`Reçu ${data.records.length} enregistrements depuis Airtable`);
 
     if (data.records.length === 0) {
-      // Return a specific message when no data is found
+      // Retourne un message spécifique lorsqu'aucune donnée n'est trouvée
       return new Response(
         JSON.stringify({ 
           error: 'Aucune donnée trouvée pour cette entreprise',
@@ -96,10 +92,10 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Extract the relevant fields
+    // Extraction des champs pertinents
     const record = data.records[0];
     
-    // Make sure to match the exact field names from your Airtable
+    // Assurez-vous de faire correspondre les noms exacts des champs depuis Airtable
     const companyData: CompanyData = {
       companyName,
       governanceScore: record.fields['Gouvernance juste & inclusive %'] || 0,
@@ -108,7 +104,7 @@ Deno.serve(async (req) => {
       averageScore: record.fields['Moyenne globale %'] || 0
     };
 
-    console.log(`Processed company data:`, companyData);
+    console.log(`Données d'entreprise traitées:`, companyData);
 
     return new Response(
       JSON.stringify(companyData),
@@ -116,7 +112,7 @@ Deno.serve(async (req) => {
     );
 
   } catch (error) {
-    console.error('Error fetching Airtable data:', error);
+    console.error('Erreur lors de la récupération des données Airtable:', error);
     return new Response(
       JSON.stringify({ error: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
