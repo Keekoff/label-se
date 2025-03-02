@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
@@ -111,11 +112,12 @@ export const DashboardCharts = () => {
   ];
 
   // Conversion des données pour les graphiques
+  // Convertir les valeurs décimales (ex: 0.41) en pourcentages (41)
   const getGovernanceChartData = () => {
     return [
       { 
         name: 'Vos résultats', 
-        value: companyData?.governanceScore || 0 
+        value: companyData?.governanceScore ? Math.round(companyData.governanceScore * 100) : 0 
       },
       { 
         name: 'Moyenne globale', 
@@ -128,7 +130,7 @@ export const DashboardCharts = () => {
     return [
       { 
         name: 'Vos résultats', 
-        value: companyData?.environmentalScore || 0 
+        value: companyData?.environmentalScore ? Math.round(companyData.environmentalScore * 100) : 0 
       },
       { 
         name: 'Moyenne globale', 
@@ -141,7 +143,7 @@ export const DashboardCharts = () => {
     return [
       { 
         name: 'Vos résultats', 
-        value: companyData?.socialImpactScore || 0 
+        value: companyData?.socialImpactScore ? Math.round(companyData.socialImpactScore * 100) : 0 
       },
       { 
         name: 'Moyenne globale', 
@@ -154,7 +156,7 @@ export const DashboardCharts = () => {
     return [
       { 
         name: 'Vos résultats', 
-        value: companyData?.averageScore || 0 
+        value: companyData?.averageScore ? Math.round(companyData.averageScore * 100) : 0 
       },
       { 
         name: 'Moyenne globale', 
