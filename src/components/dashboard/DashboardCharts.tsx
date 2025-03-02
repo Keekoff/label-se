@@ -1,13 +1,148 @@
 
+import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
+import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+
+// Define types for our chart data
+type CompanyData = {
+  companyName: string;
+  governanceScore?: number;
+  environmentalScore?: number;
+  socialImpactScore?: number;
+  averageScore?: number;
+};
 
 export const DashboardCharts = () => {
-  // Données d'exemple - à remplacer par les vraies données plus tard
-  const chartData = [
-    { name: 'Vos résultats', value: 75 },
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
+  const [companyData, setCompanyData] = useState<CompanyData | null>(null);
+  const [companyName, setCompanyName] = useState<string>("");
+
+  // Récupérer le nom de l'entreprise depuis Supabase
+  useEffect(() => {
+    const fetchCompanyName = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+
+        const { data, error } = await supabase
+          .from('label_submissions')
+          .select('nom_entreprise')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        
+        if (data && data.nom_entreprise) {
+          setCompanyName(data.nom_entreprise);
+        }
+      } catch (error) {
+        console.error('Error fetching company name:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de récupérer les données de votre entreprise",
+          variant: "destructive"
+        });
+      }
+    };
+
+    fetchCompanyName();
+  }, [toast]);
+
+  // Récupérer les données depuis Airtable via notre Edge Function
+  useEffect(() => {
+    const fetchAirtableData = async () => {
+      if (!companyName) return;
+      
+      setIsLoading(true);
+      try {
+        console.log(`Fetching Airtable data for company: ${companyName}`);
+        
+        const { data, error } = await supabase.functions.invoke('airtable-fetch', {
+          body: { companyName }
+        });
+
+        if (error) throw error;
+        
+        console.log('Airtable data received:', data);
+        setCompanyData(data);
+      } catch (error) {
+        console.error('Error fetching Airtable data:', error);
+        toast({
+          title: "Erreur",
+          description: "Impossible de récupérer vos données depuis Airtable",
+          variant: "destructive"
+        });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    if (companyName) {
+      fetchAirtableData();
+    }
+  }, [companyName, toast]);
+
+  // Données par défaut (affichées en attendant les données d'Airtable)
+  const defaultChartData = [
+    { name: 'Vos résultats', value: 0 },
     { name: 'Moyenne globale', value: 65 }
   ];
+
+  // Conversion des données pour les graphiques
+  const getGovernanceChartData = () => {
+    return [
+      { 
+        name: 'Vos résultats', 
+        value: companyData?.governanceScore || 0 
+      },
+      { 
+        name: 'Moyenne globale', 
+        value: 65  // Valeur fixe pour la démonstration
+      }
+    ];
+  };
+
+  const getEnvironmentalChartData = () => {
+    return [
+      { 
+        name: 'Vos résultats', 
+        value: companyData?.environmentalScore || 0 
+      },
+      { 
+        name: 'Moyenne globale', 
+        value: 65  // Valeur fixe pour la démonstration
+      }
+    ];
+  };
+
+  const getSocialImpactChartData = () => {
+    return [
+      { 
+        name: 'Vos résultats', 
+        value: companyData?.socialImpactScore || 0 
+      },
+      { 
+        name: 'Moyenne globale', 
+        value: 65  // Valeur fixe pour la démonstration
+      }
+    ];
+  };
+
+  const getAverageChartData = () => {
+    return [
+      { 
+        name: 'Vos résultats', 
+        value: companyData?.averageScore || 0 
+      },
+      { 
+        name: 'Moyenne globale', 
+        value: 65  // Valeur fixe pour la démonstration
+      }
+    ];
+  };
 
   // Données pour le radar chart
   const radarData: RadarDataPoint[] = [
@@ -35,12 +170,25 @@ export const DashboardCharts = () => {
     { subject: 'Économie circulaire', myScore: 70, maxScore: 95 },
   ];
 
+  // Afficher un message de chargement 
+  if (isLoading) {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {[1, 2, 3, 4].map((i) => (
+          <Card key={i} className="p-6 transition-all duration-200 h-[400px] flex items-center justify-center">
+            <div className="text-gray-500">Chargement des données...</div>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
         <TieredBarChart 
           title="Gouvernance juste et inclusive" 
-          data={chartData}
+          data={getGovernanceChartData()}
           tiers={{
             tier1: 80,
             tier2: 60,
@@ -58,7 +206,7 @@ export const DashboardCharts = () => {
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
         <TieredBarChart 
           title="Développement d'impact social positif" 
-          data={chartData}
+          data={getSocialImpactChartData()}
           tiers={{
             tier1: 85,
             tier2: 65,
@@ -76,7 +224,7 @@ export const DashboardCharts = () => {
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
         <TieredBarChart 
           title="Maitrise d'impact environnemental et développement durable" 
-          data={chartData}
+          data={getEnvironmentalChartData()}
           tiers={{
             tier1: 90,
             tier2: 70,
@@ -94,7 +242,7 @@ export const DashboardCharts = () => {
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
         <TieredBarChart 
           title="Moyenne des labellisés" 
-          data={chartData}
+          data={getAverageChartData()}
           tiers={{
             tier1: 95,
             tier2: 75,
