@@ -33,12 +33,12 @@ Deno.serve(async (req) => {
     
     console.log('Fetching echelon data from Airtable, filter:', echelonFilter);
     
-    // Build the URL with filter if provided
-    let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}?view=Grid%20view`;
+    // Build the URL with filter if provided, but without specifying a view
+    let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
     
     if (echelonFilter) {
       // Filter by Echelon if provided
-      url += `&filterByFormula={Echelon}="${echelonFilter}"`;
+      url += `?filterByFormula={Echelon}="${echelonFilter}"`;
     }
     
     const response = await fetch(url, {

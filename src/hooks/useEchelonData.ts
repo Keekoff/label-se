@@ -31,10 +31,18 @@ export const useEchelonData = () => {
       setError(null);
       
       try {
-        console.log('Fetching echelon data from Airtable for echelon:', companyData.echelonTexte);
+        // Handle the case where echelonTexte might be an array
+        let echelonValue: string;
+        if (Array.isArray(companyData.echelonTexte)) {
+          echelonValue = companyData.echelonTexte[0] || '';
+        } else {
+          echelonValue = companyData.echelonTexte;
+        }
+        
+        console.log('Fetching echelon data from Airtable for echelon:', echelonValue);
         
         const { data, error } = await supabase.functions.invoke('airtable-echelons', {
-          body: { echelon: companyData.echelonTexte }
+          body: { echelon: echelonValue }
         });
 
         if (error) {
@@ -53,7 +61,7 @@ export const useEchelonData = () => {
         if (Array.isArray(data) && data.length > 0) {
           setEchelonData(data[0]);
         } else {
-          console.warn('No echelon data found for:', companyData.echelonTexte);
+          console.warn('No echelon data found for:', echelonValue);
           setEchelonData(null);
         }
       } catch (error) {
