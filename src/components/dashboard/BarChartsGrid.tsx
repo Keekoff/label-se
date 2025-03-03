@@ -72,7 +72,7 @@ export const BarChartsGrid = ({
       }} />
       </Card>
 
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card">
+      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-slate-50">
         <TieredBarChart title="Développement d'impact social positif" data={getSocialImpactChartData()} tiers={{
         tier1: 85,
         tier2: 65,
