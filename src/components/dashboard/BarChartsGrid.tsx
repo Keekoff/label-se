@@ -1,6 +1,6 @@
 
 import { Card } from "@/components/ui/card";
-import { TieredBarChart } from "@/components/ui/chart";
+import { TieredBarChart } from "@/components/ui/charts/TieredBarChart";
 import { CompanyData } from "@/hooks/useCompanyData";
 
 interface BarChartsGridProps {

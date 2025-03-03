@@ -1,6 +1,5 @@
-
 import { Card } from "@/components/ui/card";
-import { SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
+import { SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/charts/RadarChart";
 
 export const RadarChartCard = () => {
   const radarData: RadarDataPoint[] = [
