@@ -4,3 +4,5 @@ project_id = "xrruijuepuglkguryzlp"
 [functions.get-admission-documents]
 verify_jwt = true
 
+[functions.airtable-fetch]
+verify_jwt = false

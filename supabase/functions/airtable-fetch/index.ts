@@ -15,6 +15,11 @@ type CompanyData = {
   environmentalScore?: number;
   socialImpactScore?: number;
   averageScore?: number;
+  // Nouveaux champs pour la certification
+  echelonTexte?: string;
+  logoUrl?: string;
+  dateValidation?: string;
+  dateFinValidite?: string;
 };
 
 Deno.serve(async (req) => {
@@ -101,7 +106,12 @@ Deno.serve(async (req) => {
       governanceScore: record.fields['Gouvernance juste & inclusive %'] || 0,
       environmentalScore: record.fields['Maitrise d\'impact environnemental et développement durable %'] || 0,
       socialImpactScore: record.fields['Développement d\'impact social positif %'] || 0,
-      averageScore: record.fields['Moyenne globale %'] || 0
+      averageScore: record.fields['Moyenne globale %'] || 0,
+      // Récupération des nouveaux champs pour la certification
+      echelonTexte: record.fields['Echelon_texte'] || '',
+      logoUrl: record.fields['Logo (from Millésime)']?.[0]?.url || '',
+      dateValidation: record.fields['Date validation label'] || '',
+      dateFinValidite: record.fields['Date fin validité label'] || ''
     };
 
     console.log(`Données d'entreprise traitées:`, companyData);

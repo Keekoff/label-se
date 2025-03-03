@@ -12,6 +12,10 @@ type CompanyData = {
   environmentalScore?: number;
   socialImpactScore?: number;
   averageScore?: number;
+  echelonTexte?: string;
+  logoUrl?: string;
+  dateValidation?: string;
+  dateFinValidite?: string;
 };
 
 export const DashboardCharts = () => {
@@ -194,6 +198,19 @@ export const DashboardCharts = () => {
     { subject: 'Économie circulaire', myScore: 70, maxScore: 95 },
   ];
 
+  // Formater les dates pour affichage
+  const formatDate = (dateString: string | undefined) => {
+    if (!dateString) return "Non définie";
+    
+    try {
+      const date = new Date(dateString);
+      return date.toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    } catch (e) {
+      console.error('Erreur de formatage de date:', e);
+      return dateString;
+    }
+  };
+
   // Afficher un message de chargement ou d'erreur
   if (isLoading) {
     return (
@@ -325,10 +342,20 @@ export const DashboardCharts = () => {
                 <Award className="text-[#35DA56] h-5 w-5" />
                 <h3 className="font-semibold text-gray-800">Certification : Label Startup Engagée</h3>
               </div>
-              <p className="text-gray-600">Niveau :</p>
+              <p className="text-gray-600">Niveau : {companyData?.echelonTexte || "Non défini"}</p>
+              <p className="text-gray-600">Début de validité : {formatDate(companyData?.dateValidation)}</p>
+              <p className="text-gray-600">Fin de validité : {formatDate(companyData?.dateFinValidite)}</p>
             </div>
-            <div className="h-24 w-40 bg-gray-100 rounded flex items-center justify-center">
-              <p className="text-gray-500 text-sm text-center">Image du label<br/>(à venir)</p>
+            <div className="h-24 w-40 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
+              {companyData?.logoUrl ? (
+                <img 
+                  src={companyData.logoUrl} 
+                  alt="Logo du label" 
+                  className="max-h-full max-w-full object-contain"
+                />
+              ) : (
+                <p className="text-gray-500 text-sm text-center">Image du label<br/>(à venir)</p>
+              )}
             </div>
           </div>
         </div>
