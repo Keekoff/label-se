@@ -37,3 +37,17 @@ export const LABEL_LEGAL_FORMS = [
   "SARL",
   "EURL",
 ];
+
+// Employee count options
+export const EMPLOYEE_COUNTS = [
+  "0 à 10",
+  "11 à 49",
+  "50 à 99",
+  "100 et plus"
+];
+
+// Funding options
+export const FUNDING_OPTIONS = [
+  "Oui",
+  "Non"
+];
