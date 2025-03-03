@@ -1,3 +1,4 @@
+
 import { useEffect, useState, useRef } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -146,10 +147,15 @@ export const DashboardCharts = () => {
   };
 
   const getSocialImpactChartData = () => {
+    // Assurons-nous que le score est correctement affiché
+    console.log("Social Impact Score:", companyData?.socialImpactScore);
+    const socialImpactValue = companyData?.socialImpactScore ? Math.round(companyData.socialImpactScore * 100) : 0;
+    console.log("Social Impact Value for chart:", socialImpactValue);
+    
     return [
       { 
         name: 'Vos résultats', 
-        value: companyData?.socialImpactScore ? Math.round(companyData.socialImpactScore * 100) : 0 
+        value: socialImpactValue
       },
       { 
         name: 'Moyenne globale', 

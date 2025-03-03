@@ -99,14 +99,19 @@ Deno.serve(async (req) => {
 
     // Extraction des champs pertinents
     const record = data.records[0];
+    console.log("Champs disponibles:", Object.keys(record.fields));
+    
+    // Obtenir et afficher les valeurs exactes pour le débogage
+    const socialImpactScoreField = record.fields['Développement d\'impact social positif %'];
+    console.log("Valeur brute du champ social impact:", socialImpactScoreField);
     
     // Mapping des champs Airtable en utilisant les noms exacts des champs
     const companyData: CompanyData = {
       companyName,
       governanceScore: record.fields['Gouvernance juste & inclusive %'] || 0,
       environmentalScore: record.fields['Maitrise d\'impact environnemental et développement durable %'] || 0,
-      socialImpactScore: record.fields['Développement d\'impact social positif %'] || 0, // Nouveau champ ajouté
-      averageScore: record.fields['TOTAL %'] || 0, // Nouveau champ ajouté pour la moyenne totale
+      socialImpactScore: record.fields['Développement d\'impact social positif %'] || 0,
+      averageScore: record.fields['TOTAL %'] || 0,
       // Champs pour la certification
       echelonTexte: record.fields['Echelon_texte'] || '',
       logoUrl: record.fields['Logo (from Millésime)']?.[0]?.url || '',
