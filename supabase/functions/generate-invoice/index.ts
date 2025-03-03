@@ -32,17 +32,26 @@ serve(async (req) => {
       throw new Error('Payment ID is required')
     }
 
-    // Fetch payment information
+    console.log('Fetching payment with ID:', paymentId)
+
+    // Fetch payment information using maybeSingle() instead of single()
     const { data: payment, error } = await supabase
       .from('label_submissions')
       .select('id, created_at, nom_entreprise, payment_id')
       .eq('payment_id', paymentId)
-      .single()
+      .maybeSingle()
 
-    if (error || !payment) {
+    if (error) {
       console.error('Error fetching payment:', error)
+      throw new Error('Erreur lors de la récupération du paiement')
+    }
+
+    if (!payment) {
+      console.error('Payment not found for ID:', paymentId)
       throw new Error('Paiement introuvable')
     }
+
+    console.log('Payment found:', payment)
 
     // Generate PDF invoice
     const doc = new jsPDF()
@@ -112,8 +121,9 @@ serve(async (req) => {
     doc.text('133,33 €', 170, 167)
     doc.text('800,00 €', 170, 174)
     
-    // Footer
+    // Footer with theme colors
     doc.setFontSize(10)
+    doc.setTextColor(39, 1, 127) // #27017F
     doc.text('Merci pour votre confiance!', 105, 200, { align: 'center' })
     doc.text('Label Startup Engagée - www.label-startup-engagee.fr', 105, 270, { align: 'center' })
     

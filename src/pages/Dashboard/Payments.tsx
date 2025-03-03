@@ -67,20 +67,28 @@ const Payments = () => {
     try {
       setIsDownloading(paymentId);
       
+      console.log('Downloading invoice for payment ID:', paymentId);
+      
       // Appeler la fonction Edge pour générer la facture
       const response = await supabase.functions.invoke('generate-invoice', {
         body: { paymentId }
       });
       
       if (response.error) {
+        console.error('Edge function error:', response.error);
         throw new Error(response.error.message || "Erreur lors de la génération de la facture");
       }
       
+      // Vérifier que la réponse contient des données
+      if (!response.data) {
+        throw new Error("Aucune donnée reçue du serveur");
+      }
+      
       // Créer un blob à partir des données de la réponse
-      const blob = await response.data;
+      const blob = new Blob([response.data], { type: 'application/pdf' });
       
       // Créer une URL pour le blob
-      const url = window.URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }));
+      const url = window.URL.createObjectURL(blob);
       
       // Créer un élément a temporaire pour déclencher le téléchargement
       const link = document.createElement('a');
@@ -93,7 +101,9 @@ const Payments = () => {
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
       
-      toast.success("Facture téléchargée avec succès");
+      toast.success("Facture téléchargée avec succès", {
+        style: { backgroundColor: '#35DA56', color: 'white' }
+      });
     } catch (error) {
       console.error('Error downloading invoice:', error);
       toast.error("Une erreur est survenue lors du téléchargement de la facture");
@@ -150,6 +160,7 @@ const Payments = () => {
                         onClick={() => downloadInvoice(payment.payment_id)}
                         disabled={isDownloading === payment.payment_id}
                         aria-label="Télécharger la facture"
+                        className="hover:bg-[#27017F] hover:text-white"
                       >
                         {isDownloading === payment.payment_id ? (
                           <span className="animate-pulse">Téléchargement...</span>
