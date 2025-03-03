@@ -5,8 +5,7 @@ import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/comp
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Award, Download } from "lucide-react";
-import html2canvas from "html2canvas";
-import jsPDF from "jspdf";
+import { generateChartsPDF } from "@/utils/pdf-generator";
 
 type CompanyData = {
   companyName: string;
@@ -210,83 +209,16 @@ export const DashboardCharts = () => {
   };
 
   const handleDownloadPDF = async () => {
-    if (!chartsContainerRef.current) return;
+    if (!companyName) return;
+    
+    setIsPdfGenerating(true);
     
     try {
-      setIsPdfGenerating(true);
-      toast({
-        title: "Génération du PDF en cours",
-        description: "Veuillez patienter pendant la création de votre rapport...",
-      });
-
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-      
-      pdf.setFontSize(16);
-      pdf.setTextColor(39, 1, 127); // #27017F
-      pdf.text("Rapport de Performance - Label Startup Engagée", pdfWidth / 2, 15, { align: 'center' });
-      
-      pdf.setFontSize(12);
-      pdf.setTextColor(0, 0, 0);
-      pdf.text(`Entreprise: ${companyName}`, 20, 25);
-      pdf.text(`Date: ${new Date().toLocaleDateString('fr-FR')}`, 20, 32);
-
-      if (companyData?.echelonTexte) {
-        pdf.text(`Niveau: ${companyData.echelonTexte}`, 20, 39);
-        pdf.text(`Validité: ${formatDate(companyData.dateValidation)} - ${formatDate(companyData.dateFinValidite)}`, 20, 46);
-      }
-      
-      const charts = chartsContainerRef.current.querySelectorAll('.chart-card');
-      const chartPromises = Array.from(charts).map(async (chart, index) => {
-        const canvas = await html2canvas(chart as HTMLElement, {
-          scale: 2,
-          logging: false,
-          useCORS: true,
-          allowTaint: true,
-        });
-        
-        const imgData = canvas.toDataURL('image/png');
-        
-        const isEvenIndex = index % 2 === 0;
-        const row = Math.floor(index / 2);
-        
-        const imgWidth = 80;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
-        const xPos = isEvenIndex ? 15 : pdfWidth - imgWidth - 15;
-        const yPos = 55 + (row * (imgHeight + 10));
-        
-        if (yPos + imgHeight > pdfHeight && index < charts.length - 1) {
-          pdf.addPage();
-          return { imgData, xPos, yPos: 20, imgWidth, imgHeight };
-        }
-        
-        return { imgData, xPos, yPos, imgWidth, imgHeight };
-      });
-      
-      const chartPositions = await Promise.all(chartPromises);
-      
-      chartPositions.forEach((chart, index) => {
-        if (index === 4) {
-          pdf.addPage();
-          chart.yPos = 20;
-        }
-        
-        pdf.addImage(chart.imgData, 'PNG', chart.xPos, chart.yPos, chart.imgWidth, chart.imgHeight);
-      });
-      
-      pdf.save(`rapport_${companyName.replace(/\s+/g, '_')}_${new Date().toISOString().slice(0, 10)}.pdf`);
-      
-      toast({
-        title: "PDF généré avec succès",
-        description: "Votre rapport a été téléchargé.",
-      });
-    } catch (error) {
-      console.error('Erreur lors de la génération du PDF:', error);
-      toast({
-        title: "Erreur",
-        description: "Impossible de générer le PDF. Veuillez réessayer.",
-        variant: "destructive"
+      await generateChartsPDF(chartsContainerRef, {
+        companyName,
+        echelonTexte: companyData?.echelonTexte,
+        dateValidation: companyData?.dateValidation,
+        dateFinValidite: companyData?.dateFinValidite
       });
     } finally {
       setIsPdfGenerating(false);
