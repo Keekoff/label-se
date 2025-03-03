@@ -7,7 +7,6 @@ import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { SubmissionCard } from "@/components/dashboard/SubmissionCard";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { WelcomeCard } from "@/components/dashboard/WelcomeCard";
-import { CertificationBox } from "@/components/dashboard/CertificationBox";
 
 type PaymentStatus = 'unpaid' | 'pending' | 'paid' | null;
 
@@ -140,8 +139,7 @@ const Dashboard = () => {
           isLoading={isLoading}
           onPayment={handlePayment}
         />
-        {companyName && <CertificationBox companyName={companyName} />}
-        <DashboardCharts />
+        <DashboardCharts companyName={companyName} />
       </div>
     );
   }
