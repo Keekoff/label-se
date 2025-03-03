@@ -40,12 +40,12 @@ serve(async (req) => {
 
     // Construire la requête pour Airtable
     const baseId = 'app7al7op0zAJYssh' // Base ID for your Airtable
-    const tableId = 'Startups engagées' // Nom correct de la table Airtable
+    const tableId = 'Entreprises' // Nom correct de la table Airtable
     const encodedTableName = encodeURIComponent(tableId)
     
     // Construire la formule pour filtrer par nom d'entreprise
-    // Utiliser le champ correct "Entreprises"
-    const filterByFormula = encodeURIComponent(`{Entreprises} = "${companyName}"`)
+    // Utiliser le champ correct "Entreprise"
+    const filterByFormula = encodeURIComponent(`{Entreprise} = "${companyName}"`)
     
     const url = `https://api.airtable.com/v0/${baseId}/${encodedTableName}?filterByFormula=${filterByFormula}`
     
