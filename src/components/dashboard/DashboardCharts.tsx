@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
@@ -16,6 +17,7 @@ type CompanyData = {
   logoUrl?: string;
   dateValidation?: string;
   dateFinValidite?: string;
+  developmentImpactSocialPositif?: number; // Add this field
 };
 
 export const DashboardCharts = () => {
@@ -147,10 +149,15 @@ export const DashboardCharts = () => {
   };
 
   const getSocialImpactChartData = () => {
+    // Use the specific field from Airtable data if available
+    const socialImpactValue = companyData?.developmentImpactSocialPositif !== undefined
+      ? Math.round(companyData.developmentImpactSocialPositif)
+      : (companyData?.socialImpactScore ? Math.round(companyData.socialImpactScore * 100) : 0);
+      
     return [
       { 
         name: 'Vos résultats', 
-        value: companyData?.socialImpactScore ? Math.round(companyData.socialImpactScore * 100) : 0 
+        value: socialImpactValue
       },
       { 
         name: 'Moyenne globale', 

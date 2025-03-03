@@ -1,131 +1,124 @@
 
-import { corsHeaders } from '../_shared/cors.ts'
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 
-// Définition des types pour nos données
-type AirtableResponse = {
-  records: Array<{
-    id: string;
-    fields: Record<string, any>;
-  }>;
-};
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
 
-type CompanyData = {
-  companyName: string;
-  governanceScore?: number;
-  environmentalScore?: number;
-  socialImpactScore?: number;
-  averageScore?: number;
-  // Nouveaux champs pour la certification
-  echelonTexte?: string;
-  logoUrl?: string;
-  dateValidation?: string;
-  dateFinValidite?: string;
-};
+interface AirtableRecord {
+  id: string;
+  fields: {
+    [key: string]: any;
+  };
+}
 
-Deno.serve(async (req) => {
-  // Gestion des requêtes CORS preflight
+serve(async (req) => {
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders });
+    return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    const { companyName } = await req.json();
-    console.log(`Recherche des données pour l'entreprise: ${companyName}`);
+    const { companyName } = await req.json()
+    console.log(`Received request to fetch Airtable data for company: "${companyName}"`)
 
     if (!companyName) {
       return new Response(
-        JSON.stringify({ error: 'Nom d\'entreprise manquant' }),
+        JSON.stringify({ error: 'Le nom de l\'entreprise est requis' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      );
+      )
     }
 
-    // Utilisation de la clé API fournie directement pour déboguer
-    // Note: Dans un environnement de production, utilisez toujours Deno.env.get
-    const AIRTABLE_API_KEY = "patTdMAtQE60dFXlO.06084a9769e60b4732dd2cc3459092d54194dcb13cb73c4fd1f59768d4ec6a66";
-    
-    console.log(`Utilisation de la clé API Airtable: ${AIRTABLE_API_KEY.substring(0, 10)}...`);
+    const airtableApiKey = Deno.env.get('AIRTABLE_API_KEY')
+    if (!airtableApiKey) {
+      return new Response(
+        JSON.stringify({ error: 'Configuration Airtable manquante', details: 'AIRTABLE_API_KEY n\'est pas définie' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      )
+    }
 
-    // Encodage du nom de l'entreprise pour l'URL
-    const encodedCompanyName = encodeURIComponent(companyName);
+    // Construire la requête pour Airtable
+    const baseId = 'app7al7op0zAJYssh' // Base ID for your Airtable
+    const tableId = 'Company Data' // Table name
+    const encodedTableName = encodeURIComponent(tableId)
     
-    // Mise à jour avec les bons IDs de base Airtable et le nom de table correct
-    const baseId = 'app7al7op0zAJYssh';
-    const tableName = 'Entreprises'; // Mise à jour avec le nom de table correct
-    const encodedTableName = encodeURIComponent(tableName);
+    // Construire la formule pour filtrer par nom d'entreprise
+    const filterByFormula = encodeURIComponent(`{Company Name} = "${companyName}"`)
     
-    // Construction de l'URL de l'API Airtable
-    const url = `https://api.airtable.com/v0/${baseId}/${encodedTableName}?filterByFormula=FIND("${encodedCompanyName}",{Entreprise})`;
-    console.log(`URL de l'API Airtable: ${url}`);
+    const url = `https://api.airtable.com/v0/${baseId}/${encodedTableName}?filterByFormula=${filterByFormula}`
+    
+    console.log(`Fetching data from Airtable URL: ${url}`)
 
-    // Envoi de la requête à Airtable
+    // Appel API Airtable
     const response = await fetch(url, {
       headers: {
-        'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
-        'Content-Type': 'application/json'
-      }
-    });
-
-    // Affichage détaillé du statut de la réponse pour le débogage
-    console.log(`Statut de la réponse Airtable: ${response.status} ${response.statusText}`);
+        'Authorization': `Bearer ${airtableApiKey}`,
+        'Content-Type': 'application/json',
+      },
+    })
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.error(`Erreur API Airtable: ${response.status} ${errorText}`);
-      
-      // Retourne des informations d'erreur détaillées
+      const errorText = await response.text()
+      console.error(`Airtable API error (${response.status}): ${errorText}`)
       return new Response(
         JSON.stringify({ 
-          error: `Erreur Airtable: ${response.status}`, 
-          details: errorText,
-          requestUrl: url.replace(AIRTABLE_API_KEY, '[MASQUÉ]')
+          error: `Erreur API Airtable (${response.status})`, 
+          details: errorText
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: response.status }
-      );
+      )
     }
 
-    const data: AirtableResponse = await response.json();
-    console.log(`Reçu ${data.records.length} enregistrements depuis Airtable`);
+    const result = await response.json()
+    console.log('Airtable API response:', JSON.stringify(result, null, 2))
 
-    if (data.records.length === 0) {
-      // Retourne un message spécifique lorsqu'aucune donnée n'est trouvée
+    if (!result.records || result.records.length === 0) {
+      console.log(`No data found for company: "${companyName}"`)
       return new Response(
         JSON.stringify({ 
-          error: 'Aucune donnée trouvée pour cette entreprise',
-          companyName: companyName 
+          error: 'Entreprise non trouvée', 
+          details: `Aucune donnée trouvée pour l'entreprise: "${companyName}"` 
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
-      );
+      )
     }
 
-    // Extraction des champs pertinents
-    const record = data.records[0];
-    
-    // Assurez-vous de faire correspondre les noms exacts des champs depuis Airtable
-    const companyData: CompanyData = {
-      companyName,
-      governanceScore: record.fields['Gouvernance juste & inclusive %'] || 0,
-      environmentalScore: record.fields['Maitrise d\'impact environnemental et développement durable %'] || 0,
-      socialImpactScore: record.fields['Développement d\'impact social positif %'] || 0,
-      averageScore: record.fields['Moyenne globale %'] || 0,
-      // Récupération des nouveaux champs pour la certification
-      echelonTexte: record.fields['Echelon_texte'] || '',
-      logoUrl: record.fields['Logo (from Millésime)']?.[0]?.url || '',
-      dateValidation: record.fields['Date validation label'] || '',
-      dateFinValidite: record.fields['Date fin validité label'] || ''
-    };
+    // Extraire les données pertinentes du premier enregistrement correspondant
+    const recordData = result.records[0] as AirtableRecord
+    console.log('Found record:', JSON.stringify(recordData, null, 2))
 
-    console.log(`Données d'entreprise traitées:`, companyData);
+    // Mapper les champs Airtable vers notre structure de données
+    const formattedData = {
+      companyName: companyName,
+      // Prendre les valeurs des scores si elles existent
+      governanceScore: recordData.fields['Governance Score'] || null,
+      environmentalScore: recordData.fields['Environmental Score'] || null,
+      socialImpactScore: recordData.fields['Social Impact Score'] || null,
+      averageScore: recordData.fields['Average Score'] || null,
+      echelonTexte: recordData.fields['Echelon Texte'] || null,
+      dateValidation: recordData.fields['Date Validation'] || null,
+      dateFinValidite: recordData.fields['Date Fin Validité'] || null,
+      logoUrl: recordData.fields['Logo'] ? 
+        (Array.isArray(recordData.fields['Logo']) && recordData.fields['Logo'].length > 0 ? 
+          recordData.fields['Logo'][0].url : null) : null,
+      // Add the specific field for social impact development
+      developmentImpactSocialPositif: recordData.fields['Développement d\'impact social positif (%)'] || null,
+    }
 
+    console.log('Formatted data for response:', JSON.stringify(formattedData, null, 2))
+
+    // Retourner les données formatées
     return new Response(
-      JSON.stringify(companyData),
+      JSON.stringify(formattedData),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    );
+    )
 
   } catch (error) {
-    console.error('Erreur lors de la récupération des données Airtable:', error);
+    console.error('Error in airtable-fetch function:', error)
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: 'Erreur interne', details: error.message }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
-    );
+    )
   }
-});
+})
