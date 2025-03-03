@@ -4,6 +4,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
+import { Award } from "lucide-react";
 
 type CertificationData = {
   level: string;
@@ -36,6 +37,8 @@ export const CertificationBox = ({ companyName }: { companyName: string }) => {
           throw new Error(fetchError.message);
         }
 
+        console.log('Airtable data received:', data);
+
         if (data?.certification) {
           setCertificationData(data.certification);
         }
@@ -67,15 +70,23 @@ export const CertificationBox = ({ companyName }: { companyName: string }) => {
     );
   }
 
-  if (error || !certificationData) {
-    return null;
+  if (error) {
+    return (
+      <Card className="p-6 mb-6 border-[#35DA56] shadow-sm">
+        <p className="text-red-500">{error}</p>
+      </Card>
+    );
   }
 
+  // Display a default certification card even if no data
   return (
     <Card className="p-6 mb-6 border-[#35DA56] shadow-sm">
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="space-y-2">
-          <h3 className="font-bold text-lg">Certification : Label Startup Engagée</h3>
+          <div className="flex items-center gap-2">
+            <Award className="h-6 w-6 text-[#35DA56]" />
+            <h3 className="font-bold text-lg">Certification : Label Startup Engagée</h3>
+          </div>
           <p className="text-gray-700">Niveau : {certificationData?.level || 'Non défini'}</p>
           <p className="text-gray-700">Début de validité : {formatDate(certificationData?.startDate)}</p>
           <p className="text-gray-700">Fin de validité : {formatDate(certificationData?.endDate)}</p>
@@ -89,7 +100,7 @@ export const CertificationBox = ({ companyName }: { companyName: string }) => {
             />
           ) : (
             <div className="bg-gray-100 h-24 w-40 rounded-md flex items-center justify-center">
-              <p className="text-gray-400 text-sm">Image non disponible</p>
+              <p className="text-gray-400 text-sm">Image du label<br/>(à venir)</p>
             </div>
           )}
         </div>

@@ -22,6 +22,7 @@ serve(async (req) => {
     }
 
     console.log(`Fetching Airtable data for company: ${companyName}`);
+    console.log(`Utilisation de la clé API Airtable: ${AIRTABLE_API_KEY?.substring(0, 10)}...`);
 
     // Fetch performance metrics data
     const performanceResponse = await fetch(
@@ -50,6 +51,9 @@ serve(async (req) => {
 
     const companyData = await companyResponse.json();
     console.log('Company data response received');
+    
+    // Log the raw data for debugging
+    console.log('Company raw data:', JSON.stringify(companyData));
 
     // Extract certification data if available
     let certificationData = null;
@@ -68,6 +72,8 @@ serve(async (req) => {
       performance: performanceData.records || [],
       certification: certificationData
     };
+    
+    console.log('Airtable data received:', JSON.stringify(responseData));
 
     return new Response(
       JSON.stringify(responseData),

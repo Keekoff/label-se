@@ -40,8 +40,10 @@ const Dashboard = () => {
       if (data) {
         setFirstName(data.prenom || '');
         setCompanyName(data.nom_entreprise || '');
+        console.log("Nom d'entreprise récupéré:", data.nom_entreprise);
         setSubmissionId(data.id);
         setHasSubmittedForm(data.status !== 'draft');
+        console.log("Statut du formulaire:", data.status);
         setPaymentStatus(data.payment_status as PaymentStatus);
       } else {
         // If no label submission exists yet, try to get data from eligibility submission
