@@ -1,164 +1,144 @@
 
-import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
-import { jsPDF } from 'https://esm.sh/jspdf@2.5.1'
-import { format } from 'https://esm.sh/date-fns@2.30.0'
-import { fr } from 'https://esm.sh/date-fns@2.30.0/locale'
+import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
+import jsPDF from 'jspdf'
+import { createClient } from '@supabase/supabase-js'
+import { format } from 'date-fns'
 
-// Configuration des en-têtes CORS
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
 serve(async (req) => {
-  // Gérer la requête OPTIONS (CORS preflight)
+  // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
   }
 
   try {
-    // Récupérer les données de la requête
+    const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Supabase URL or key missing')
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Get request body
     const { paymentId } = await req.json()
 
     if (!paymentId) {
-      return new Response(
-        JSON.stringify({ error: 'ID de paiement manquant' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
-      )
+      throw new Error('Payment ID is required')
     }
 
-    // Initialiser le client Supabase
-    const supabaseUrl = Deno.env.get('SUPABASE_URL') ?? ''
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    const supabase = createClient(supabaseUrl, supabaseKey)
-
-    // Récupérer les détails du paiement depuis la base de données
-    const { data: paymentData, error: paymentError } = await supabase
+    // Fetch payment information
+    const { data: payment, error } = await supabase
       .from('label_submissions')
-      .select('id, created_at, payment_id, nom_entreprise, payment_status, user_id, montant')
+      .select('id, created_at, nom_entreprise, payment_id')
       .eq('payment_id', paymentId)
       .single()
 
-    if (paymentError || !paymentData) {
-      console.error('Erreur lors de la récupération des détails du paiement:', paymentError)
-      return new Response(
-        JSON.stringify({ error: 'Impossible de trouver le paiement demandé' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 404 }
-      )
+    if (error || !payment) {
+      console.error('Error fetching payment:', error)
+      throw new Error('Paiement introuvable')
     }
 
-    // Récupérer les informations de l'utilisateur
-    const { data: userData, error: userError } = await supabase
-      .from('profiles')
-      .select('*')
-      .eq('id', paymentData.user_id)
-      .single()
-
-    // Générer le PDF
+    // Generate PDF invoice
     const doc = new jsPDF()
     
-    // Ajouter le titre et les informations d'en-tête
-    doc.setFillColor(53, 218, 86) // #35DA56
-    doc.rect(0, 0, 210, 30, 'F')
+    // Add logo (if you want to add this later)
+    // const logoWidth = 40
+    // doc.addImage(logoBase64, 'PNG', 15, 15, logoWidth, logoWidth * 0.5)
     
-    doc.setTextColor(255, 255, 255)
-    doc.setFontSize(22)
-    doc.text('FACTURE', 105, 20, { align: 'center' })
+    // Header
+    doc.setFontSize(20)
+    doc.setFont('helvetica', 'bold')
+    doc.text('FACTURE', 105, 30, { align: 'center' })
     
-    doc.setTextColor(0, 0, 0)
+    // Company info
     doc.setFontSize(12)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Label Startup Engagée', 15, 50)
+    doc.text('45 rue de l\'Innovation', 15, 57)
+    doc.text('75008 Paris', 15, 64)
+    doc.text('France', 15, 71)
+    doc.text('SIRET: 12345678900010', 15, 78)
     
-    // Informations de l'entreprise émettrice
-    doc.text('Label Startup Engagée', 15, 45)
-    doc.text('SIRET: 123 456 789 00010', 15, 52)
-    doc.text('123 Avenue des Startups', 15, 59)
-    doc.text('75001 Paris, France', 15, 66)
+    // Customer info
+    doc.setFont('helvetica', 'bold')
+    doc.text('Facturé à:', 130, 50)
+    doc.setFont('helvetica', 'normal')
+    doc.text(payment.nom_entreprise || 'Client', 130, 57)
     
-    // Informations de facturation
-    const dateFacture = format(new Date(paymentData.created_at), 'dd/MM/yyyy')
-    const numeroFacture = `LSE-${paymentData.payment_id.substring(0, 8)}`
-    
-    doc.text(`Facture N° : ${numeroFacture}`, 140, 45)
-    doc.text(`Date : ${dateFacture}`, 140, 52)
-    
-    // Informations du client
-    doc.text('Facturé à :', 15, 85)
+    // Invoice details
     doc.setFontSize(11)
-    doc.text(paymentData.nom_entreprise || 'Client', 15, 92)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Numéro de facture:', 15, 95)
+    doc.text('Date de facturation:', 15, 102)
+    doc.text('Référence:', 15, 109)
     
-    if (userData) {
-      if (userData.address) doc.text(userData.address, 15, 99)
-      if (userData.email) doc.text(userData.email, 15, 106)
-    }
+    doc.setFont('helvetica', 'normal')
+    doc.text(`INV-${payment.id.substring(0, 8)}`, 75, 95)
+    doc.text(format(new Date(payment.created_at), 'dd/MM/yyyy'), 75, 102)
+    doc.text(payment.payment_id, 75, 109)
     
-    // Ligne de séparation
-    doc.setDrawColor(220, 220, 220)
-    doc.line(15, 115, 195, 115)
-    
-    // En-têtes du tableau
-    doc.setFillColor(240, 240, 240)
+    // Table header
+    doc.setFont('helvetica', 'bold')
     doc.rect(15, 120, 180, 10, 'F')
-    
-    doc.setFontSize(10)
+    doc.setTextColor(255, 255, 255)
     doc.text('Description', 20, 127)
-    doc.text('Montant HT', 140, 127)
-    doc.text('TVA', 165, 127)
-    doc.text('Montant TTC', 185, 127)
+    doc.text('Quantité', 100, 127)
+    doc.text('Prix', 130, 127)
+    doc.text('Total', 170, 127)
     
-    // Ligne d'article
-    const montantHT = paymentData.montant ? (paymentData.montant / 1.2) : 500
-    const montantTVA = paymentData.montant ? (paymentData.montant - montantHT) : 100
-    const montantTTC = paymentData.montant || 600
-    
-    doc.setFontSize(10)
-    doc.text('Label Startup Engagée - Certification', 20, 140)
-    doc.text(`${montantHT.toFixed(2)} €`, 140, 140, { align: 'right' })
-    doc.text('20%', 165, 140, { align: 'right' })
-    doc.text(`${montantTTC.toFixed(2)} €`, 185, 140, { align: 'right' })
-    
-    // Ligne de séparation
-    doc.line(15, 150, 195, 150)
+    // Table content
+    doc.setTextColor(0, 0, 0)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Label Startup Engagée - Certification annuelle', 20, 140)
+    doc.text('1', 100, 140)
+    doc.text('800,00 €', 130, 140)
+    doc.text('800,00 €', 170, 140)
     
     // Total
-    doc.setFontSize(11)
-    doc.setFont(undefined, 'bold')
-    doc.text('Total HT :', 140, 160, { align: 'right' })
-    doc.text(`${montantHT.toFixed(2)} €`, 185, 160, { align: 'right' })
+    doc.line(15, 150, 195, 150)
+    doc.setFont('helvetica', 'bold')
+    doc.text('Total HT:', 130, 160)
+    doc.text('TVA (20%):', 130, 167)
+    doc.text('Total TTC:', 130, 174)
     
-    doc.text('TVA (20%) :', 140, 167, { align: 'right' })
-    doc.text(`${montantTVA.toFixed(2)} €`, 185, 167, { align: 'right' })
+    doc.setFont('helvetica', 'normal')
+    doc.text('666,67 €', 170, 160)
+    doc.text('133,33 €', 170, 167)
+    doc.text('800,00 €', 170, 174)
     
-    doc.text('Total TTC :', 140, 174, { align: 'right' })
-    doc.text(`${montantTTC.toFixed(2)} €`, 185, 174, { align: 'right' })
+    // Footer
+    doc.setFontSize(10)
+    doc.text('Merci pour votre confiance!', 105, 200, { align: 'center' })
+    doc.text('Label Startup Engagée - www.label-startup-engagee.fr', 105, 270, { align: 'center' })
     
-    // Pied de page
-    doc.setFontSize(8)
-    doc.setFont(undefined, 'normal')
-    doc.text('Label Startup Engagée - SAS au capital de 10 000 € - RCS Paris 123 456 789', 105, 260, { align: 'center' })
-    doc.text('TVA Intracommunautaire : FR12345678900010', 105, 265, { align: 'center' })
-    doc.text('Siège social : 123 Avenue des Startups, 75001 Paris, France', 105, 270, { align: 'center' })
+    // Convert to ArrayBuffer
+    const pdfBytes = doc.output('arraybuffer')
     
-    // Convertir le PDF en données binaires
-    const pdfOutput = doc.output('arraybuffer')
-    
-    // Renvoyer le PDF généré
     return new Response(
-      pdfOutput,
+      pdfBytes,
       { 
         headers: { 
-          ...corsHeaders, 
+          ...corsHeaders,
           'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="facture_${paymentData.nom_entreprise.replace(/\s+/g, '_')}_${dateFacture.replace(/\//g, '-')}.pdf"` 
-        },
-        status: 200 
+          'Content-Disposition': `attachment; filename="facture_${paymentId}.pdf"` 
+        } 
       }
     )
   } catch (error) {
-    console.error('Erreur lors de la génération de la facture:', error)
+    console.error('Error generating invoice:', error)
+    
     return new Response(
-      JSON.stringify({ error: 'Erreur lors de la génération de la facture', details: error.message }),
-      { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+      JSON.stringify({ error: error.message }),
+      { 
+        status: 400, 
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+      }
     )
   }
 })

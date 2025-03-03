@@ -22,7 +22,6 @@ interface Payment {
   payment_id: string;
   nom_entreprise: string;
   payment_status: string;
-  montant?: number;
 }
 
 const Payments = () => {
@@ -41,7 +40,7 @@ const Payments = () => {
 
         const { data, error } = await supabase
           .from('label_submissions')
-          .select('id, created_at, payment_id, nom_entreprise, payment_status, montant')
+          .select('id, created_at, payment_id, nom_entreprise, payment_status')
           .eq('user_id', session.user.id)
           .eq('payment_status', 'paid')
           .order('created_at', { ascending: false });
@@ -129,7 +128,6 @@ const Payments = () => {
                   <TableHead>Date</TableHead>
                   <TableHead>Entreprise</TableHead>
                   <TableHead>Référence</TableHead>
-                  <TableHead>Montant</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -144,9 +142,6 @@ const Payments = () => {
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
                       {payment.payment_id}
-                    </TableCell>
-                    <TableCell>
-                      {payment.montant ? `${payment.montant.toLocaleString('fr-FR', { minimumFractionDigits: 2 })} €` : 'N/A'}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 
