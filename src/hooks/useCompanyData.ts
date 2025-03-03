@@ -13,6 +13,7 @@ export type CompanyData = {
   logoUrl?: string;
   dateValidation?: string;
   dateFinValidite?: string;
+  developpementImpactSocialPositifPercentage?: number;
 };
 
 export type FetchCompanyDataResult = {
@@ -95,7 +96,18 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         }
         
         console.log('Airtable data received:', data);
-        setCompanyData(data);
+
+        // Si les données contiennent le champ "Développement d'impact social positif (%)"
+        const processedData = {
+          ...data,
+          developpementImpactSocialPositifPercentage: 
+            data["Développement d'impact social positif (%)"] !== undefined 
+              ? parseFloat(data["Développement d'impact social positif (%)"]) 
+              : undefined
+        };
+        
+        console.log('Processed company data:', processedData);
+        setCompanyData(processedData);
       } catch (error) {
         console.error('Error fetching Airtable data:', error);
         setError(error.message || "Impossible de récupérer vos données depuis Airtable");

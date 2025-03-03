@@ -44,11 +44,12 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
   };
 
   const getSocialImpactChartData = () => {
-    // Si socialImpactScore est déjà un pourcentage (ex: 66 et non 0.66)
-    // on l'utilise directement, sinon on le convertit de décimal à pourcentage
-    const socialImpactValue = companyData?.socialImpactScore 
-      ? (companyData.socialImpactScore > 1 ? Math.round(companyData.socialImpactScore) : Math.round(companyData.socialImpactScore * 100))
-      : 0;
+    // Utiliser le nouveau champ developpementImpactSocialPositifPercentage s'il existe
+    const socialImpactValue = companyData?.developpementImpactSocialPositifPercentage !== undefined
+      ? Math.round(companyData.developpementImpactSocialPositifPercentage)
+      : companyData?.socialImpactScore 
+        ? (companyData.socialImpactScore > 1 ? Math.round(companyData.socialImpactScore) : Math.round(companyData.socialImpactScore * 100))
+        : 0;
       
     const socialImpactAverage = echelonData?.socialImpactAverage || 0;
     console.log("Social Impact Value for chart:", socialImpactValue);
