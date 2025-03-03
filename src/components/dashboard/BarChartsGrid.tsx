@@ -19,7 +19,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: echelonData?.governanceAverage || 65 
+        value: echelonData?.governanceAverage || 0 
       }
     ];
   };
@@ -32,7 +32,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: echelonData?.environmentalAverage || 65 
+        value: echelonData?.environmentalAverage || 0 
       }
     ];
   };
@@ -53,7 +53,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: echelonData?.socialImpactAverage || 65 
+        value: echelonData?.socialImpactAverage || 0 
       }
     ];
   };
@@ -66,7 +66,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: echelonData?.totalAverage || 65 
+        value: echelonData?.totalAverage || 0 
       }
     ];
   };

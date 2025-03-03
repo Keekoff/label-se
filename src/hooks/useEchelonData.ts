@@ -31,7 +31,7 @@ export const useEchelonData = () => {
       setError(null);
       
       try {
-        // Handle the case where echelonTexte might be an array
+        // Gérer le cas où echelonTexte pourrait être un tableau
         let echelonValue: string;
         if (Array.isArray(companyData.echelonTexte)) {
           echelonValue = companyData.echelonTexte[0] || '';
@@ -39,33 +39,33 @@ export const useEchelonData = () => {
           echelonValue = companyData.echelonTexte;
         }
         
-        console.log('Fetching echelon data from Airtable for echelon:', echelonValue);
+        console.log('Récupération des données d\'échelon depuis Airtable pour l\'échelon:', echelonValue);
         
         const { data, error } = await supabase.functions.invoke('airtable-echelons', {
           body: { echelon: echelonValue }
         });
 
         if (error) {
-          console.error('Supabase function invocation error:', error);
+          console.error('Erreur d\'invocation de fonction Supabase:', error);
           throw new Error(`Erreur d'invocation: ${error.message}`);
         }
         
         if (data.error) {
-          console.error('Airtable error from function:', data.error, data.details || '');
+          console.error('Erreur Airtable depuis la fonction:', data.error, data.details || '');
           throw new Error(data.error);
         }
         
-        console.log('Echelon data received:', data);
+        console.log('Données d\'échelon reçues:', data);
         
-        // If we have data and it's an array with at least one element
+        // Si nous avons des données et c'est un tableau avec au moins un élément
         if (Array.isArray(data) && data.length > 0) {
           setEchelonData(data[0]);
         } else {
-          console.warn('No echelon data found for:', echelonValue);
+          console.warn('Aucune donnée d\'échelon trouvée pour:', echelonValue);
           setEchelonData(null);
         }
       } catch (error) {
-        console.error('Error fetching Airtable echelon data:', error);
+        console.error('Erreur lors de la récupération des données d\'échelon Airtable:', error);
         setError(error.message || "Impossible de récupérer les données d'échelons depuis Airtable");
         toast({
           title: "Erreur de connexion à Airtable",

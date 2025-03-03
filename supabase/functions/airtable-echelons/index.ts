@@ -10,34 +10,34 @@ const AIRTABLE_API_KEY = Deno.env.get("AIRTABLE_API_KEY") || "";
 const AIRTABLE_BASE_ID = "app7al7op0zAJYssh";
 const AIRTABLE_TABLE_NAME = "Echelons";
 
-// Define the exact field names from Airtable
+// Définir les noms exacts des champs dans Airtable
 const GOVERNANCE_FIELD = "Moyenne gouvernance juste et inclusive (%)";
 const SOCIAL_IMPACT_FIELD = "Moyenne développement d'impact social positif (%)";
 const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et DD (%)";
 const TOTAL_AVERAGE_FIELD = "Moyenne globale (%)";
 
 serve(async (req) => {
-  // Handle CORS preflight requests
+  // Gestion des requêtes CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Parse request body to get echelon filter value
+    // Analyser le corps de la requête pour obtenir la valeur de filtre d'échelon
     const requestData = await req.json();
     const echelonFilter = requestData.echelon;
     
     if (!AIRTABLE_API_KEY) {
-      throw new Error("Airtable API key is not configured");
+      throw new Error("La clé API Airtable n'est pas configurée");
     }
     
-    console.log('Fetching echelon data from Airtable, filter:', echelonFilter);
+    console.log('Récupération des données d\'échelon depuis Airtable, filtre:', echelonFilter);
     
-    // Build the URL with filter if provided
+    // Construire l'URL avec un filtre si fourni
     let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
     
     if (echelonFilter) {
-      // Filter by Echelon if provided
+      // Filtrer par Échelon si fourni
       url += `?filterByFormula={Echelon}="${echelonFilter}"`;
     }
     
@@ -50,16 +50,16 @@ serve(async (req) => {
     
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`Airtable API error: ${response.status} ${errorText}`);
-      throw new Error(`Airtable API returned ${response.status}: ${errorText}`);
+      console.error(`Erreur API Airtable: ${response.status} ${errorText}`);
+      throw new Error(`L'API Airtable a retourné ${response.status}: ${errorText}`);
     }
     
     const data = await response.json();
-    console.log('Received Airtable data:', JSON.stringify(data));
+    console.log('Données Airtable reçues:', JSON.stringify(data));
     
-    // Process and format the data
+    // Traiter et formater les données
     const transformedData = data.records.map(record => {
-      // Make sure we're using the correct field names and converting to numbers
+      // S'assurer que nous utilisons les noms de champs corrects et convertissons en nombres
       const governanceAverage = parseInt(record.fields[GOVERNANCE_FIELD] || '0', 10);
       const socialImpactAverage = parseInt(record.fields[SOCIAL_IMPACT_FIELD] || '0', 10);
       const environmentalAverage = parseInt(record.fields[ENVIRONMENTAL_FIELD] || '0', 10);
@@ -75,7 +75,7 @@ serve(async (req) => {
       };
     });
     
-    console.log('Transformed data:', JSON.stringify(transformedData));
+    console.log('Données transformées:', JSON.stringify(transformedData));
     
     return new Response(
       JSON.stringify(transformedData),
@@ -88,7 +88,7 @@ serve(async (req) => {
     );
     
   } catch (error) {
-    console.error('Error in airtable-echelons function:', error.message);
+    console.error('Erreur dans la fonction airtable-echelons:', error.message);
     
     return new Response(
       JSON.stringify({ 
