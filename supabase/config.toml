@@ -6,3 +6,6 @@ verify_jwt = true
 
 [functions.airtable-fetch]
 verify_jwt = false
+
+[functions.airtable-echelons]
+verify_jwt = false
