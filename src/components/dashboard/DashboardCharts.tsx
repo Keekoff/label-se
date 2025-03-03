@@ -8,6 +8,36 @@ interface DashboardChartsProps {
 }
 
 export const DashboardCharts = ({ companyName }: DashboardChartsProps) => {
+  // Transform the data for the first chart
+  const gouvernanceData = [
+    { name: "Echelon 1", value: 46 },
+    { name: "Echelon 2", value: 63 },
+    { name: "Echelon 3", value: 81 },
+    { name: "Résultats", value: 70 },
+  ];
+
+  // Transform the data for the second chart
+  const impactData = [
+    { name: "Echelon 1", value: 56 },
+    { name: "Echelon 2", value: 73 },
+    { name: "Echelon 3", value: 91 },
+    { name: "Résultats", value: 85 },
+  ];
+
+  // Define tier references for both charts
+  const tierLevels = {
+    tier1: 33,
+    tier2: 66,
+    tier3: 90
+  };
+
+  // Custom tier labels
+  const tierLabels = {
+    tier1: "Niveau 1",
+    tier2: "Niveau 2",
+    tier3: "Niveau 3"
+  };
+
   return (
     <div className="space-y-6">
       {companyName && <CertificationBox companyName={companyName} />}
@@ -22,20 +52,11 @@ export const DashboardCharts = ({ companyName }: DashboardChartsProps) => {
           <CardContent>
             <div className="h-[280px] w-full">
               <TieredBarChart
-                axisName=""
-                value={[46, 63, 81, 70]}
-                valueLabel={["Echelon 1", "Echelon 2", "Echelon 3", "Résultats"]}
-                categories={[]}
-                yAxisAnnotations={[
-                  {
-                    y: 33,
-                    text: ''
-                  },
-                  {
-                    y: 66,
-                    text: ''
-                  },
-                ]}
+                data={gouvernanceData}
+                tiers={tierLevels}
+                title=""
+                barColor="#35DA56"
+                tierLabels={tierLabels}
               />
             </div>
           </CardContent>
@@ -50,20 +71,11 @@ export const DashboardCharts = ({ companyName }: DashboardChartsProps) => {
           <CardContent>
             <div className="h-[280px] w-full">
               <TieredBarChart
-                axisName=""
-                value={[56, 73, 91, 85]}
-                valueLabel={["Echelon 1", "Echelon 2", "Echelon 3", "Résultats"]}
-                categories={[]}
-                yAxisAnnotations={[
-                  {
-                    y: 33,
-                    text: ''
-                  },
-                  {
-                    y: 66,
-                    text: ''
-                  },
-                ]}
+                data={impactData}
+                tiers={tierLevels}
+                title=""
+                barColor="#27017F"
+                tierLabels={tierLabels}
               />
             </div>
           </CardContent>
