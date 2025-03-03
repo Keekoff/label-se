@@ -44,7 +44,8 @@ serve(async (req) => {
     const encodedTableName = encodeURIComponent(tableId)
     
     // Construire la formule pour filtrer par nom d'entreprise
-    const filterByFormula = encodeURIComponent(`{Company Name} = "${companyName}"`)
+    // Correction : Utiliser le bon nom de champ "Nom Entreprise" au lieu de "Company Name"
+    const filterByFormula = encodeURIComponent(`{Nom Entreprise} = "${companyName}"`)
     
     const url = `https://api.airtable.com/v0/${baseId}/${encodedTableName}?filterByFormula=${filterByFormula}`
     

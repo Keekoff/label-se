@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { TieredBarChart, SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/chart";
@@ -6,7 +5,6 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Award } from "lucide-react";
 
-// Define types for our chart data
 type CompanyData = {
   companyName: string;
   governanceScore?: number;
@@ -17,7 +15,7 @@ type CompanyData = {
   logoUrl?: string;
   dateValidation?: string;
   dateFinValidite?: string;
-  developmentImpactSocialPositif?: number; // Add this field
+  developmentImpactSocialPositif?: number;
 };
 
 export const DashboardCharts = () => {
@@ -29,7 +27,6 @@ export const DashboardCharts = () => {
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [hasSubmittedForm, setHasSubmittedForm] = useState<boolean>(false);
 
-  // Récupérer le nom de l'entreprise depuis Supabase et vérifier si le formulaire a été soumis
   useEffect(() => {
     const fetchCompanyName = async () => {
       try {
@@ -65,7 +62,6 @@ export const DashboardCharts = () => {
     fetchCompanyName();
   }, [toast]);
 
-  // Récupérer les données depuis Airtable via notre Edge Function
   useEffect(() => {
     const fetchAirtableData = async () => {
       if (!companyName) return;
@@ -114,14 +110,11 @@ export const DashboardCharts = () => {
     }
   }, [companyName, toast]);
 
-  // Données par défaut (affichées en attendant les données d'Airtable)
   const defaultChartData = [
     { name: 'Vos résultats', value: 0 },
     { name: 'Moyenne globale', value: 65 }
   ];
 
-  // Conversion des données pour les graphiques
-  // Convertir les valeurs décimales (ex: 0.41) en pourcentages (41)
   const getGovernanceChartData = () => {
     return [
       { 
@@ -130,7 +123,7 @@ export const DashboardCharts = () => {
       },
       { 
         name: 'Moyenne globale', 
-        value: 65  // Valeur fixe pour la démonstration
+        value: 65 
       }
     ];
   };
@@ -143,13 +136,12 @@ export const DashboardCharts = () => {
       },
       { 
         name: 'Moyenne globale', 
-        value: 65  // Valeur fixe pour la démonstration
+        value: 65 
       }
     ];
   };
 
   const getSocialImpactChartData = () => {
-    // Use the specific field from Airtable data if available
     const socialImpactValue = companyData?.developmentImpactSocialPositif !== undefined
       ? Math.round(companyData.developmentImpactSocialPositif)
       : (companyData?.socialImpactScore ? Math.round(companyData.socialImpactScore * 100) : 0);
@@ -161,7 +153,7 @@ export const DashboardCharts = () => {
       },
       { 
         name: 'Moyenne globale', 
-        value: 65  // Valeur fixe pour la démonstration
+        value: 65 
       }
     ];
   };
@@ -174,12 +166,11 @@ export const DashboardCharts = () => {
       },
       { 
         name: 'Moyenne globale', 
-        value: 65  // Valeur fixe pour la démonstration
+        value: 65 
       }
     ];
   };
 
-  // Données pour le radar chart
   const radarData: RadarDataPoint[] = [
     { subject: 'Diversité', myScore: 65, maxScore: 90 },
     { subject: 'Égalité', myScore: 75, maxScore: 95 },
@@ -205,7 +196,6 @@ export const DashboardCharts = () => {
     { subject: 'Économie circulaire', myScore: 70, maxScore: 95 },
   ];
 
-  // Formater les dates pour affichage
   const formatDate = (dateString: string | undefined) => {
     if (!dateString) return "Non définie";
     
@@ -218,7 +208,6 @@ export const DashboardCharts = () => {
     }
   };
 
-  // Afficher un message de chargement ou d'erreur
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -231,7 +220,6 @@ export const DashboardCharts = () => {
     );
   }
 
-  // Afficher un message d'erreur si nécessaire
   if (error) {
     return (
       <div className="grid grid-cols-1 gap-6">
@@ -252,6 +240,7 @@ export const DashboardCharts = () => {
               <ul className="text-left text-xs text-gray-500 list-disc list-inside">
                 <li>Base Airtable ID: app7al7op0zAJYssh</li>
                 <li>Table: Entreprises</li>
+                <li>Champ utilisé: Nom Entreprise</li>
                 <li>Nom d'entreprise utilisé: {companyName || "Non défini"}</li>
               </ul>
               <p className="text-gray-500 text-sm mt-4">Veuillez vérifier votre connexion à Airtable ou contacter l'assistance.</p>
@@ -259,7 +248,6 @@ export const DashboardCharts = () => {
           </div>
         </Card>
         
-        {/* Afficher les graphiques avec données par défaut même en cas d'erreur */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px]">
             <TieredBarChart 
@@ -337,10 +325,8 @@ export const DashboardCharts = () => {
     );
   }
 
-  // Si tout va bien, afficher les graphiques avec les données réelles
   return (
     <div className="space-y-6">
-      {/* Certification Box - Only shown if user has submitted the form */}
       {hasSubmittedForm && (
         <div className="bg-white border-2 border-[#35DA56] rounded-lg p-4 shadow-sm animate-fadeIn">
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -441,7 +427,6 @@ export const DashboardCharts = () => {
           />
         </Card>
 
-        {/* Radar Chart */}
         <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[600px] md:col-span-2">
           <SustainabilityRadarChart 
             title="Analyse comparative des critères de durabilité" 
