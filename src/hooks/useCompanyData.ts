@@ -97,9 +97,30 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         
         console.log('Airtable data received:', data);
 
-        // Si les données contiennent le champ "Développement d'impact social positif (%)"
+        // Transformation des données pour s'assurer que les valeurs sont en pourcentages
         const processedData = {
           ...data,
+          // Conversion de governanceScore en pourcentage si nécessaire
+          governanceScore: data.governanceScore !== undefined 
+            ? (data.governanceScore <= 1 ? data.governanceScore : data.governanceScore / 100) 
+            : undefined,
+          
+          // Conversion de environmentalScore en pourcentage si nécessaire
+          environmentalScore: data.environmentalScore !== undefined 
+            ? (data.environmentalScore <= 1 ? data.environmentalScore : data.environmentalScore / 100) 
+            : undefined,
+          
+          // Conversion de socialImpactScore en pourcentage si nécessaire
+          socialImpactScore: data.socialImpactScore !== undefined 
+            ? (data.socialImpactScore <= 1 ? data.socialImpactScore : data.socialImpactScore / 100) 
+            : undefined,
+          
+          // Conversion de averageScore en pourcentage si nécessaire
+          averageScore: data.averageScore !== undefined 
+            ? (data.averageScore <= 1 ? data.averageScore : data.averageScore / 100) 
+            : undefined,
+          
+          // Traitement spécial pour développement d'impact social positif
           developpementImpactSocialPositifPercentage: 
             data["Développement d'impact social positif (%)"] !== undefined 
               ? parseFloat(data["Développement d'impact social positif (%)"]) 

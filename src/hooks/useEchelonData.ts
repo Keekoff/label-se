@@ -59,16 +59,24 @@ export const useEchelonData = () => {
         
         // Si nous avons des données et c'est un tableau avec au moins un élément
         if (Array.isArray(data) && data.length > 0) {
-          // Vérifier les valeurs avant de les définir
-          const echelonItem = data[0];
+          // Convertir les valeurs en nombres et s'assurer qu'elles sont bien des pourcentages
+          const processedData = {
+            ...data[0],
+            // S'assurer que les valeurs sont des nombres
+            governanceAverage: typeof data[0].governanceAverage === 'number' ? data[0].governanceAverage : 0,
+            socialImpactAverage: typeof data[0].socialImpactAverage === 'number' ? data[0].socialImpactAverage : 0,
+            environmentalAverage: typeof data[0].environmentalAverage === 'number' ? data[0].environmentalAverage : 0,
+            totalAverage: typeof data[0].totalAverage === 'number' ? data[0].totalAverage : 0
+          };
+          
           console.log('Valeurs d\'échelon à utiliser:', {
-            gouvernance: echelonItem.governanceAverage,
-            socialImpact: echelonItem.socialImpactAverage,
-            environmental: echelonItem.environmentalAverage,
-            total: echelonItem.totalAverage
+            gouvernance: processedData.governanceAverage,
+            socialImpact: processedData.socialImpactAverage,
+            environmental: processedData.environmentalAverage,
+            total: processedData.totalAverage
           });
           
-          setEchelonData(echelonItem);
+          setEchelonData(processedData);
         } else {
           console.warn('Aucune donnée d\'échelon trouvée pour:', echelonValue);
           // Si aucune donnée n'est trouvée, créer un ensemble de données par défaut pour éviter les erreurs

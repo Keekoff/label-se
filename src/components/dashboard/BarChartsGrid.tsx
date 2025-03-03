@@ -48,7 +48,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
     const socialImpactValue = companyData?.developpementImpactSocialPositifPercentage !== undefined
       ? Math.round(companyData.developpementImpactSocialPositifPercentage)
       : companyData?.socialImpactScore 
-        ? (companyData.socialImpactScore > 1 ? Math.round(companyData.socialImpactScore) : Math.round(companyData.socialImpactScore * 100))
+        ? Math.round(companyData.socialImpactScore * 100)
         : 0;
       
     const socialImpactAverage = echelonData?.socialImpactAverage || 0;
