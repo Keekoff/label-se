@@ -50,7 +50,7 @@ Deno.serve(async (req) => {
     
     // Mise à jour avec les bons IDs de base Airtable et le nom de table correct
     const baseId = 'app7al7op0zAJYssh';
-    const tableName = 'Entreprises'; // Mise à jour avec le nom de table correct
+    const tableName = 'Entreprises'; // Nom de table correct
     const encodedTableName = encodeURIComponent(tableName);
     
     // Construction de l'URL de l'API Airtable
@@ -100,14 +100,14 @@ Deno.serve(async (req) => {
     // Extraction des champs pertinents
     const record = data.records[0];
     
-    // Assurez-vous de faire correspondre les noms exacts des champs depuis Airtable
+    // Mapping des champs Airtable en utilisant les noms exacts des champs
     const companyData: CompanyData = {
       companyName,
       governanceScore: record.fields['Gouvernance juste & inclusive %'] || 0,
       environmentalScore: record.fields['Maitrise d\'impact environnemental et développement durable %'] || 0,
-      socialImpactScore: record.fields['Développement d\'impact social positif %'] || 0,
-      averageScore: record.fields['Moyenne globale %'] || 0,
-      // Récupération des nouveaux champs pour la certification
+      socialImpactScore: record.fields['Développement d\'impact social positif %'] || 0, // Nouveau champ ajouté
+      averageScore: record.fields['TOTAL %'] || 0, // Nouveau champ ajouté pour la moyenne totale
+      // Champs pour la certification
       echelonTexte: record.fields['Echelon_texte'] || '',
       logoUrl: record.fields['Logo (from Millésime)']?.[0]?.url || '',
       dateValidation: record.fields['Date validation label'] || '',
