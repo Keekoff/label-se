@@ -81,7 +81,11 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         console.log(`Fetching Airtable data for company: ${companyName}`);
         
         const { data, error } = await supabase.functions.invoke('airtable-fetch', {
-          body: { companyName }
+          body: { 
+            companyName,
+            // Indiquer que nous filtrons par le champ "Entreprise"
+            filterField: "Entreprise" 
+          }
         });
 
         if (error) {
