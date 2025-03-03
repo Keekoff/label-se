@@ -40,7 +40,7 @@ serve(async (req) => {
 
     // Construire la requête pour Airtable
     const baseId = 'app7al7op0zAJYssh' // Base ID for your Airtable
-    const tableId = 'Entreprises' // Table name corrigé de "Company Data" à "Entreprises"
+    const tableId = 'Entreprises' // Table name corrigé
     const encodedTableName = encodeURIComponent(tableId)
     
     // Construire la formule pour filtrer par nom d'entreprise
