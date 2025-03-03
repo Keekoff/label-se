@@ -1,35 +1,35 @@
 
-import { corsHeaders } from '../_shared/cors.ts';
+import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
-const AIRTABLE_API_KEY = Deno.env.get('AIRTABLE_API_KEY') || '';
-const AIRTABLE_BASE_ID = 'app7al7op0zAJYssh';
-const AIRTABLE_TABLE_NAME = 'Echelons';
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
 
-interface EchelonRecord {
-  id: string;
-  fields: {
-    Echelon?: string;
-    'Moyenne gouvernance juste et inclusive (%)'?: number;
-    'Moyenne développement d\'impact social positif (%)'?: number;
-    'Moyenne maitrise d\'impact environnement et développement durable (%)'?: number;
-    'Score moyen total (%)'?: number;
-  };
-}
+const AIRTABLE_API_KEY = Deno.env.get("AIRTABLE_API_KEY") || "";
+const AIRTABLE_BASE_ID = "app7al7op0zAJYssh";
+const AIRTABLE_TABLE_NAME = "Echelons";
 
-interface AirtableResponse {
-  records: EchelonRecord[];
-}
+// Define fields to extract from Airtable
+const GOVERNANCE_FIELD = "Moyenne gouvernance juste et inclusive (%)";
+const SOCIAL_IMPACT_FIELD = "Moyenne développement d'impact social positif (%)";
+const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et DD (%)";
+const TOTAL_AVERAGE_FIELD = "Moyenne globale (%)";
 
-Deno.serve(async (req) => {
+serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Get request data if any
-    const requestData = req.method === 'POST' ? await req.json() : {};
-    const echelonFilter = requestData.echelon || '';
+    // Parse request body to get echelon filter value
+    const requestData = await req.json();
+    const echelonFilter = requestData.echelon;
+    
+    if (!AIRTABLE_API_KEY) {
+      throw new Error("Airtable API key is not configured");
+    }
     
     console.log('Fetching echelon data from Airtable, filter:', echelonFilter);
     
@@ -42,46 +42,65 @@ Deno.serve(async (req) => {
     }
     
     const response = await fetch(url, {
-      method: 'GET',
       headers: {
         'Authorization': `Bearer ${AIRTABLE_API_KEY}`,
         'Content-Type': 'application/json',
       },
     });
-
+    
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('Airtable API error:', response.status, errorText);
+      console.error(`Airtable API error: ${response.status} ${errorText}`);
       throw new Error(`Airtable API returned ${response.status}: ${errorText}`);
     }
-
-    const data: AirtableResponse = await response.json();
-    console.log(`Retrieved ${data.records.length} echelon records`);
     
-    // Process the data to make it easier to use
-    const processedData = data.records.map(record => ({
-      id: record.id,
-      echelon: record.fields.Echelon || '',
-      governanceAverage: record.fields['Moyenne gouvernance juste et inclusive (%)'] || 0,
-      socialImpactAverage: record.fields['Moyenne développement d\'impact social positif (%)'] || 0,
-      environmentalAverage: record.fields['Moyenne maitrise d\'impact environnement et développement durable (%)'] || 0,
-      totalAverage: record.fields['Score moyen total (%)'] || 0
-    }));
-
-    return new Response(JSON.stringify(processedData), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
+    const data = await response.json();
+    console.log('Received Airtable data:', JSON.stringify(data));
+    
+    // Process and format the data
+    const transformedData = data.records.map(record => {
+      // Make sure all numeric values are properly converted to numbers
+      const governanceAverage = parseInt(record.fields[GOVERNANCE_FIELD] || '0', 10);
+      const socialImpactAverage = parseInt(record.fields[SOCIAL_IMPACT_FIELD] || '0', 10);
+      const environmentalAverage = parseInt(record.fields[ENVIRONMENTAL_FIELD] || '0', 10);
+      const totalAverage = parseInt(record.fields[TOTAL_AVERAGE_FIELD] || '0', 10);
+      
+      return {
+        id: record.id,
+        echelon: record.fields.Echelon || '',
+        governanceAverage: governanceAverage,
+        socialImpactAverage: socialImpactAverage,
+        environmentalAverage: environmentalAverage,
+        totalAverage: totalAverage
+      };
     });
+    
+    console.log('Transformed data:', JSON.stringify(transformedData));
+    
+    return new Response(
+      JSON.stringify(transformedData),
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json' 
+        } 
+      }
+    );
+    
   } catch (error) {
     console.error('Error in airtable-echelons function:', error.message);
+    
     return new Response(
-      JSON.stringify({
-        error: 'Erreur lors de la récupération des données Airtable',
-        details: error.message
+      JSON.stringify({ 
+        error: "Erreur lors de la récupération des données depuis Airtable", 
+        details: error.message 
       }),
-      {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+      { 
+        status: 500, 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json' 
+        } 
       }
     );
   }

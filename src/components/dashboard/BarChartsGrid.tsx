@@ -38,9 +38,6 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
   };
 
   const getSocialImpactChartData = () => {
-    // Loguer la valeur brute du score d'impact social
-    console.log("Social Impact Score:", companyData?.socialImpactScore);
-    
     // Si socialImpactScore est déjà un pourcentage (ex: 66 et non 0.66)
     // on l'utilise directement, sinon on le convertit de décimal à pourcentage
     const socialImpactValue = companyData?.socialImpactScore 
