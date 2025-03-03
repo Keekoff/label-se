@@ -13,7 +13,7 @@ const AIRTABLE_TABLE_NAME = "Echelons";
 // Définir les noms exacts des champs dans Airtable
 const GOVERNANCE_FIELD = "Moyenne gouvernance juste et inclusive (%)";
 const SOCIAL_IMPACT_FIELD = "Moyenne développement d'impact social positif (%)";
-const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et développement durable (%)";
+const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et DD (%)";
 const TOTAL_AVERAGE_FIELD = "Moyenne TOTAL (%)";
 
 serve(async (req) => {
@@ -93,10 +93,10 @@ serve(async (req) => {
       }
       
       // Convertir en valeurs entières pour les pourcentages
-      governanceAverage = Math.round(governanceAverage);
-      socialImpactAverage = Math.round(socialImpactAverage);
-      environmentalAverage = Math.round(environmentalAverage);
-      totalAverage = Math.round(totalAverage);
+      governanceAverage = Math.round(governanceAverage * 100);
+      socialImpactAverage = Math.round(socialImpactAverage * 100);
+      environmentalAverage = Math.round(environmentalAverage * 100);
+      totalAverage = Math.round(totalAverage * 100);
       
       console.log('Valeurs transformées pour échelon', fields.Echelon, ':', {
         governanceAverage,
