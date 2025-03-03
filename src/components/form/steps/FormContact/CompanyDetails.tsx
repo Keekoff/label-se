@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SECTORS, LEGAL_FORMS } from './constants';
+import { SECTORS, LABEL_LEGAL_FORMS } from './constants';
 
 interface CompanyDetailsProps {
   formState: Record<string, any>;
@@ -39,6 +39,10 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
       [field]: value
     }));
   };
+
+  // Check if the current legal form is valid for the label submission
+  // This helps handle cases where the legal form from eligibility might not be in our label form options
+  const isValidLegalForm = (form: string) => LABEL_LEGAL_FORMS.includes(form);
 
   return (
     <div className="space-y-6">
@@ -90,14 +94,24 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
             disabled={readOnly}
           >
             <div className="grid grid-cols-2 gap-3">
-              {LEGAL_FORMS.map((formType) => (
+              {LABEL_LEGAL_FORMS.map((formType) => (
                 <div key={formType} className="flex items-center space-x-2">
-                  <RadioGroupItem value={formType} id={`legal-${formType}`} disabled={readOnly} />
+                  <RadioGroupItem 
+                    value={formType} 
+                    id={`legal-${formType}`} 
+                    disabled={readOnly} 
+                    className={formState?.legalForm === formType ? "text-primary border-primary" : ""}
+                  />
                   <Label htmlFor={`legal-${formType}`}>{formType}</Label>
                 </div>
               ))}
             </div>
           </RadioGroup>
+          {!isValidLegalForm(formState?.legalForm) && formState?.legalForm && (
+            <p className="text-sm text-amber-600">
+              La forme juridique "{formState.legalForm}" n'est pas éligible pour le label. Veuillez sélectionner une forme juridique valide.
+            </p>
+          )}
         </div>
       </div>
     </div>

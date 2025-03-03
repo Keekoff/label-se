@@ -54,6 +54,8 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
             employeeCount = "100 et plus";
           }
 
+          console.log('Legal form from eligibility:', data.legal_form);
+
           // Populate form with eligibility data
           const updatedFormState = {
             ...formState,
@@ -65,6 +67,7 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
             sector: Array.isArray(data.sectors) && data.sectors.length > 0 
               ? data.sectors[0] 
               : formState.sector,
+            // Set the legal form from eligibility data
             legalForm: data.legal_form || formState.legalForm,
             employeeCount: employeeCount || formState.employeeCount,
             phone: data.phone || formState.phone,

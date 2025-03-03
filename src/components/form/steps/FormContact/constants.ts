@@ -1,42 +1,39 @@
 
 export const SECTORS = [
-  "Food",
   "Agro-alimentaire",
-  "Mode/Beauté",
-  "Luxe",
+  "Automobile",
+  "Banque / Assurance",
+  "BTP / Construction",
+  "Commerce / Distribution",
+  "Conseil",
+  "Éducation / Formation",
+  "Énergie / Environnement",
+  "Hôtellerie / Restauration",
+  "Immobilier",
   "Industrie",
-  "Santé/Pharma",
-  "Banque/Assurance",
-  "Environnement",
-  "Social",
-  "ESS",
-  "Data & IT",
-  "E-commerce",
-  "Legal",
-  "Finance",
-  "Marketing",
-  "Ressources Humaines",
-  "Agence",
-  "Cabinet de conseil",
+  "Informatique / Télécom",
+  "Luxe / Mode",
+  "Média / Communication",
+  "Santé / Pharmaceutique",
+  "Transport / Logistique",
   "Autre"
 ];
 
 export const LEGAL_FORMS = [
-  "SARL",
   "SAS",
+  "SASU",
   "SA",
+  "SARL",
   "EURL",
-  "Autre"
+  "Association Loi 1901",
+  "EI (auto-entrepreneur, micro-entreprise)",
 ];
 
-export const EMPLOYEE_COUNTS = [
-  "0 à 10",
-  "11 à 49",
-  "50 à 99",
-  "100 et plus"
-];
-
-export const FUNDING_OPTIONS = [
-  "Oui",
-  "Non"
+// For the contact form, we'll filter out ineligible forms
+export const LABEL_LEGAL_FORMS = [
+  "SAS",
+  "SASU",
+  "SA",
+  "SARL",
+  "EURL",
 ];
