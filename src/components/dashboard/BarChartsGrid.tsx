@@ -2,12 +2,15 @@
 import { Card } from "@/components/ui/card";
 import { TieredBarChart } from "@/components/ui/charts/TieredBarChart";
 import { CompanyData } from "@/hooks/useCompanyData";
+import { useEchelonData } from "@/hooks/useEchelonData";
 
 interface BarChartsGridProps {
   companyData: CompanyData | null;
 }
 
 export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
+  const { echelonData, isLoading: isEchelonDataLoading } = useEchelonData();
+
   const getGovernanceChartData = () => {
     return [
       { 
@@ -16,7 +19,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: 65 
+        value: echelonData?.governanceAverage || 65 
       }
     ];
   };
@@ -29,7 +32,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: 65 
+        value: echelonData?.environmentalAverage || 65 
       }
     ];
   };
@@ -53,7 +56,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: 65 
+        value: echelonData?.socialImpactAverage || 65 
       }
     ];
   };
@@ -66,7 +69,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: 65 
+        value: echelonData?.totalAverage || 65 
       }
     ];
   };
