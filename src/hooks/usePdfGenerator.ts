@@ -12,7 +12,13 @@ export const usePdfGenerator = () => {
     setIsPdfGenerating(true);
     
     try {
-      await generateChartsPDF(chartsContainerRef, chartData);
+      // Assurons-nous que nous passons toutes les données nécessaires au générateur PDF
+      const completeChartData = {
+        ...chartData,
+        // Si d'autres propriétés spécifiques sont nécessaires, les ajouter ici
+      };
+      
+      await generateChartsPDF(chartsContainerRef, completeChartData);
     } finally {
       setIsPdfGenerating(false);
     }
