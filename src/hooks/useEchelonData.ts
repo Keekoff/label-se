@@ -59,10 +59,27 @@ export const useEchelonData = () => {
         
         // Si nous avons des données et c'est un tableau avec au moins un élément
         if (Array.isArray(data) && data.length > 0) {
-          setEchelonData(data[0]);
+          // Vérifier les valeurs avant de les définir
+          const echelonItem = data[0];
+          console.log('Valeurs d\'échelon à utiliser:', {
+            gouvernance: echelonItem.governanceAverage,
+            socialImpact: echelonItem.socialImpactAverage,
+            environmental: echelonItem.environmentalAverage,
+            total: echelonItem.totalAverage
+          });
+          
+          setEchelonData(echelonItem);
         } else {
           console.warn('Aucune donnée d\'échelon trouvée pour:', echelonValue);
-          setEchelonData(null);
+          // Si aucune donnée n'est trouvée, créer un ensemble de données par défaut pour éviter les erreurs
+          setEchelonData({
+            id: "default",
+            echelon: echelonValue,
+            governanceAverage: 0,
+            socialImpactAverage: 0,
+            environmentalAverage: 0,
+            totalAverage: 0
+          });
         }
       } catch (error) {
         console.error('Erreur lors de la récupération des données d\'échelon Airtable:', error);

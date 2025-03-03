@@ -14,7 +14,7 @@ const AIRTABLE_TABLE_NAME = "Echelons";
 const GOVERNANCE_FIELD = "Moyenne gouvernance juste et inclusive (%)";
 const SOCIAL_IMPACT_FIELD = "Moyenne développement d'impact social positif (%)";
 const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et DD (%)";
-const TOTAL_AVERAGE_FIELD = "Moyenne globale (%)";
+const TOTAL_AVERAGE_FIELD = "Moyenne TOTAL (%)";
 
 serve(async (req) => {
   // Gestion des requêtes CORS preflight
@@ -59,19 +59,59 @@ serve(async (req) => {
     
     // Traiter et formater les données
     const transformedData = data.records.map(record => {
-      // S'assurer que nous utilisons les noms de champs corrects et convertissons en nombres
-      const governanceAverage = parseInt(record.fields[GOVERNANCE_FIELD] || '0', 10);
-      const socialImpactAverage = parseInt(record.fields[SOCIAL_IMPACT_FIELD] || '0', 10);
-      const environmentalAverage = parseInt(record.fields[ENVIRONMENTAL_FIELD] || '0', 10);
-      const totalAverage = parseInt(record.fields[TOTAL_AVERAGE_FIELD] || '0', 10);
+      const fields = record.fields;
+      
+      // Extraire les valeurs des champs avec vérification
+      let governanceAverage = 0;
+      let socialImpactAverage = 0;
+      let environmentalAverage = 0;
+      let totalAverage = 0;
+      
+      // Vérifier si les champs existent et extraire leur valeur
+      if (GOVERNANCE_FIELD in fields) {
+        governanceAverage = typeof fields[GOVERNANCE_FIELD] === 'number' 
+          ? fields[GOVERNANCE_FIELD]
+          : parseFloat(fields[GOVERNANCE_FIELD] || '0');
+      }
+      
+      if (SOCIAL_IMPACT_FIELD in fields) {
+        socialImpactAverage = typeof fields[SOCIAL_IMPACT_FIELD] === 'number'
+          ? fields[SOCIAL_IMPACT_FIELD]
+          : parseFloat(fields[SOCIAL_IMPACT_FIELD] || '0');
+      }
+      
+      if (ENVIRONMENTAL_FIELD in fields) {
+        environmentalAverage = typeof fields[ENVIRONMENTAL_FIELD] === 'number'
+          ? fields[ENVIRONMENTAL_FIELD]
+          : parseFloat(fields[ENVIRONMENTAL_FIELD] || '0');
+      }
+      
+      if (TOTAL_AVERAGE_FIELD in fields) {
+        totalAverage = typeof fields[TOTAL_AVERAGE_FIELD] === 'number'
+          ? fields[TOTAL_AVERAGE_FIELD]
+          : parseFloat(fields[TOTAL_AVERAGE_FIELD] || '0');
+      }
+      
+      // Convertir en valeurs entières pour les pourcentages
+      governanceAverage = Math.round(governanceAverage * 100);
+      socialImpactAverage = Math.round(socialImpactAverage * 100);
+      environmentalAverage = Math.round(environmentalAverage * 100);
+      totalAverage = Math.round(totalAverage * 100);
+      
+      console.log('Valeurs transformées pour échelon', fields.Echelon, ':', {
+        governanceAverage,
+        socialImpactAverage,
+        environmentalAverage,
+        totalAverage
+      });
       
       return {
         id: record.id,
-        echelon: record.fields.Echelon || '',
-        governanceAverage: governanceAverage,
-        socialImpactAverage: socialImpactAverage,
-        environmentalAverage: environmentalAverage,
-        totalAverage: totalAverage
+        echelon: fields.Echelon || '',
+        governanceAverage,
+        socialImpactAverage,
+        environmentalAverage,
+        totalAverage
       };
     });
     

@@ -12,6 +12,9 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
   const { echelonData, isLoading: isEchelonDataLoading } = useEchelonData();
 
   const getGovernanceChartData = () => {
+    const governanceAverage = echelonData?.governanceAverage || 0;
+    console.log('Valeur moyenne de gouvernance à afficher:', governanceAverage);
+    
     return [
       { 
         name: 'Vos résultats', 
@@ -19,12 +22,15 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: echelonData?.governanceAverage || 0 
+        value: governanceAverage
       }
     ];
   };
 
   const getEnvironmentalChartData = () => {
+    const environmentalAverage = echelonData?.environmentalAverage || 0;
+    console.log('Valeur moyenne environnementale à afficher:', environmentalAverage);
+    
     return [
       { 
         name: 'Vos résultats', 
@@ -32,7 +38,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: echelonData?.environmentalAverage || 0 
+        value: environmentalAverage
       }
     ];
   };
@@ -44,7 +50,9 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       ? (companyData.socialImpactScore > 1 ? Math.round(companyData.socialImpactScore) : Math.round(companyData.socialImpactScore * 100))
       : 0;
       
+    const socialImpactAverage = echelonData?.socialImpactAverage || 0;
     console.log("Social Impact Value for chart:", socialImpactValue);
+    console.log("Social Impact Average for chart:", socialImpactAverage);
     
     return [
       { 
@@ -53,12 +61,15 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: echelonData?.socialImpactAverage || 0 
+        value: socialImpactAverage
       }
     ];
   };
 
   const getAverageChartData = () => {
+    const totalAverage = echelonData?.totalAverage || 0;
+    console.log('Valeur moyenne totale à afficher:', totalAverage);
+    
     return [
       { 
         name: 'Vos résultats', 
@@ -66,7 +77,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       },
       { 
         name: 'Moyenne globale', 
-        value: echelonData?.totalAverage || 0 
+        value: totalAverage
       }
     ];
   };
