@@ -251,7 +251,7 @@ export const DashboardCharts = () => {
               <p className="text-gray-500 text-sm">Informations de débogage:</p>
               <ul className="text-left text-xs text-gray-500 list-disc list-inside">
                 <li>Base Airtable ID: app7al7op0zAJYssh</li>
-                <li>Table: Company Data</li>
+                <li>Table: Entreprises</li>
                 <li>Nom d'entreprise utilisé: {companyName || "Non défini"}</li>
               </ul>
               <p className="text-gray-500 text-sm mt-4">Veuillez vérifier votre connexion à Airtable ou contacter l'assistance.</p>
