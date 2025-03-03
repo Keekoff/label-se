@@ -10,7 +10,7 @@ const AIRTABLE_API_KEY = Deno.env.get("AIRTABLE_API_KEY") || "";
 const AIRTABLE_BASE_ID = "app7al7op0zAJYssh";
 const AIRTABLE_TABLE_NAME = "Echelons";
 
-// Define fields to extract from Airtable
+// Define the exact field names from Airtable
 const GOVERNANCE_FIELD = "Moyenne gouvernance juste et inclusive (%)";
 const SOCIAL_IMPACT_FIELD = "Moyenne développement d'impact social positif (%)";
 const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et DD (%)";
@@ -33,7 +33,7 @@ serve(async (req) => {
     
     console.log('Fetching echelon data from Airtable, filter:', echelonFilter);
     
-    // Build the URL with filter if provided, but without specifying a view
+    // Build the URL with filter if provided
     let url = `https://api.airtable.com/v0/${AIRTABLE_BASE_ID}/${AIRTABLE_TABLE_NAME}`;
     
     if (echelonFilter) {
@@ -59,7 +59,7 @@ serve(async (req) => {
     
     // Process and format the data
     const transformedData = data.records.map(record => {
-      // Make sure all numeric values are properly converted to numbers
+      // Make sure we're using the correct field names and converting to numbers
       const governanceAverage = parseInt(record.fields[GOVERNANCE_FIELD] || '0', 10);
       const socialImpactAverage = parseInt(record.fields[SOCIAL_IMPACT_FIELD] || '0', 10);
       const environmentalAverage = parseInt(record.fields[ENVIRONMENTAL_FIELD] || '0', 10);
