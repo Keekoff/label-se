@@ -14,9 +14,9 @@ serve(async (req) => {
   }
 
   try {
-    // Only use companyName from the request, always using "Entreprise" as filterField
+    // Only use companyName from the request, always using "Entreprises" as filterField
     const { companyName } = await req.json();
-    const filterField = "Entreprise"; // Always use "Entreprise" as the filter field
+    const filterField = "Entreprises"; // Corrected from "Entreprise" to "Entreprises"
     
     if (!companyName) {
       return new Response(
