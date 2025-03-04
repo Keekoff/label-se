@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -82,8 +83,8 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         
         const { data, error } = await supabase.functions.invoke('airtable-fetch', {
           body: { 
-            companyName,
-            filterField: "Entreprise" 
+            companyName
+            // Removed filterField parameter to ensure default is used
           }
         });
 

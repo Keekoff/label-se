@@ -14,7 +14,9 @@ serve(async (req) => {
   }
 
   try {
-    const { companyName, filterField = "Entreprise" } = await req.json();
+    // Only use companyName from the request, always using "Entreprise" as filterField
+    const { companyName } = await req.json();
+    const filterField = "Entreprise"; // Always use "Entreprise" as the filter field
     
     if (!companyName) {
       return new Response(
@@ -71,6 +73,9 @@ serve(async (req) => {
     // Get the fields from the first record
     const fields = data.records[0].fields;
     console.log('Champs extraits:', JSON.stringify(fields));
+    
+    // Print social impact field value for debugging
+    console.log('Valeur du champ social impact:', fields['Développement d\'impact social positif (%)']);
 
     // Extract and format the required fields, ensuring proper handling of the social impact field
     const result = {
