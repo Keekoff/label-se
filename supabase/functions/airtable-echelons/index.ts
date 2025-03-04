@@ -7,7 +7,7 @@ const corsHeaders = {
 };
 
 const AIRTABLE_API_KEY = Deno.env.get("AIRTABLE_API_KEY") || "";
-const AIRTABLE_BASE_ID = "appiUmKvXnN1SSWtz";
+const AIRTABLE_BASE_ID = "app7al7op0zAJYssh";
 const AIRTABLE_TABLE_NAME = "Echelons";
 
 // Définir les noms exacts des champs dans Airtable

@@ -1,13 +1,10 @@
-
 import { Card } from "@/components/ui/card";
 import { TieredBarChart } from "@/components/ui/charts/TieredBarChart";
 import { CompanyData } from "@/hooks/useCompanyData";
 import { useEchelonData } from "@/hooks/useEchelonData";
-
 interface BarChartsGridProps {
   companyData: CompanyData | null;
 }
-
 export const BarChartsGrid = ({
   companyData
 }: BarChartsGridProps) => {
@@ -15,7 +12,6 @@ export const BarChartsGrid = ({
     echelonData,
     isLoading: isEchelonDataLoading
   } = useEchelonData();
-
   const getGovernanceChartData = () => {
     const governanceAverage = echelonData?.governanceAverage || 0;
     console.log('Valeur moyenne de gouvernance à afficher:', governanceAverage);
@@ -27,7 +23,6 @@ export const BarChartsGrid = ({
       value: governanceAverage
     }];
   };
-
   const getEnvironmentalChartData = () => {
     const environmentalAverage = echelonData?.environmentalAverage || 0;
     console.log('Valeur moyenne environnementale à afficher:', environmentalAverage);
@@ -39,22 +34,12 @@ export const BarChartsGrid = ({
       value: environmentalAverage
     }];
   };
-
   const getSocialImpactChartData = () => {
-    // Prioritize using the raw percentage directly from Airtable
-    const socialImpactValue = companyData?.["Développement d'impact social positif (%)"] !== undefined 
-      ? parseFloat(companyData["Développement d'impact social positif (%)"]) 
-      : companyData?.developpementImpactSocialPositifPercentage !== undefined 
-        ? Math.round(companyData.developpementImpactSocialPositifPercentage) 
-        : companyData?.socialImpactScore 
-          ? Math.round(companyData.socialImpactScore * 100) 
-          : 0;
-    
+    // Utiliser le nouveau champ developpementImpactSocialPositifPercentage s'il existe
+    const socialImpactValue = companyData?.developpementImpactSocialPositifPercentage !== undefined ? Math.round(companyData.developpementImpactSocialPositifPercentage) : companyData?.socialImpactScore ? Math.round(companyData.socialImpactScore * 100) : 0;
     const socialImpactAverage = echelonData?.socialImpactAverage || 0;
-    
     console.log("Social Impact Value for chart:", socialImpactValue);
     console.log("Social Impact Average for chart:", socialImpactAverage);
-    
     return [{
       name: 'Vos résultats',
       value: socialImpactValue
@@ -63,7 +48,6 @@ export const BarChartsGrid = ({
       value: socialImpactAverage
     }];
   };
-
   const getAverageChartData = () => {
     const totalAverage = echelonData?.totalAverage || 0;
     console.log('Valeur moyenne totale à afficher:', totalAverage);
@@ -75,7 +59,6 @@ export const BarChartsGrid = ({
       value: totalAverage
     }];
   };
-
   return <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-slate-50">
         <TieredBarChart title="Gouvernance juste et inclusive" data={getGovernanceChartData()} tiers={{
