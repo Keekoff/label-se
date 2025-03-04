@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -14,6 +13,7 @@ export type CompanyData = {
   dateValidation?: string;
   dateFinValidite?: string;
   developpementImpactSocialPositifPercentage?: number;
+  "Développement d'impact social positif (%)": string;
 };
 
 export type FetchCompanyDataResult = {
@@ -83,7 +83,6 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         const { data, error } = await supabase.functions.invoke('airtable-fetch', {
           body: { 
             companyName,
-            // Indiquer que nous filtrons par le champ "Entreprise"
             filterField: "Entreprise" 
           }
         });
@@ -101,34 +100,31 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         
         console.log('Airtable data received:', data);
 
-        // Transformation des données pour s'assurer que les valeurs sont en pourcentages
         const processedData = {
           ...data,
-          // Conversion de governanceScore en pourcentage si nécessaire
           governanceScore: data.governanceScore !== undefined 
             ? (data.governanceScore <= 1 ? data.governanceScore : data.governanceScore / 100) 
             : undefined,
           
-          // Conversion de environmentalScore en pourcentage si nécessaire
           environmentalScore: data.environmentalScore !== undefined 
             ? (data.environmentalScore <= 1 ? data.environmentalScore : data.environmentalScore / 100) 
             : undefined,
           
-          // Conversion de socialImpactScore en pourcentage si nécessaire
           socialImpactScore: data.socialImpactScore !== undefined 
             ? (data.socialImpactScore <= 1 ? data.socialImpactScore : data.socialImpactScore / 100) 
             : undefined,
           
-          // Conversion de averageScore en pourcentage si nécessaire
           averageScore: data.averageScore !== undefined 
             ? (data.averageScore <= 1 ? data.averageScore : data.averageScore / 100) 
             : undefined,
           
-          // Traitement spécial pour développement d'impact social positif
           developpementImpactSocialPositifPercentage: 
             data["Développement d'impact social positif (%)"] !== undefined 
               ? parseFloat(data["Développement d'impact social positif (%)"]) 
-              : undefined
+              : undefined,
+          
+          "Développement d'impact social positif (%)": 
+            data["Développement d'impact social positif (%)"]
         };
         
         console.log('Processed company data:', processedData);
