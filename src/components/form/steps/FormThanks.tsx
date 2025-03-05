@@ -52,10 +52,10 @@ const FormThanks = ({ onValidityChange, formState }: FormThanksProps) => {
           <div className="font-semibold text-gray-600">Prix</div>
           {pricingTiers.map((tier) => (
             <React.Fragment key={tier.range}>
-              <div className={`py-2 ${tier.range === currentTier ? 'bg-[#35DA56]/10 font-medium' : ''}`}>
+              <div className={`py-2 ${tier.range === currentTier ? 'bg-primary/5 font-medium' : ''}`}>
                 {tier.range}
               </div>
-              <div className={`py-2 ${tier.range === currentTier ? 'bg-[#35DA56]/10 font-medium' : ''}`}>
+              <div className={`py-2 ${tier.range === currentTier ? 'bg-primary/5 font-medium' : ''}`}>
                 {tier.price}
               </div>
             </React.Fragment>
