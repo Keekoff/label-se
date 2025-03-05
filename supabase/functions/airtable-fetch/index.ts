@@ -130,7 +130,7 @@ Deno.serve(async (req) => {
       { name: "Prise en compte de l'impact social", field: "Score Prise en compte de l'impact social" },
       { name: "Production : énergie & matériaux utilisés", field: "Score Production : énergie & matériaux utilisés" },
       { name: "Recyclage & gestion des déchets", field: "Score Recyclage & gestion des déchets" },
-      { name: "Éco-conception", field: "Score Éco-conception" },
+      { name: "Éco-conception", field: "Score Eco-conception" }, // Fixed: removed accent in field name
       { name: "Évaluation permanente", field: "Score Évaluation permanente" },
       { name: "Maîtrise et optimisation de la consommation de ressources énergétiques", field: "Score Maîtrise et optimisation de la consommation de ressources énergétiques" },
       { name: "Plan de contrôle / limite des émissions carbones", field: "Score Plan de contrôle / limite des émissions carbones" },
