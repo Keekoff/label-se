@@ -141,7 +141,7 @@ const DashboardLayout = () => {
           </div>
         </header>
         <main className="pt-16 min-h-screen bg-neutral-100">
-          <div className="p-6">
+          <div className="p-6 bg-[#f6f6f6]">
             <Outlet />
           </div>
         </main>
