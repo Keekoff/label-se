@@ -12,7 +12,7 @@ const FaqItem = ({ question, answer }: FaqItemProps) => {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
-    <div className="border-b border-gray-200">
+    <div className="border-b border-[#35DA56]">
       <button
         className="flex w-full items-center justify-between py-4 text-left focus:outline-none"
         onClick={() => setIsOpen(!isOpen)}
@@ -33,7 +33,7 @@ const FaqItem = ({ question, answer }: FaqItemProps) => {
           isOpen ? "max-h-96 pb-4" : "max-h-0"
         )}
       >
-        <p className="text-gray-600">{answer}</p>
+        <p className="text-gray-600 whitespace-pre-line">{answer}</p>
       </div>
     </div>
   );

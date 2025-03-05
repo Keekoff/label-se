@@ -18,6 +18,18 @@ const faqItems = [
   {
     question: "Pourquoi avoir lancé un label à destination des startups ?",
     answer: "Les certifications B Corp, EcoVadis ou autre peuvent parfois être trop contraignantes pour des entreprises en phase de lancement. Nous avons pensé un dispositif flexible et adapté aux préoccupations des startups pour allier croissance et maîtrise d'impact afin de les guider vers l'atteinte de leurs objectifs. Ce label peut être une bonne préparation aux certifications généralistes."
+  },
+  {
+    question: "Qu'est-ce que ça m'apporte ?",
+    answer: "L'obtention d'un label est la garantie qu'un tiers de confiance a vérifier vos déclarations. C'est l'assurance pour vos parties prenantes de l'intégrité de votre engagement et de votre volonté à contribuer à construire un écosystème plus durable. En partageant vos certifications et labels vous participez à établir un standard minimal pour toutes les entreprises quelque soit leur secteur et leur taille. Voici 5 bonnes raisons de rejoindre la communauté des labellisés Startup Engagée :\n\n– Faire valoir votre engagement de manière officielle et vérifiée par un tiers de confiance\n– Vous démarquer de la concurrence en rassurant vos clients sur vos engagements en évitant le greenwashing\n– Communiquer sur votre image de marque et permettre de créer de la traction pour votre entreprise\n– Donner envie aux talents de vous rejoindre, les nouvelles générations étant très sensibles aux valeurs et aux actions réalisées par les entreprises en faveur de l'impact positif\n– Créer du lien et solidifier votre écosystème en étant acteur d'un cercle vertueux de parties prenantes durables et responsables"
+  },
+  {
+    question: "Quel est le processus de labellisation ?",
+    answer: "3 étapes à suivre :\n– tester son éligibilité,\n– passer le questionnaire,\n– présenter les justificatifs demandés.\nLes résultats vous sont ensuite communiqués par les équipes dans un délai de 14 jours maximum. Vous obtenez ensuite le label Startup Engagée selon votre échelon. Un livret de résultats ainsi qu'un kit de communication à personnaliser vous sont également fournis."
+  },
+  {
+    question: "Combien ça coûte de se faire labelliser ?",
+    answer: "Nous avons fait le choix d'indexer le tarif de l'audit de labellisation sur le nombre de collaborateurs. Cela nous parait juste et cohérent avec la notion de maturité sur les sujets RSE pour les startups.\n\nTarifs 2024 :\n– Pour une entreprise de 0 à 10 collaborateurs : 99€ HT\n– Pour une entreprise de 10 à 49 : 199€ HT\n– Pour une entreprise de 50 à 99 : 249€ HT\n– Pour une entreprise de plus de 100 collaborateurs : 399€ HT Ce tarif raisonnable vise à rendre accessible ce label au plus grand nombre. Il est payant car nos équipes passent du temps sur l'audit des pièces justificatives ainsi que sur le suivi des demandes d'accompagnement des entreprises candidates."
   }
 ];
 
