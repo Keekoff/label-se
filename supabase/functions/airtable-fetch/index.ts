@@ -22,6 +22,10 @@ type CompanyData = {
   dateFinValidite?: string;
   // Champ spécifique pour le développement d'impact social positif
   developpementImpactSocialPositifPercentage?: number;
+  // Scores des critères pour le radar chart
+  criteriaScores?: {
+    [key: string]: number;
+  };
 };
 
 Deno.serve(async (req) => {
@@ -107,6 +111,45 @@ Deno.serve(async (req) => {
     const socialImpactField = record.fields['Développement d\'impact social positif (%)'];
     console.log("Valeur brute du champ développement d'impact social positif:", socialImpactField);
     
+    // Liste des critères pour le radar chart
+    const criteriaFields = [
+      { name: "Diversité", field: "Score Diversité" },
+      { name: "Égalité", field: "Score Égalité" },
+      { name: "Handicap", field: "Score Handicap" },
+      { name: "Santé des salariés/bien-être au travail", field: "Score Santé des salariés/bien-être au travail" },
+      { name: "Parentalité", field: "Score Parentalité" },
+      { name: "Formation", field: "Score Formation" },
+      { name: "Politique RSE", field: "Score Politique RSE" },
+      { name: "Privacy/Data", field: "Score Privacy/Data" },
+      { name: "Transports", field: "Score Transports" },
+      { name: "Contribution associative", field: "Score Contribution associative" },
+      { name: "Politique d'achats responsables", field: "Score Politique d'achats responsables" },
+      { name: "Numérique responsable", field: "Score Numérique responsable" },
+      { name: "Communication", field: "Score Communication" },
+      { name: "Relation fournisseurs et prestataires", field: "Score Relation fournisseurs et prestataires" },
+      { name: "Prise en compte de l'impact social", field: "Score Prise en compte de l'impact social" },
+      { name: "Production : énergie & matériaux utilisés", field: "Score Production : énergie & matériaux utilisés" },
+      { name: "Recyclage & gestion des déchets", field: "Score Recyclage & gestion des déchets" },
+      { name: "Éco-conception", field: "Score Éco-conception" },
+      { name: "Évaluation permanente", field: "Score Évaluation permanente" },
+      { name: "Maîtrise et optimisation de la consommation de ressources énergétiques", field: "Score Maîtrise et optimisation de la consommation de ressources énergétiques" },
+      { name: "Plan de contrôle / limite des émissions carbones", field: "Score Plan de contrôle / limite des émissions carbones" },
+      { name: "Gestion participative & économie circulaire", field: "Score Gestion participative & économie circulaire" }
+    ];
+    
+    // Récupération des scores des critères
+    const criteriaScores: { [key: string]: number } = {};
+    for (const criteria of criteriaFields) {
+      const score = record.fields[criteria.field];
+      if (score !== undefined) {
+        criteriaScores[criteria.name] = Number(score);
+        console.log(`Score pour ${criteria.name}: ${score}`);
+      } else {
+        console.log(`Aucun score trouvé pour ${criteria.name}`);
+        criteriaScores[criteria.name] = 0; // Valeur par défaut
+      }
+    }
+    
     // Mapping des champs Airtable en utilisant les noms exacts des champs
     const companyData: CompanyData = {
       companyName,
@@ -120,7 +163,9 @@ Deno.serve(async (req) => {
       echelonTexte: record.fields['Echelon_texte'] || '',
       logoUrl: record.fields['Logo (from Millésime)']?.[0]?.url || '',
       dateValidation: record.fields['Date validation label'] || '',
-      dateFinValidite: record.fields['Date fin validité label'] || ''
+      dateFinValidite: record.fields['Date fin validité label'] || '',
+      // Scores des critères pour le radar chart
+      criteriaScores
     };
 
     console.log(`Données d'entreprise traitées:`, companyData);

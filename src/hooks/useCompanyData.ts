@@ -14,6 +14,9 @@ export type CompanyData = {
   dateValidation?: string;
   dateFinValidite?: string;
   developpementImpactSocialPositifPercentage?: number;
+  criteriaScores?: {
+    [key: string]: number;
+  };
 };
 
 export type FetchCompanyDataResult = {
@@ -123,7 +126,10 @@ export const useCompanyData = (): FetchCompanyDataResult => {
           // Traitement du champ développement d'impact social positif
           developpementImpactSocialPositifPercentage: data.developpementImpactSocialPositifPercentage !== undefined
             ? parseFloat(data.developpementImpactSocialPositifPercentage)
-            : undefined
+            : undefined,
+            
+          // On conserve les scores des critères tels quels
+          criteriaScores: data.criteriaScores || {}
         };
         
         console.log('Processed company data:', processedData);

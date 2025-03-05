@@ -72,7 +72,12 @@ export const SustainabilityRadarChart = ({
               fill={maxScoreColor} 
               fillOpacity={0.2} 
             />
-            <Tooltip formatter={(value, name) => [`${value}`, name === "myScore" ? "Mes résultats" : "Score max"]} />
+            <Tooltip 
+              formatter={(value, name) => [
+                `${value}`, 
+                name === "myScore" ? "Mes résultats" : "Score max"
+              ]} 
+            />
             <Legend />
           </RechartsRadarChart>
         </ResponsiveContainer>
