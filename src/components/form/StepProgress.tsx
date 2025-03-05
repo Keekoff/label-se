@@ -14,12 +14,7 @@ const StepProgress = ({ steps, currentStep }: StepProgressProps) => {
         {steps.map((step, index) => (
           <div
             key={step.id}
-            className={cn(
-              "flex flex-col items-center relative min-w-[100px]",
-              index < steps.length - 1 && 
-              "after:content-[''] after:absolute after:top-4 after:left-[calc(50%+1rem)] after:w-[calc(100%-2rem)] after:h-[2px] after:bg-gray-200 after:transition-colors",
-              index < steps.length - 1 && currentStep > step.id && "after:bg-primary"
-            )}
+            className="flex flex-col items-center relative min-w-[100px]"
           >
             <div
               className={cn(

@@ -18,8 +18,7 @@ const StepIndicator = ({ currentStep }: StepIndicatorProps) => {
         <div
           key={index}
           className={cn(
-            "flex flex-col items-center space-y-2 relative w-1/3",
-            index === steps.length - 1 ? "flex-1" : "after:content-[''] after:absolute after:top-5 after:left-1/2 after:w-full after:h-[2px] after:bg-gray-200"
+            "flex flex-col items-center space-y-2 relative w-1/3"
           )}
         >
           <div
