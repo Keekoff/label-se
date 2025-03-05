@@ -16,7 +16,7 @@ export const SubmissionCard = ({
   return <Card className="border-none shadow-md bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl transition-all duration-200 hover:shadow-xl hover:scale-[1.01]">
       <CardContent className="p-6 bg-amber-200">
         <div className="space-y-6">
-          <p className="text-lg">
+          <p className="text-base text-stone-950">
             Bravo, nous avons bien reçu votre formulaire de labellisation. 
             {paymentStatus === 'unpaid' ? " Merci de procéder au paiement pour accéder aux pièces justificatives à nous envoyer, nécessaire à la validation de votre dossier." : " Vous pouvez maintenant accéder aux pièces justificatives nécessaires à la validation de votre dossier."}
           </p>
