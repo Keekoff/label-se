@@ -81,11 +81,7 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         console.log(`Fetching Airtable data for company: ${companyName}`);
         
         const { data, error } = await supabase.functions.invoke('airtable-fetch', {
-          body: { 
-            companyName,
-            // Indiquer que nous filtrons par le champ "Entreprise"
-            filterField: "Entreprise" 
-          }
+          body: { companyName }
         });
 
         if (error) {
@@ -124,11 +120,10 @@ export const useCompanyData = (): FetchCompanyDataResult => {
             ? (data.averageScore <= 1 ? data.averageScore : data.averageScore / 100) 
             : undefined,
           
-          // Traitement spécial pour développement d'impact social positif
-          developpementImpactSocialPositifPercentage: 
-            data["Développement d'impact social positif (%)"] !== undefined 
-              ? parseFloat(data["Développement d'impact social positif (%)"]) 
-              : undefined
+          // Traitement du champ développement d'impact social positif
+          developpementImpactSocialPositifPercentage: data.developpementImpactSocialPositifPercentage !== undefined
+            ? parseFloat(data.developpementImpactSocialPositifPercentage)
+            : undefined
         };
         
         console.log('Processed company data:', processedData);

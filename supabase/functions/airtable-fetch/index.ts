@@ -20,6 +20,8 @@ type CompanyData = {
   logoUrl?: string;
   dateValidation?: string;
   dateFinValidite?: string;
+  // Champ spécifique pour le développement d'impact social positif
+  developpementImpactSocialPositifPercentage?: number;
 };
 
 Deno.serve(async (req) => {
@@ -50,7 +52,7 @@ Deno.serve(async (req) => {
     
     // Mise à jour avec les bons IDs de base Airtable et le nom de table correct
     const baseId = 'app7al7op0zAJYssh';
-    const tableName = 'Entreprises'; // Nom de table correct
+    const tableName = 'Entreprises'; // Nom correct de la table
     const encodedTableName = encodeURIComponent(tableName);
     
     // Construction de l'URL de l'API Airtable
@@ -102,8 +104,8 @@ Deno.serve(async (req) => {
     console.log("Champs disponibles:", Object.keys(record.fields));
     
     // Obtenir et afficher les valeurs exactes pour le débogage
-    const socialImpactScoreField = record.fields['Développement d\'impact social positif %'];
-    console.log("Valeur brute du champ social impact:", socialImpactScoreField);
+    const socialImpactField = record.fields['Développement d\'impact social positif (%)'];
+    console.log("Valeur brute du champ développement d'impact social positif:", socialImpactField);
     
     // Mapping des champs Airtable en utilisant les noms exacts des champs
     const companyData: CompanyData = {
@@ -112,6 +114,8 @@ Deno.serve(async (req) => {
       environmentalScore: record.fields['Maitrise d\'impact environnemental et développement durable %'] || 0,
       socialImpactScore: record.fields['Développement d\'impact social positif %'] || 0,
       averageScore: record.fields['TOTAL %'] || 0,
+      // Champ spécifique pour le développement d'impact social positif
+      developpementImpactSocialPositifPercentage: record.fields['Développement d\'impact social positif (%)'] || 0,
       // Champs pour la certification
       echelonTexte: record.fields['Echelon_texte'] || '',
       logoUrl: record.fields['Logo (from Millésime)']?.[0]?.url || '',

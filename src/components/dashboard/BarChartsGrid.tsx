@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { TieredBarChart } from "@/components/ui/charts/TieredBarChart";
 import { CompanyData } from "@/hooks/useCompanyData";
@@ -35,8 +36,13 @@ export const BarChartsGrid = ({
     }];
   };
   const getSocialImpactChartData = () => {
-    // Utiliser le nouveau champ developpementImpactSocialPositifPercentage s'il existe
-    const socialImpactValue = companyData?.developpementImpactSocialPositifPercentage !== undefined ? Math.round(companyData.developpementImpactSocialPositifPercentage) : companyData?.socialImpactScore ? Math.round(companyData.socialImpactScore * 100) : 0;
+    // Utiliser le champ developpementImpactSocialPositifPercentage en priorité
+    const socialImpactValue = companyData?.developpementImpactSocialPositifPercentage !== undefined 
+      ? Math.round(companyData.developpementImpactSocialPositifPercentage) 
+      : companyData?.socialImpactScore 
+        ? Math.round(companyData.socialImpactScore * 100) 
+        : 0;
+    
     const socialImpactAverage = echelonData?.socialImpactAverage || 0;
     console.log("Social Impact Value for chart:", socialImpactValue);
     console.log("Social Impact Average for chart:", socialImpactAverage);
