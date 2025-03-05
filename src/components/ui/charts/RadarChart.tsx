@@ -55,7 +55,7 @@ export const SustainabilityRadarChart = ({
             />
             <PolarRadiusAxis 
               angle={30} 
-              domain={[0, 10]} 
+              domain={[0, 'auto']} 
               tickCount={6}
             />
             <Radar 
