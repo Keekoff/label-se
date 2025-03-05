@@ -114,7 +114,7 @@ Deno.serve(async (req) => {
     // Liste des critères pour le radar chart
     const criteriaFields = [
       { name: "Diversité", field: "Score Diversité" },
-      { name: "Égalité", field: "Score Égalité" },
+      { name: "Égalité", field: "Score Egalité" }, // Fixed: removed accent in field name
       { name: "Handicap", field: "Score Handicap" },
       { name: "Santé des salariés/bien-être au travail", field: "Score Santé des salariés/bien-être au travail" },
       { name: "Parentalité", field: "Score Parentalité" },
