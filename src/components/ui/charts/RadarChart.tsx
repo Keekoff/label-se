@@ -20,8 +20,8 @@ export interface RadarDataPoint {
 export const SustainabilityRadarChart = ({ 
   data, 
   title,
-  myScoreColor = "#0EA5E9",
-  maxScoreColor = "#35DA56" 
+  myScoreColor = "#35DA56",
+  maxScoreColor = "#27017F" 
 }: { 
   data: RadarDataPoint[];
   title: string;
@@ -55,7 +55,7 @@ export const SustainabilityRadarChart = ({
             />
             <PolarRadiusAxis 
               angle={30} 
-              domain={[0, 100]} 
+              domain={[0, 10]} 
               tickCount={6}
             />
             <Radar 
@@ -72,7 +72,7 @@ export const SustainabilityRadarChart = ({
               fill={maxScoreColor} 
               fillOpacity={0.2} 
             />
-            <Tooltip />
+            <Tooltip formatter={(value, name) => [`${value}`, name === "myScore" ? "Mes résultats" : "Score max"]} />
             <Legend />
           </RechartsRadarChart>
         </ResponsiveContainer>
