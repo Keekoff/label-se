@@ -13,7 +13,7 @@ const AIRTABLE_TABLE_NAME = "Echelons";
 // Définir les noms exacts des champs dans Airtable
 const GOVERNANCE_FIELD = "Moyenne gouvernance juste et inclusive (%)";
 const SOCIAL_IMPACT_FIELD = "Moyenne développement d'impact social positif (%)";
-const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et DD (%)";
+const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et développement durable (%)";
 const TOTAL_AVERAGE_FIELD = "Moyenne TOTAL (%)";
 
 serve(async (req) => {
@@ -60,6 +60,10 @@ serve(async (req) => {
     // Traiter et formater les données
     const transformedData = data.records.map(record => {
       const fields = record.fields;
+      
+      // Log tous les champs disponibles pour le débogage
+      console.log('Champs disponibles dans Airtable pour l\'échelon', fields.Echelon, ':', Object.keys(fields));
+      console.log('Valeur brute du champ environnemental:', fields[ENVIRONMENTAL_FIELD]);
       
       // Extraire les valeurs des champs avec vérification
       let governanceAverage = 0;

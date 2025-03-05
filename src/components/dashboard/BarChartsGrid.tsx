@@ -1,3 +1,4 @@
+
 import { Card } from "@/components/ui/card";
 import { TieredBarChart } from "@/components/ui/charts/TieredBarChart";
 import { CompanyData } from "@/hooks/useCompanyData";
