@@ -7,7 +7,6 @@ import {
   PolarRadiusAxis, 
   Radar, 
   Tooltip, 
-  Legend, 
   ResponsiveContainer 
 } from "recharts"
 
@@ -55,7 +54,7 @@ export const SustainabilityRadarChart = ({
             />
             <PolarRadiusAxis 
               angle={30} 
-              domain={[0, 'auto']} 
+              domain={[0, 8]} 
               tickCount={6}
             />
             <Radar 
@@ -78,7 +77,6 @@ export const SustainabilityRadarChart = ({
                 name === "myScore" ? "Mes résultats" : "Score max"
               ]} 
             />
-            <Legend />
           </RechartsRadarChart>
         </ResponsiveContainer>
       </div>
