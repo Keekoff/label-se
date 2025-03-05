@@ -7,7 +7,6 @@ import FormPart1 from "@/components/form/steps/FormPart1";
 import FormPart2 from "@/components/form/steps/FormPart2";
 import FormPart3 from "@/components/form/steps/FormPart3";
 import FormThanks from "@/components/form/steps/FormThanks";
-import { SubmissionModal } from "@/components/form/SubmissionModal";
 import { FormState, FormStep } from "./types";
 import { FORM_STEPS, INITIAL_FORM_STATE } from "./constants";
 import { useFormSubmission } from "./useFormSubmission";
@@ -17,7 +16,6 @@ const Form = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(FORM_STEPS);
-  const [showSubmissionModal, setShowSubmissionModal] = useState(false);
 
   const { submissionId, handleSave, handleSubmit } = useFormSubmission(formState, setCurrentStep);
 
@@ -46,7 +44,9 @@ const Form = () => {
   const onSubmit = async () => {
     try {
       await handleSubmit();
-      setShowSubmissionModal(true);
+      // Directly move to the thanks page instead of showing the modal
+      setCurrentStep(6);
+      window.scrollTo(0, 0);
     } catch (error) {
       console.error("Erreur lors de la soumission:", error);
     }
@@ -116,12 +116,6 @@ const Form = () => {
           />
         </div>
       </div>
-
-      <SubmissionModal 
-        open={showSubmissionModal}
-        onOpenChange={setShowSubmissionModal}
-        submissionId={submissionId}
-      />
     </div>
   );
 };
