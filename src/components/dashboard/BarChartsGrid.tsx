@@ -1,4 +1,3 @@
-
 import { Card } from "@/components/ui/card";
 import { TieredBarChart } from "@/components/ui/charts/TieredBarChart";
 import { CompanyData } from "@/hooks/useCompanyData";
@@ -41,9 +40,8 @@ export const BarChartsGrid = ({
   };
 
   const getSocialImpactChartData = () => {
-    // Utiliser le champ developpementImpactSocialPositifPercentage en priorité
     const socialImpactValue = companyData?.developpementImpactSocialPositifPercentage !== undefined 
-      ? Math.round(companyData.developpementImpactSocialPositifPercentage) 
+      ? Math.round(companyData.developpementImpactSocialPositifPercentage * 100) 
       : companyData?.socialImpactScore 
         ? Math.round(companyData.socialImpactScore * 100) 
         : 0;
