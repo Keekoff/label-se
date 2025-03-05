@@ -11,6 +11,7 @@ import Form from "./pages/Dashboard/Form";
 import Justificatifs from "./pages/Dashboard/Justificatifs";
 import Payments from "./pages/Dashboard/Payments";
 import Profil from "./pages/Dashboard/Profil";
+import Faq from "./pages/Faq";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "sonner";
 
@@ -29,6 +30,7 @@ function App() {
           <Route path="payments" element={<Payments />} />
           <Route path="profil" element={<Profil />} />
           <Route path="settings" element={<div>Settings Page</div>} />
+          <Route path="faq" element={<Faq />} />
         </Route>
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />

@@ -1,16 +1,18 @@
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt, Upload } from "lucide-react";
+import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt, Upload, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [hasPaid, setHasPaid] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -67,16 +69,22 @@ const DashboardLayout = () => {
     });
     return () => subscription.unsubscribe();
   }, [navigate, location.pathname]);
+
   const baseMenuItems = [{
     icon: LayoutDashboard,
     label: "Tableau de bord",
     path: "/dashboard"
   }, {
+    icon: HelpCircle,
+    label: "FAQ",
+    path: "/dashboard/faq"
+  }, {
     icon: Settings,
     label: "Paramètres",
     path: "/dashboard/settings"
   }];
-  const menuItems = hasPaid ? [...baseMenuItems.slice(0, 1), {
+
+  const menuItems = hasPaid ? [...baseMenuItems.slice(0, 2), {
     icon: Upload,
     label: "Justificatifs",
     path: "/dashboard/justificatifs"
@@ -84,12 +92,14 @@ const DashboardLayout = () => {
     icon: Receipt,
     label: "Mes paiements",
     path: "/dashboard/payments"
-  }, ...baseMenuItems.slice(1)] : baseMenuItems;
+  }, ...baseMenuItems.slice(2)] : baseMenuItems;
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
       Chargement...
     </div>;
   }
+
   return <div className="min-h-screen bg-background">
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
@@ -148,4 +158,5 @@ const DashboardLayout = () => {
       </div>
     </div>;
 };
+
 export default DashboardLayout;
