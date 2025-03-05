@@ -1,6 +1,5 @@
-
 import { Card } from "@/components/ui/card";
-import { TieredBarChart } from "@/components/ui/chart";
+import { TieredBarChart } from "@/components/ui/charts/TieredBarChart";
 
 interface ErrorDisplayProps {
   error: string;
