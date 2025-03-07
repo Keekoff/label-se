@@ -7,6 +7,7 @@ import { CertificationCard } from "./CertificationCard";
 import { ErrorDisplay } from "./ErrorDisplay";
 import { BarChartsGrid } from "./BarChartsGrid";
 import { RadarChartCard } from "./RadarChartCard";
+import { ImprovementSuggestions } from "./ImprovementSuggestions";
 
 export const DashboardCharts = () => {
   const { 
@@ -64,6 +65,7 @@ export const DashboardCharts = () => {
       <div ref={chartsContainerRef} className="space-y-6">
         <BarChartsGrid companyData={companyData} />
         <RadarChartCard />
+        <ImprovementSuggestions />
       </div>
     </div>
   );
