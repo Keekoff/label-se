@@ -45,17 +45,17 @@ const FormThanks = ({ onValidityChange, formState }: FormThanksProps) => {
         Nous avons bien reçu votre dossier et nous reviendrons vers vous dans les plus brefs délais.
       </p>
 
-      <Card className="p-6 mt-8">
+      <Card className="p-6 mt-8 shadow-md bg-white/95 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
         <h3 className="text-xl font-semibold mb-6">Grille tarifaire</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="font-semibold text-gray-600">Nombre de collaborateurs</div>
           <div className="font-semibold text-gray-600">Prix</div>
           {pricingTiers.map((tier) => (
             <React.Fragment key={tier.range}>
-              <div className={`py-2 ${tier.range === currentTier ? 'bg-primary/5 font-medium' : ''}`}>
+              <div className={`py-2 ${tier.range === currentTier ? 'bg-[#35DA56]/10 font-medium' : ''}`}>
                 {tier.range}
               </div>
-              <div className={`py-2 ${tier.range === currentTier ? 'bg-primary/5 font-medium' : ''}`}>
+              <div className={`py-2 ${tier.range === currentTier ? 'bg-[#35DA56]/10 font-medium' : ''}`}>
                 {tier.price}
               </div>
             </React.Fragment>
@@ -69,7 +69,7 @@ const FormThanks = ({ onValidityChange, formState }: FormThanksProps) => {
       <div className="flex justify-center gap-4 pt-4">
         <Button 
           onClick={handlePay}
-          className="bg-primary hover:bg-primary/90"
+          className="bg-[#35DA56] hover:bg-[#35DA56]/90 shadow-sm hover:shadow-md"
         >
           <CreditCard className="mr-2 h-4 w-4" />
           Payer maintenant
@@ -77,6 +77,7 @@ const FormThanks = ({ onValidityChange, formState }: FormThanksProps) => {
         <Button 
           variant="outline"
           onClick={() => navigate("/dashboard")}
+          className="shadow-sm hover:shadow-md"
         >
           <LayoutDashboard className="mr-2 h-4 w-4" />
           Tableau de bord

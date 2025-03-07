@@ -24,6 +24,24 @@
   }
 }
 
+@layer utilities {
+  .glass {
+    @apply backdrop-blur-sm bg-white/80 shadow-sm border border-white/20;
+  }
+  .glass-card {
+    @apply backdrop-blur-sm bg-white/90 shadow-md border border-white/40 transition-all duration-300 hover:shadow-lg;
+  }
+  .glass-primary {
+    @apply backdrop-blur-sm bg-primary/95 shadow-md border border-primary/20;
+  }
+  .subtle-shadow {
+    @apply shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)];
+  }
+  .hover-lift {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-md;
+  }
+}
+
 .fade-enter {
   opacity: 0;
   transform: translateY(10px);

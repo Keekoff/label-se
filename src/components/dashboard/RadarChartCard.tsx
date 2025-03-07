@@ -46,7 +46,7 @@ export const RadarChartCard = () => {
 
   if (isLoading) {
     return (
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[600px] md:col-span-2 chart-card bg-slate-50">
+      <Card className="p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-[600px] md:col-span-2 chart-card bg-slate-50/90 backdrop-blur-sm">
         <div className="flex items-center justify-center h-full">
           <p className="text-gray-500">Chargement des données...</p>
         </div>
@@ -55,7 +55,7 @@ export const RadarChartCard = () => {
   }
 
   return (
-    <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[600px] md:col-span-2 chart-card bg-slate-50">
+    <Card className="p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-[600px] md:col-span-2 chart-card bg-slate-50/90 backdrop-blur-sm">
       <SustainabilityRadarChart 
         title="Analyse comparative des critères de durabilité" 
         data={radarData} 

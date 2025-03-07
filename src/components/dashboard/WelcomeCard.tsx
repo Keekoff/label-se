@@ -7,8 +7,8 @@ export const WelcomeCard = () => {
   const navigate = useNavigate();
   
   return (
-    <Card className="border-none shadow-md bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl transition-all duration-200 hover:shadow-xl hover:scale-[1.01]">
-      <CardContent className="p-6 rounded-xl bg-[8985FF] bg-[#8a86ff]">
+    <Card className="border-none shadow-lg bg-gradient-to-br from-primary/5 to-secondary/5 rounded-xl transition-all duration-300 hover:shadow-xl hover:scale-[1.01] backdrop-blur-sm">
+      <CardContent className="p-6 rounded-xl bg-white/80 backdrop-blur-sm">
         <div className="space-y-4">
           <h2 className="text-xl text-primary font-extrabold">Label Startup Engagée</h2>
           <p className="text-base font-semibold">
@@ -21,7 +21,7 @@ export const WelcomeCard = () => {
             Vous disposez de 30 jours pour compléter le questionnaire.<br />
             Nous restons disponibles si besoin !
           </p>
-          <Button onClick={() => navigate("/dashboard/form")} className="mt-4 text-slate-50 bg-[27017F] bg-[#27017e]">
+          <Button onClick={() => navigate("/dashboard/form")} className="mt-4 text-slate-50 bg-[#35DA56] hover:bg-[#2EB449] shadow-sm hover:shadow-md">
             Remplir le questionnaire
           </Button>
         </div>

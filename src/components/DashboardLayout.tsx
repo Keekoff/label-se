@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt, Upload, HelpCircle } from "lucide-react";
@@ -101,8 +102,8 @@ const DashboardLayout = () => {
   }
 
   return <div className="min-h-screen bg-background">
-      <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30`}>
-        <div className="flex items-center justify-between p-4 h-16 border-b border-white/10">
+      <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30 shadow-lg`}>
+        <div className="flex items-center justify-between p-4 h-16 border-b border-white/10 backdrop-blur-sm bg-primary/95">
           <div className="text-slate-50 text-base font-bold">
             {sidebarOpen ? <img src="/lovable-uploads/de6325b8-2d80-4327-963c-d4a068f337fe.png" alt="Logo" className="h-10" /> : <img src="/lovable-uploads/de6325b8-2d80-4327-963c-d4a068f337fe.png" alt="Logo" className="h-6" />}
           </div>
@@ -111,7 +112,7 @@ const DashboardLayout = () => {
           </Button>
         </div>
         <nav className="p-4 space-y-2">
-          {menuItems.map(item => <Button key={item.path} variant="ghost" className={`w-full justify-start text-white hover:bg-[#8985FF] ${!sidebarOpen && "justify-center"} ${location.pathname === item.path ? "bg-[#35DA56]" : ""}`} onClick={() => navigate(item.path)}>
+          {menuItems.map(item => <Button key={item.path} variant="ghost" className={`w-full justify-start text-white hover:bg-[#8985FF] ${!sidebarOpen && "justify-center"} ${location.pathname === item.path ? "bg-[#35DA56]" : ""} transition-all duration-300`} onClick={() => navigate(item.path)}>
               <item.icon className="h-4 w-4 mr-2" />
               {sidebarOpen && <span>{item.label}</span>}
             </Button>)}
@@ -119,27 +120,27 @@ const DashboardLayout = () => {
       </div>
 
       <div className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
-        <header className="h-16 border-b border-border bg-white/80 backdrop-blur-sm fixed top-0 right-0 left-auto w-full z-20">
+        <header className="h-16 border-b border-border bg-white/80 backdrop-blur-sm fixed top-0 right-0 left-auto w-full z-20 shadow-sm">
           <div className="flex items-center justify-end h-full px-6">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="relative h-9 w-9 rounded-full">
+                <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:bg-gray-100/50">
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-56 bg-white" align="end" forceMount>
+              <DropdownMenuContent className="w-56 bg-white/95 backdrop-blur-sm shadow-md" align="end" forceMount>
                 <DropdownMenuLabel>Mon compte</DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => navigate("/dashboard/profil")}>
+                <DropdownMenuItem onClick={() => navigate("/dashboard/profil")} className="hover:bg-gray-100/70">
                   <User className="mr-2 h-4 w-4" />
                   <span>Mon profil</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")}>
+                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")} className="hover:bg-gray-100/70">
                   <Settings className="mr-2 h-4 w-4" />
                   <span>Paramètres</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem className="text-red-600" onClick={async () => {
+                <DropdownMenuItem className="text-red-600 hover:bg-red-50/70" onClick={async () => {
                 await supabase.auth.signOut();
                 navigate("/login");
               }}>
@@ -150,8 +151,8 @@ const DashboardLayout = () => {
             </DropdownMenu>
           </div>
         </header>
-        <main className="pt-16 min-h-screen bg-neutral-100">
-          <div className="p-6 bg-[#f9f9f9]/[0.31]">
+        <main className="pt-16 min-h-screen bg-neutral-100/80">
+          <div className="p-6 bg-[#f9f9f9]/[0.31] backdrop-blur-sm">
             <Outlet />
           </div>
         </main>

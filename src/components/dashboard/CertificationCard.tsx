@@ -20,7 +20,7 @@ export const formatDate = (dateString: string | undefined) => {
 
 export const CertificationCard = ({ companyData }: CertificationCardProps) => {
   return (
-    <div className="bg-white border-2 border-[#35DA56] rounded-lg p-4 shadow-sm animate-fadeIn">
+    <div className="bg-white/90 backdrop-blur-sm border-2 border-[#35DA56] rounded-lg p-4 shadow-md animate-fadeIn transition-all duration-300 hover:shadow-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
@@ -31,7 +31,7 @@ export const CertificationCard = ({ companyData }: CertificationCardProps) => {
           <p className="text-gray-600">Début de validité : {formatDate(companyData?.dateValidation)}</p>
           <p className="text-gray-600">Fin de validité : {formatDate(companyData?.dateFinValidite)}</p>
         </div>
-        <div className="h-24 w-40 bg-gray-100 rounded flex items-center justify-center overflow-hidden">
+        <div className="h-24 w-40 bg-gray-100/80 backdrop-blur-sm rounded flex items-center justify-center overflow-hidden shadow-inner">
           {companyData?.logoUrl ? (
             <img 
               src={companyData.logoUrl} 
