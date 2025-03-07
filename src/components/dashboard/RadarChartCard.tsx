@@ -1,6 +1,8 @@
+
 import { Card } from "@/components/ui/card";
 import { SustainabilityRadarChart, RadarDataPoint } from "@/components/ui/charts/RadarChart";
 import { useCompanyData } from "@/hooks/useCompanyData";
+
 export const RadarChartCard = () => {
   const {
     companyData,
@@ -89,6 +91,7 @@ export const RadarChartCard = () => {
       maxScore
     };
   });
+  
   if (isLoading) {
     return <Card className="p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-[600px] md:col-span-2 chart-card bg-slate-50/90 backdrop-blur-sm">
         <div className="flex items-center justify-center h-full">
@@ -96,6 +99,7 @@ export const RadarChartCard = () => {
         </div>
       </Card>;
   }
+  
   return <Card className="p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-[600px] md:col-span-2 chart-card backdrop-blur-sm bg-white">
       <SustainabilityRadarChart title="Analyse comparative des critères de durabilité" data={radarData} myScoreColor="#35DA56" maxScoreColor="#27017F" />
     </Card>;

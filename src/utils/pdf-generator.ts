@@ -54,9 +54,77 @@ export const generateChartsPDF = async (
       pdf.text(`Validité: ${formatDate(chartData.dateValidation)} - ${formatDate(chartData.dateFinValidite)}`, 20, 46);
     }
     
-    // Capturer et ajouter les graphiques
-    const charts = chartsContainerRef.current.querySelectorAll('.chart-card');
-    const chartPromises = Array.from(charts).map(async (chart, index) => {
+    // Identifier et capturer le graphique radar en premier pour l'afficher en pleine largeur
+    const radarChart = chartsContainerRef.current.querySelector('.md\\:col-span-2.chart-card');
+    if (radarChart) {
+      const radarCanvas = await html2canvas(radarChart as HTMLElement, {
+        scale: 2,
+        logging: false,
+        useCORS: true,
+        allowTaint: true,
+      });
+      
+      const radarImgData = radarCanvas.toDataURL('image/png');
+      const radarImgWidth = 170; // Utiliser presque toute la largeur de la page
+      const radarImgHeight = (radarCanvas.height * radarImgWidth) / radarCanvas.width;
+      
+      // Centrer horizontalement
+      const centerX = (pdfWidth - radarImgWidth) / 2;
+      pdf.addImage(radarImgData, 'PNG', centerX, 55, radarImgWidth, radarImgHeight);
+      
+      // Avancer la position Y pour les prochains éléments
+      let currentY = 55 + radarImgHeight + 10;
+      
+      // Capturer et ajouter les pistes d'amélioration
+      const improvementCards = chartsContainerRef.current.querySelectorAll('.improvement-card');
+      if (improvementCards && improvementCards.length > 0) {
+        pdf.setFontSize(14);
+        pdf.setTextColor(39, 1, 127); // #27017F
+        pdf.text("Pistes d'amélioration", pdfWidth / 2, currentY, { align: 'center' });
+        currentY += 10;
+        
+        for (let i = 0; i < improvementCards.length; i++) {
+          const card = improvementCards[i];
+          const cardCanvas = await html2canvas(card as HTMLElement, {
+            scale: 2,
+            logging: false,
+            useCORS: true,
+            allowTaint: true,
+          });
+          
+          const cardImgData = cardCanvas.toDataURL('image/png');
+          const cardImgWidth = 170;
+          const cardImgHeight = (cardCanvas.height * cardImgWidth) / cardCanvas.width;
+          
+          // Vérifier si on a besoin d'une nouvelle page
+          if (currentY + cardImgHeight > pdfHeight - 20) {
+            pdf.addPage();
+            currentY = 20;
+          }
+          
+          // Centrer horizontalement
+          const cardCenterX = (pdfWidth - cardImgWidth) / 2;
+          pdf.addImage(cardImgData, 'PNG', cardCenterX, currentY, cardImgWidth, cardImgHeight);
+          
+          currentY += cardImgHeight + 10;
+        }
+      }
+      
+      // Ajouter une nouvelle page pour les autres graphiques si nécessaire
+      pdf.addPage();
+      currentY = 20;
+      
+      // Ajouter un titre pour les graphiques détaillés
+      pdf.setFontSize(14);
+      pdf.setTextColor(39, 1, 127); // #27017F
+      pdf.text("Graphiques détaillés", pdfWidth / 2, currentY, { align: 'center' });
+      currentY += 10;
+    }
+    
+    // Capturer et ajouter les autres graphiques (barres, etc.)
+    const otherCharts = Array.from(chartsContainerRef.current.querySelectorAll('.chart-card:not(.md\\:col-span-2)'));
+    
+    const chartPromises = otherCharts.map(async (chart, index) => {
       const canvas = await html2canvas(chart as HTMLElement, {
         scale: 2,
         logging: false,
@@ -64,33 +132,46 @@ export const generateChartsPDF = async (
         allowTaint: true,
       });
       
-      const imgData = canvas.toDataURL('image/png');
-      
-      const isEvenIndex = index % 2 === 0;
-      const row = Math.floor(index / 2);
-      
-      const imgWidth = 80;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      const xPos = isEvenIndex ? 15 : pdfWidth - imgWidth - 15;
-      const yPos = 55 + (row * (imgHeight + 10));
-      
-      if (yPos + imgHeight > pdfHeight && index < charts.length - 1) {
-        pdf.addPage();
-        return { imgData, xPos, yPos: 20, imgWidth, imgHeight };
-      }
-      
-      return { imgData, xPos, yPos, imgWidth, imgHeight };
+      return {
+        imgData: canvas.toDataURL('image/png'),
+        width: canvas.width,
+        height: canvas.height,
+      };
     });
     
-    const chartPositions = await Promise.all(chartPromises);
+    const chartImages = await Promise.all(chartPromises);
     
-    chartPositions.forEach((chart, index) => {
-      if (index === 4) {
-        pdf.addPage();
-        chart.yPos = 20;
+    let currentY = 30; // Position Y initiale sur la nouvelle page
+    let currentPage = 1; // On considère que le radar est sur la page 1 et les autres graphiques commencent sur la page 2
+    
+    chartImages.forEach((chartImg, index) => {
+      const isEvenIndex = index % 2 === 0;
+      
+      // Dimensions des graphiques sur la page
+      const imgWidth = 80;
+      const imgHeight = (chartImg.height * imgWidth) / chartImg.width;
+      
+      // Positionner les graphiques en 2 colonnes
+      const xPos = isEvenIndex ? 15 : pdfWidth - imgWidth - 15;
+      
+      // Si ce n'est pas un index pair, on ne change pas currentY car on place à droite
+      if (isEvenIndex && index > 0) {
+        currentY += imgHeight + 10;
       }
       
-      pdf.addImage(chart.imgData, 'PNG', chart.xPos, chart.yPos, chart.imgWidth, chart.imgHeight);
+      // Vérifier s'il faut ajouter une nouvelle page
+      if (currentY + imgHeight > pdfHeight - 20) {
+        pdf.addPage();
+        currentPage++;
+        currentY = 20;
+      }
+      
+      pdf.addImage(chartImg.imgData, 'PNG', xPos, currentY, imgWidth, imgHeight);
+      
+      // Si c'est le dernier élément d'une paire, augmenter currentY
+      if (!isEvenIndex || index === chartImages.length - 1) {
+        currentY += imgHeight + 10;
+      }
     });
     
     // Générer le nom du fichier et le sauvegarder

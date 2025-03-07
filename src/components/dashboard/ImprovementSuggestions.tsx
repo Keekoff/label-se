@@ -202,7 +202,7 @@ export const ImprovementSuggestions = () => {
         {topImprovementSuggestions.map((suggestion, index) => (
           <Card 
             key={index} 
-            className="transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white/90 backdrop-blur-sm"
+            className="improvement-card transition-all duration-300 hover:shadow-xl hover:-translate-y-1 bg-white/90 backdrop-blur-sm"
           >
             <CardHeader>
               <CardTitle className="text-lg flex items-center">
