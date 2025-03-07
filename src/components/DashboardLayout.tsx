@@ -144,7 +144,7 @@ const DashboardLayout = () => {
             </DropdownMenu>
           </div>
         </header>
-        <main className="pt-16 min-h-screen bg-neutral-100/80">
+        <main className="pt-16 min-h-screen bg-white">
           <div className="p-6 backdrop-blur-sm bg-white">
             <Outlet />
           </div>
