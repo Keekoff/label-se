@@ -133,7 +133,7 @@ Deno.serve(async (req) => {
       { name: "Éco-conception", field: "Score Eco-conception" }, // Fixed: removed accent in field name
       { name: "Évaluation permanente", field: "Score Évaluation permanente" },
       { name: "Maîtrise et optimisation de la consommation de ressources énergétiques", field: "Score Maîtrise et optimisation de la consommation de ressources énergétiques" },
-      { name: "Plan de contrôle / limite des émissions carbones", field: "Score Plan de contrôle / limite des émissions carbones" },
+      { name: "Plan de contrôle / limite des émissions carbones", field: "Score Plan de controle / limite des émissions carbones" }, // Corrigé : suppression de l'accent dans le nom du champ
       { name: "Gestion participative & économie circulaire", field: "Score Gestion participative & économie circulaire" }
     ];
     
