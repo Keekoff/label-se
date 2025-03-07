@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt, Upload, HelpCircle } from "lucide-react";
@@ -6,14 +5,12 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [hasPaid, setHasPaid] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -70,7 +67,6 @@ const DashboardLayout = () => {
     });
     return () => subscription.unsubscribe();
   }, [navigate, location.pathname]);
-
   const baseMenuItems = [{
     icon: LayoutDashboard,
     label: "Tableau de bord",
@@ -84,7 +80,6 @@ const DashboardLayout = () => {
     label: "Paramètres",
     path: "/dashboard/settings"
   }];
-
   const menuItems = hasPaid ? [...baseMenuItems.slice(0, 2), {
     icon: Upload,
     label: "Justificatifs",
@@ -94,13 +89,11 @@ const DashboardLayout = () => {
     label: "Mes paiements",
     path: "/dashboard/payments"
   }, ...baseMenuItems.slice(2)] : baseMenuItems;
-
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
       Chargement...
     </div>;
   }
-
   return <div className="min-h-screen bg-background">
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30 shadow-lg`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10 backdrop-blur-sm bg-primary/95">
@@ -152,12 +145,11 @@ const DashboardLayout = () => {
           </div>
         </header>
         <main className="pt-16 min-h-screen bg-neutral-100/80">
-          <div className="p-6 bg-[#f9f9f9]/[0.31] backdrop-blur-sm">
+          <div className="p-6 backdrop-blur-sm bg-slate-50">
             <Outlet />
           </div>
         </main>
       </div>
     </div>;
 };
-
 export default DashboardLayout;
