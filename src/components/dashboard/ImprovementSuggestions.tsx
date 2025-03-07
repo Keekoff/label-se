@@ -59,6 +59,61 @@ const improvementAxes = [
     criteria: "Politique d'achats responsables",
     axis: "On peut faire le lien ici entre achats responsable et impact social positif, 2 indicateurs sur lesquels la marge de progression est importante. Privilégier le sourcing auprès de fournisseurs engagés participe à développer une chaîne de valeur positive et à rayonner dans votre écosystème. Être prescripteur compte.",
     order: 11
+  },
+  {
+    criteria: "Numérique responsable",
+    axis: "La société se digitalise et pour fonctionner les entreprises ont besoin d'équipements informatiques, d'outils, de solutions logicielles ou encore d'héberger des données. La sobriété numérique peut devenir un vrai objectif. Rationaliser l'utilisation de services numériques limite l'empreinte carbone. Le numérique n'est pas une industrie immatérielle, il faut agir avec responsabilité. On peut garder plus longtemps son ordinateur, son portable ou encore faire le choix du reconditionné par exemple.",
+    order: 12
+  },
+  {
+    criteria: "Communication",
+    axis: "",
+    order: 13
+  },
+  {
+    criteria: "Relation fournisseurs et prestataires",
+    axis: "Sélectionner avec soin les entreprises fournisseurs et prestataires qui on travaille est indispensable à la création d'un écosystème favorisant l'impact positif. Devenir un moteur dans son écosystème permet de normaliser les démarches d'impact positif et de valoriser les acteurs engagés.",
+    order: 14
+  },
+  {
+    criteria: "Prise en compte de l'impact social",
+    axis: "Une startup, même si elle est encore qu'au début de sa croissance, a un impact sur son environnement proche. Proche au sens géographique - sa région, sa localité - mais également au sens de partenaires directs - ses clients, ses fournisseurs, ses distributeurs, ses prestataires. Créatrice de valeur, d'emploi ou vecteur d'innovation pour stimuler un secteur, la startup a des effets sur son entourage, au-delà d'elle-même. Cet impact est à ne pas négliger.",
+    order: 15
+  },
+  {
+    criteria: "Production : énergie & matériaux utilisés",
+    axis: "",
+    order: 16
+  },
+  {
+    criteria: "Recyclage & gestion des déchets",
+    axis: "Le recyclage et sa promotion auprès tant des collaborateurs que des clients et fournisseurs fait souvent suite à la mise en place d'une meilleure gestion du cycle de vie des produits utilisés par et pour l'entreprise. C'est un point à ne pas négliger et pour lequel de petites actions à faible coût ont un fort impact.",
+    order: 17
+  },
+  {
+    criteria: "Éco-conception",
+    axis: "",
+    order: 18
+  },
+  {
+    criteria: "Évalution permanente",
+    axis: "Cette idée d'évaluation permanente est corrélée avec celle d'amélioration continue. Cela implique d'auditer de manière régulière ses processus, ses produits, ses fournisseurs mais également de former ses parties prenantes au changement. Ce concept illustre la nécessité de prendre du recul sur ce que l'on produit pour écouter les feedbacks et itérer.",
+    order: 19
+  },
+  {
+    criteria: "Maîtrise et optimisation de la consommation de ressources énergétiques",
+    axis: "À l'échelle d'une jeune entreprise, l'enjeu de maîtrise des ressources énergétiques et leur optimisation n'est pas forcément le point de focus alors que ce sont souvent des réflexes qu'il est très facile d'adopter. Elle vient renforcer vos usages en termes d'énergie et de choix de votre matériel mais également vos choix de fournisseurs (chauffage, climatisation, consommation électrique) le tout est déjà d'avoir conscience de son impact et de le partager.",
+    order: 20
+  },
+  {
+    criteria: "Plan de controle / limite des émissions carbones",
+    axis: "",
+    order: 21
+  },
+  {
+    criteria: "Gestion participative & économie circulaire",
+    axis: "",
+    order: 22
   }
 ];
 
