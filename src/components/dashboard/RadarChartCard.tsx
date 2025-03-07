@@ -6,7 +6,8 @@ import { useCompanyData } from "@/hooks/useCompanyData";
 export const RadarChartCard = () => {
   const {
     companyData,
-    isLoading
+    isLoading,
+    isPremium
   } = useCompanyData();
 
   // Définition des valeurs maximales pour chaque critère
@@ -83,6 +84,15 @@ export const RadarChartCard = () => {
     subject,
     maxScore
   }) => {
+    // Si l'utilisateur n'est pas premium, mettre des scores à 0
+    if (!isPremium) {
+      return {
+        subject,
+        myScore: 0,
+        maxScore
+      };
+    }
+    
     // Récupération du score de l'entreprise pour ce critère, ou valeur par défaut
     const myScore = companyData?.criteriaScores?.[subject] || 0;
     return {

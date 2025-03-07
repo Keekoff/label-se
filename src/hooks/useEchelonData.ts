@@ -15,7 +15,7 @@ export type EchelonData = {
 
 export const useEchelonData = () => {
   const { toast } = useToast();
-  const { companyData } = useCompanyData();
+  const { companyData, isPremium } = useCompanyData();
   const [isLoading, setIsLoading] = useState(true);
   const [echelonData, setEchelonData] = useState<EchelonData | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,6 +29,12 @@ export const useEchelonData = () => {
       
       setIsLoading(true);
       setError(null);
+      
+      // Si l'utilisateur n'est pas premium, ne pas appeler l'Edge Function
+      if (!isPremium) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
         // Gérer le cas où echelonTexte pourrait être un tableau
@@ -124,7 +130,7 @@ export const useEchelonData = () => {
     };
 
     fetchEchelonData();
-  }, [companyData?.echelonTexte, toast]);
+  }, [companyData?.echelonTexte, isPremium, toast]);
 
   return {
     isLoading,

@@ -1,10 +1,9 @@
 
 import { Button } from "@/components/ui/button";
-import { Download } from "lucide-react";
+import { Download, Lock } from "lucide-react";
 import { useCompanyData } from "@/hooks/useCompanyData";
 import { usePdfGenerator } from "@/hooks/usePdfGenerator";
 import { CertificationCard } from "./CertificationCard";
-import { ErrorDisplay } from "./ErrorDisplay";
 import { BarChartsGrid } from "./BarChartsGrid";
 import { RadarChartCard } from "./RadarChartCard";
 import { ImprovementSuggestions } from "./ImprovementSuggestions";
@@ -14,9 +13,8 @@ export const DashboardCharts = () => {
     isLoading, 
     companyData, 
     companyName, 
-    error, 
-    errorDetails, 
-    hasSubmittedForm 
+    hasSubmittedForm,
+    isPremium
   } = useCompanyData();
   
   const { 
@@ -37,10 +35,6 @@ export const DashboardCharts = () => {
     );
   }
 
-  if (error) {
-    return <ErrorDisplay error={error} errorDetails={errorDetails} companyName={companyName} />;
-  }
-
   return (
     <div className="space-y-6">
       {hasSubmittedForm && <CertificationCard companyData={companyData} />}
@@ -54,7 +48,7 @@ export const DashboardCharts = () => {
             dateValidation: companyData?.dateValidation,
             dateFinValidite: companyData?.dateFinValidite
           })}
-          disabled={isLoading || isPdfGenerating}
+          disabled={isLoading || isPdfGenerating || !isPremium}
           className="bg-white hover:bg-[#27017F] hover:text-white border-[#35DA56] text-[#27017F]"
         >
           <Download className="h-4 w-4 mr-2" />
@@ -63,9 +57,48 @@ export const DashboardCharts = () => {
       </div>
 
       <div ref={chartsContainerRef} className="space-y-6">
-        <BarChartsGrid companyData={companyData} />
-        <RadarChartCard />
-        <ImprovementSuggestions />
+        {isPremium ? (
+          <>
+            <BarChartsGrid companyData={companyData} />
+            <RadarChartCard />
+            <ImprovementSuggestions />
+          </>
+        ) : (
+          <div className="space-y-6">
+            <div className="relative">
+              <div className="filter blur-[6px] pointer-events-none opacity-70">
+                <BarChartsGrid companyData={null} />
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center flex-col gap-3 bg-black/5 rounded-lg">
+                <Lock className="h-10 w-10 text-[#35DA56]" />
+                <div className="text-xl font-semibold text-[#27017F]">Fonctionnalité Premium</div>
+                <p className="text-center text-gray-600 max-w-md px-4">
+                  Veuillez effectuer votre paiement pour accéder à toutes les fonctionnalités analytiques.
+                </p>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <div className="filter blur-[6px] pointer-events-none opacity-70">
+                <RadarChartCard />
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center flex-col gap-3 bg-black/5 rounded-lg">
+                <Lock className="h-10 w-10 text-[#35DA56]" />
+                <div className="text-xl font-semibold text-[#27017F]">Fonctionnalité Premium</div>
+              </div>
+            </div>
+            
+            <div className="relative">
+              <div className="filter blur-[6px] pointer-events-none opacity-70">
+                <ImprovementSuggestions />
+              </div>
+              <div className="absolute inset-0 flex items-center justify-center flex-col gap-3 bg-black/5 rounded-lg">
+                <Lock className="h-10 w-10 text-[#35DA56]" />
+                <div className="text-xl font-semibold text-[#27017F]">Fonctionnalité Premium</div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

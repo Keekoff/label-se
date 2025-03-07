@@ -96,7 +96,7 @@ const improvementAxes = [
     order: 18
   },
   {
-    criteria: "Évalution permanente",
+    criteria: "Évalutation permanente",
     axis: "Cette idée d'évaluation permanente est corrélée avec celle d'amélioration continue. Cela implique d'auditer de manière régulière ses processus, ses produits, ses fournisseurs mais également de former ses parties prenantes au changement. Ce concept illustre la nécessité de prendre du recul sur ce que l'on produit pour écouter les feedbacks et itérer.",
     order: 19
   },
@@ -121,9 +121,29 @@ const improvementAxes = [
 const validImprovementAxes = improvementAxes.filter(item => item.axis !== "");
 
 export const ImprovementSuggestions = () => {
-  const { companyData, isLoading } = useCompanyData();
+  const { companyData, isLoading, isPremium } = useCompanyData();
+
+  // Exemples de pistes d'amélioration par défaut pour les utilisateurs non premium
+  const defaultSuggestions = [
+    {
+      criteria: "Diversité",
+      score: 2,
+      axis: validImprovementAxes.find(axis => axis.criteria === "Diversité")?.axis || "",
+      order: 1
+    },
+    {
+      criteria: "Numérique responsable",
+      score: 3,
+      axis: validImprovementAxes.find(axis => axis.criteria === "Numérique responsable")?.axis || "",
+      order: 12
+    }
+  ];
 
   const topImprovementSuggestions = useMemo(() => {
+    if (!isPremium) {
+      return defaultSuggestions;
+    }
+    
     if (!companyData?.criteriaScores || isLoading) return [];
 
     // Create an array of criteria with their scores
@@ -160,7 +180,7 @@ export const ImprovementSuggestions = () => {
         order: axisInfo?.order || 999
       };
     });
-  }, [companyData, isLoading]);
+  }, [companyData, isLoading, isPremium]);
 
   if (isLoading) {
     return (

@@ -26,6 +26,7 @@ export type FetchCompanyDataResult = {
   error: string | null;
   errorDetails: string | null;
   hasSubmittedForm: boolean;
+  isPremium: boolean;
 };
 
 export const useCompanyData = (): FetchCompanyDataResult => {
@@ -36,6 +37,7 @@ export const useCompanyData = (): FetchCompanyDataResult => {
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [hasSubmittedForm, setHasSubmittedForm] = useState<boolean>(false);
+  const [isPremium, setIsPremium] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchCompanyName = async () => {
@@ -45,17 +47,19 @@ export const useCompanyData = (): FetchCompanyDataResult => {
 
         const { data, error } = await supabase
           .from('label_submissions')
-          .select('nom_entreprise, status')
+          .select('nom_entreprise, status, payment_status')
           .eq('user_id', session.user.id)
           .maybeSingle();
         
         if (error) throw error;
         
-        if (data && data.nom_entreprise) {
+        if (data) {
           setCompanyName(data.nom_entreprise);
           setHasSubmittedForm(data.status !== 'draft');
+          setIsPremium(data.payment_status === 'paid');
           console.log(`Nom d'entreprise récupéré: ${data.nom_entreprise}`);
           console.log(`Statut du formulaire: ${data.status}`);
+          console.log(`Statut premium: ${data.payment_status === 'paid'}`);
         } else {
           console.log('Aucun nom d\'entreprise trouvé');
         }
@@ -79,6 +83,12 @@ export const useCompanyData = (): FetchCompanyDataResult => {
       setIsLoading(true);
       setError(null);
       setErrorDetails(null);
+      
+      // Si l'utilisateur n'est pas premium, ne pas appeler l'Edge Function
+      if (!isPremium) {
+        setIsLoading(false);
+        return;
+      }
       
       try {
         console.log(`Fetching Airtable data for company: ${companyName}`);
@@ -152,7 +162,7 @@ export const useCompanyData = (): FetchCompanyDataResult => {
     } else {
       setIsLoading(false);
     }
-  }, [companyName, toast]);
+  }, [companyName, isPremium, toast]);
 
   return {
     isLoading,
@@ -160,6 +170,7 @@ export const useCompanyData = (): FetchCompanyDataResult => {
     companyName,
     error,
     errorDetails,
-    hasSubmittedForm
+    hasSubmittedForm,
+    isPremium
   };
 };
