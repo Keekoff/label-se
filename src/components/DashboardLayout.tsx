@@ -114,7 +114,7 @@ const DashboardLayout = () => {
 
       <div className={`transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         <header className="h-16 border-b border-border bg-white/80 backdrop-blur-sm fixed top-0 right-0 left-auto w-full z-20 shadow-sm">
-          <div className="flex items-center justify-end h-full px-6">
+          <div className="flex items-center justify-end h-full px-6 bg-white">
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full hover:bg-gray-100/50">
