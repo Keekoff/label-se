@@ -95,7 +95,7 @@ export const BarChartsGrid = ({
       }} />
       </Card>
 
-      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-slate-50">
+      <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-white">
         <TieredBarChart title="Moyenne des labellisés" data={getAverageChartData()} tiers={{
         tier1: 95,
         tier2: 75,
