@@ -61,16 +61,23 @@ export function SubmissionModal({ open, onOpenChange, submissionId }: Submission
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogTitle>Soumission réussie</DialogTitle>
-        <DialogDescription className="py-4">
+      <DialogContent className="sm:max-w-md shadow-lg bg-white/90 backdrop-blur-sm border border-white/60">
+        <DialogTitle className="text-[#27017F] font-semibold">Soumission réussie</DialogTitle>
+        <DialogDescription className="py-4 text-gray-700">
           Merci d'avoir soumis votre demande. Vous trouverez les documents à fournir dans votre Dashboard.
         </DialogDescription>
         <div className="flex gap-4 justify-end">
-          <Button variant="outline" onClick={() => navigate("/dashboard")}>
+          <Button 
+            variant="outline" 
+            onClick={() => navigate("/dashboard")}
+            className="bg-white/90 backdrop-blur-sm text-[#27017F] hover:bg-[#27017F] hover:text-white shadow-md"
+          >
             Tableau de bord
           </Button>
-          <Button onClick={handlePayment}>
+          <Button 
+            onClick={handlePayment}
+            className="bg-[#35DA56] text-white shadow-md border border-[#35DA56]/20"
+          >
             Payer maintenant
           </Button>
         </div>
