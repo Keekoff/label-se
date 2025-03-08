@@ -199,7 +199,7 @@ const Justificatifs = () => {
         </p>
       </div>
 
-      <Card className="p-6 bg-slate-50">
+      <Card className="p-6 bg-white">
         <Table>
           <TableHeader>
             <TableRow>
