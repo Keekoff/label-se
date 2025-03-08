@@ -257,12 +257,257 @@ export const useFormSubmission = (
     return formattedData;
   };
 
+  const formatDataForWebhook = (data: any) => {
+    console.log('Formatage des données pour le webhook Make.com');
+    
+    // Créer un tableau pour stocker toutes les réponses
+    const réponses = [];
+    
+    // Regrouper toutes les questions et leurs réponses dans des collections
+    // Partie 1: Questions humaines et sociales
+    if (data.diversite && data.diversite.length > 0) {
+      réponses.push({
+        question: "Diversité",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.diversite
+      });
+    }
+    
+    if (data.egalite && data.egalite.length > 0) {
+      réponses.push({
+        question: "Égalité",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.egalite
+      });
+    }
+    
+    if (data.situation_handicap && data.situation_handicap.length > 0) {
+      réponses.push({
+        question: "Situation de handicap",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.situation_handicap
+      });
+    }
+    
+    if (data.sante_bien_etre && data.sante_bien_etre.length > 0) {
+      réponses.push({
+        question: "Santé des salariés/bien-être au travail",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.sante_bien_etre
+      });
+    }
+    
+    if (data.parentalite && data.parentalite.length > 0) {
+      réponses.push({
+        question: "Parentalité",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.parentalite
+      });
+    }
+    
+    if (data.formation && data.formation.length > 0) {
+      réponses.push({
+        question: "Formation",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.formation
+      });
+    }
+    
+    if (data.politique_rse && data.politique_rse.length > 0) {
+      réponses.push({
+        question: "Politique RSE",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.politique_rse
+      });
+    }
+    
+    if (data.confidentialite_donnees && data.confidentialite_donnees.length > 0) {
+      réponses.push({
+        question: "Privacy/Data",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.confidentialite_donnees
+      });
+    }
+    
+    if (data.mobilite && data.mobilite.length > 0) {
+      réponses.push({
+        question: "Transports",
+        catégorie: "Humain & Social",
+        partie: 1,
+        réponses: data.mobilite
+      });
+    }
+    
+    // Partie 2: Questions économiques et sociétales
+    if (data.contribution_associative && data.contribution_associative.length > 0) {
+      réponses.push({
+        question: "Contribution associative",
+        catégorie: "Économique & Sociétal",
+        partie: 2,
+        réponses: data.contribution_associative
+      });
+    }
+    
+    if (data.achats_responsables && data.achats_responsables.length > 0) {
+      réponses.push({
+        question: "Politique d'achats responsables",
+        catégorie: "Économique & Sociétal",
+        partie: 2,
+        réponses: data.achats_responsables
+      });
+    }
+    
+    if (data.numerique_responsable && data.numerique_responsable.length > 0) {
+      réponses.push({
+        question: "Numérique responsable",
+        catégorie: "Économique & Sociétal",
+        partie: 2,
+        réponses: data.numerique_responsable
+      });
+    }
+    
+    if (data.communication_transparente && data.communication_transparente.length > 0) {
+      réponses.push({
+        question: "Communication",
+        catégorie: "Économique & Sociétal",
+        partie: 2,
+        réponses: data.communication_transparente
+      });
+    }
+    
+    if (data.relations_fournisseurs && data.relations_fournisseurs.length > 0) {
+      réponses.push({
+        question: "Relation fournisseurs et prestataires",
+        catégorie: "Économique & Sociétal",
+        partie: 2,
+        réponses: data.relations_fournisseurs
+      });
+    }
+    
+    if (data.impact_social && data.impact_social.length > 0) {
+      réponses.push({
+        question: "Prise en compte de l'impact social",
+        catégorie: "Économique & Sociétal",
+        partie: 2,
+        réponses: data.impact_social
+      });
+    }
+    
+    // Partie 3: Questions environnementales
+    if (data.production_durable && data.production_durable.length > 0) {
+      réponses.push({
+        question: "Production : énergie & matériaux utilisés",
+        catégorie: "Environnemental",
+        partie: 3,
+        réponses: data.production_durable
+      });
+    }
+    
+    if (data.eco_conception && data.eco_conception.length > 0) {
+      réponses.push({
+        question: "Éco-conception",
+        catégorie: "Environnemental",
+        partie: 3,
+        réponses: data.eco_conception
+      });
+    }
+    
+    if (data.evaluation_continue && data.evaluation_continue.length > 0) {
+      réponses.push({
+        question: "Évaluation permanente",
+        catégorie: "Environnemental",
+        partie: 3,
+        réponses: data.evaluation_continue
+      });
+    }
+    
+    if (data.gestion_energie && data.gestion_energie.length > 0) {
+      réponses.push({
+        question: "Maîtrise et optimisation de la consommation de ressources énergétiques",
+        catégorie: "Environnemental",
+        partie: 3,
+        réponses: data.gestion_energie
+      });
+    }
+    
+    if (data.emissions_carbone && data.emissions_carbone.length > 0) {
+      réponses.push({
+        question: "Plan de contrôle / limite des émissions carbones",
+        catégorie: "Environnemental",
+        partie: 3,
+        réponses: data.emissions_carbone
+      });
+    }
+    
+    if (data.economie_circulaire && data.economie_circulaire.length > 0) {
+      réponses.push({
+        question: "Gestion participative & économie circulaire",
+        catégorie: "Environnemental",
+        partie: 3,
+        réponses: data.economie_circulaire
+      });
+    }
+    
+    if (data.gestion_dechets && data.gestion_dechets.length > 0) {
+      réponses.push({
+        question: "Recyclage & gestion des déchets",
+        catégorie: "Environnemental",
+        partie: 3,
+        réponses: data.gestion_dechets
+      });
+    }
+    
+    // Informations de l'entreprise
+    const informationsEntreprise = {
+      nom_entreprise: data.nom_entreprise,
+      secteurs_activite: data.secteurs_activite,
+      forme_juridique: data.forme_juridique,
+      adresse: data.adresse,
+      code_postal: data.code_postal,
+      ville: data.ville,
+      annee_creation: data.annee_creation,
+      nombre_employes: data.nombre_employes,
+      a_financements: data.a_financements,
+      details_financement: data.details_financement,
+    };
+    
+    // Informations du contact
+    const informationsContact = {
+      prenom: data.prenom,
+      courriel: data.courriel,
+      user_id: data.user_id,
+    };
+    
+    // Objet final pour le webhook
+    const webhookPayload = {
+      réponses: réponses,
+      informations_entreprise: informationsEntreprise,
+      informations_contact: informationsContact,
+      date_soumission: new Date().toISOString(),
+      id_soumission: data.id
+    };
+    
+    console.log('Payload formaté pour le webhook:', webhookPayload);
+    return webhookPayload;
+  };
+
   const sendToMakeWebhook = async (data: any) => {
     try {
       console.log('Préparation de l\'envoi des données au webhook Make.com');
       
+      // Formatage des données selon la structure demandée
+      const formattedData = formatDataForWebhook(data);
+      
       // Assurons-nous que le contenu est bien un objet JSON valide
-      const jsonPayload = JSON.stringify(data);
+      const jsonPayload = JSON.stringify(formattedData);
       console.log('Payload JSON à envoyer:', jsonPayload);
       
       // Utilisation directe de fetch avec timeout pour éviter les problèmes de connexion
