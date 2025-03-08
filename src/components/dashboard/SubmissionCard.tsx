@@ -1,25 +1,20 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CreditCard, FileCheck, Receipt } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-
 interface SubmissionCardProps {
   paymentStatus: 'unpaid' | 'pending' | 'paid' | null;
   isLoading: boolean;
   onPayment: () => void;
 }
-
 export const SubmissionCard = ({
   paymentStatus,
   isLoading,
   onPayment
 }: SubmissionCardProps) => {
   const navigate = useNavigate();
-  
-  return (
-    <Card className="border border-white/40 shadow-[0_8px_30px_rgba(0,0,0,0.08)] bg-gradient-to-r from-[#FDF6E3]/90 to-[#FDF6E3]/70 backdrop-blur-sm rounded-xl">
-      <CardContent className="p-8">
+  return <Card className="border border-white/40 shadow-[0_8px_30px_rgba(0,0,0,0.08)] bg-gradient-to-r from-[#FDF6E3]/90 to-[#FDF6E3]/70 backdrop-blur-sm rounded-xl">
+      <CardContent className="p-8 bg-[#00ff1f]/[0.23]">
         <div className="space-y-6">
           <div className="flex items-start gap-4">
             <Receipt className="h-6 w-6 text-[#27017F] mt-0.5 flex-shrink-0" aria-hidden="true" />
@@ -29,29 +24,16 @@ export const SubmissionCard = ({
             </p>
           </div>
           <div className="flex flex-wrap gap-4">
-            {paymentStatus === 'unpaid' && (
-              <Button 
-                onClick={onPayment} 
-                className="bg-[#35DA56] text-white transition-shadow duration-300 shadow-md border border-[#35DA56]/20 px-6 py-5 h-auto" 
-                disabled={isLoading}
-              >
+            {paymentStatus === 'unpaid' && <Button onClick={onPayment} className="bg-[#35DA56] text-white transition-shadow duration-300 shadow-md border border-[#35DA56]/20 px-6 py-5 h-auto" disabled={isLoading}>
                 <CreditCard className="mr-3 h-5 w-5" />
                 {isLoading ? 'Chargement...' : 'Payer maintenant'}
-              </Button>
-            )}
-            {paymentStatus === 'paid' && (
-              <Button 
-                variant="outline" 
-                onClick={() => navigate('/dashboard/justificatifs')}
-                className="bg-white/90 backdrop-blur-sm text-[#27017F] hover:bg-[#27017F] hover:text-white transition-colors duration-300 shadow-md border border-white/60 px-6 py-5 h-auto"
-              >
+              </Button>}
+            {paymentStatus === 'paid' && <Button variant="outline" onClick={() => navigate('/dashboard/justificatifs')} className="bg-white/90 backdrop-blur-sm text-[#27017F] hover:bg-[#27017F] hover:text-white transition-colors duration-300 shadow-md border border-white/60 px-6 py-5 h-auto">
                 <FileCheck className="mr-3 h-5 w-5" />
                 Ajouter mes justificatifs
-              </Button>
-            )}
+              </Button>}
           </div>
         </div>
       </CardContent>
-    </Card>
-  );
+    </Card>;
 };
