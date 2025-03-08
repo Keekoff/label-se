@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,6 +8,9 @@ import { getJustificatifs } from "@/components/form/steps/FormPart1";
 import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2/index";
 import { getJustificatifsForPart3 } from "@/components/form/steps/FormPart3";
 
+// Make.com webhook URL
+const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/20xuorrw61s481mz4f7lwqrdfgotq5qj";
+
 export const useFormSubmission = (
   formState: FormState,
   setCurrentStep: (step: number) => void
@@ -14,6 +18,7 @@ export const useFormSubmission = (
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -252,6 +257,30 @@ export const useFormSubmission = (
     return formattedData;
   };
 
+  const sendToMakeWebhook = async (data: any) => {
+    try {
+      console.log('Envoi des données au webhook Make.com:', data);
+      
+      const response = await fetch(MAKE_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(data),
+      });
+      
+      if (!response.ok) {
+        console.error('Erreur lors de l\'envoi au webhook Make.com:', response.status);
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      
+      console.log('Données envoyées avec succès au webhook Make.com');
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi au webhook:', error);
+      // We continue with the form submission even if webhook call fails
+    }
+  };
+
   const handleSave = async () => {
     if (!isAuthenticated) {
       toast({
@@ -321,9 +350,18 @@ export const useFormSubmission = (
       return;
     }
 
+    if (isSubmitting) {
+      return;
+    }
+
+    setIsSubmitting(true);
+
     try {
       const submissionData = await formatSubmissionData(formState, 'submitted');
       console.log('Submitting form with data:', submissionData);
+
+      // Send data to Make.com webhook
+      await sendToMakeWebhook(submissionData);
 
       let finalSubmissionId = submissionId;
 
@@ -379,6 +417,8 @@ export const useFormSubmission = (
         description: "Une erreur est survenue lors de la soumission du formulaire.",
         variant: "destructive"
       });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -386,6 +426,7 @@ export const useFormSubmission = (
     submissionId,
     handleSave,
     handleSubmit,
-    isAuthenticated
+    isAuthenticated,
+    isSubmitting
   };
 };

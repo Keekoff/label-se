@@ -19,7 +19,7 @@ const Form = () => {
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(FORM_STEPS);
   const [showSubmissionModal, setShowSubmissionModal] = useState(false);
 
-  const { submissionId, handleSave, handleSubmit } = useFormSubmission(formState, setCurrentStep);
+  const { submissionId, handleSave, handleSubmit, isSubmitting } = useFormSubmission(formState, setCurrentStep);
 
   const updateStepValidity = (stepId: number, isValid: boolean) => {
     setStepsValidity(prev => 
@@ -44,6 +44,8 @@ const Form = () => {
   };
 
   const onSubmit = async () => {
+    if (isSubmitting) return;
+    
     try {
       await handleSubmit();
       setShowSubmissionModal(true);
@@ -112,7 +114,7 @@ const Form = () => {
             onNext={handleNext}
             onSave={handleSave}
             onSubmit={onSubmit}
-            isDisabled={currentStep === 1 && !formState.disclaimerAccepted}
+            isDisabled={currentStep === 1 && !formState.disclaimerAccepted || isSubmitting}
           />
         </div>
       </div>

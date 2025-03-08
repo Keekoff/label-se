@@ -26,7 +26,7 @@ export const FormNavigation = ({
       return (
         <Button
           onClick={onSubmit}
-          className="flex items-center gap-2 bg-primary"
+          className="flex items-center gap-2 bg-[#27017F] text-white"
         >
           Envoyer ma demande
         </Button>
