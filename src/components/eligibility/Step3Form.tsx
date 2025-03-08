@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { FormData } from "@/types/eligibility";
 import { ArrowLeft } from "lucide-react";
+import { toast } from "sonner";
 
 interface Step3FormProps {
   initialData: FormData;
@@ -61,6 +62,9 @@ const certificationStatuses = [
   "Non",
 ];
 
+// Make.com webhook URL
+const WEBHOOK_URL = "https://hook.eu1.make.com/1qdieciiwpnag26wl2ewme593sud371o";
+
 const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
   const [formData, setFormData] = useState({
     roles: initialData.roles,
@@ -72,6 +76,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
     phone: initialData.phone,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -98,10 +103,53 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
     return /^(?:(?:\+|00)33|0)\s*[1-9](?:[\s.-]*\d{2}){4}$/.test(phone);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const sendToWebhook = async (completeData: FormData) => {
+    try {
+      const response = await fetch(WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(completeData),
+      });
+      
+      if (!response.ok) {
+        console.error('Erreur lors de l\'envoi au webhook:', response.status);
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      
+      console.log('Données envoyées avec succès au webhook Make.com');
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi au webhook:', error);
+      // We don't show this error to the user as we want the form submission to continue
+      // even if the webhook call fails
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (validate()) {
+    
+    if (!validate()) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      // Combine all form data (from all steps)
+      const completeData: FormData = {
+        ...initialData,
+        ...formData
+      };
+      
+      // Send data to webhook
+      await sendToWebhook(completeData);
+      
+      // Continue with normal form submission
       onSubmit(formData);
+    } catch (error) {
+      console.error('Erreur:', error);
+      toast.error("Une erreur est survenue lors de l'envoi du formulaire. Veuillez réessayer.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -290,8 +338,12 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
           <ArrowLeft className="w-4 h-4" />
           Retour
         </Button>
-        <Button type="submit" className="bg-primary hover:bg-primary/90">
-          Envoyer
+        <Button 
+          type="submit" 
+          className="bg-primary hover:bg-primary/90"
+          disabled={isSubmitting}
+        >
+          {isSubmitting ? 'Envoi en cours...' : 'Envoyer'}
         </Button>
       </div>
     </form>
