@@ -259,25 +259,43 @@ export const useFormSubmission = (
 
   const sendToMakeWebhook = async (data: any) => {
     try {
-      console.log('Envoi des données au webhook Make.com:', data);
+      console.log('Préparation de l\'envoi des données au webhook Make.com');
+      
+      // Assurons-nous que le contenu est bien un objet JSON valide
+      const jsonPayload = JSON.stringify(data);
+      console.log('Payload JSON à envoyer:', jsonPayload);
+      
+      // Utilisation directe de fetch avec timeout pour éviter les problèmes de connexion
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10s timeout
       
       const response = await fetch(MAKE_WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
         },
-        body: JSON.stringify(data),
+        body: jsonPayload,
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
+      
+      const responseText = await response.text();
+      console.log('Réponse du webhook:', responseText);
       
       if (!response.ok) {
         console.error('Erreur lors de l\'envoi au webhook Make.com:', response.status);
+        console.error('Détails de l\'erreur:', responseText);
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
       
       console.log('Données envoyées avec succès au webhook Make.com');
+      return true;
     } catch (error) {
       console.error('Erreur lors de l\'envoi au webhook:', error);
-      // We continue with the form submission even if webhook call fails
+      // Continue with form submission even if webhook call fails
+      return false;
     }
   };
 
@@ -360,8 +378,9 @@ export const useFormSubmission = (
       const submissionData = await formatSubmissionData(formState, 'submitted');
       console.log('Submitting form with data:', submissionData);
 
-      // Send data to Make.com webhook
-      await sendToMakeWebhook(submissionData);
+      // Send data to Make.com webhook first
+      const webhookSuccess = await sendToMakeWebhook(submissionData);
+      console.log('Résultat de l\'envoi au webhook:', webhookSuccess ? 'Succès' : 'Échec');
 
       let finalSubmissionId = submissionId;
 

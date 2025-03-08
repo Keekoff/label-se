@@ -13,7 +13,7 @@ import { toast } from "sonner";
 interface SubmissionModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  submissionId?: string;
+  submissionId?: string | null;
 }
 
 export function SubmissionModal({ open, onOpenChange, submissionId }: SubmissionModalProps) {
