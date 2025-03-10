@@ -219,7 +219,7 @@ export const QUESTIONS: Question[] = [
       },
       {
         value: "option3",
-        label: "L'entreprise contribue à développer l'employabilité de son personnel et propose une montée en compétence régulière et des actions favorisant la mobilité interne, même externe ou encore de GPEC",
+        label: "L'entreprise contribue à developper l'employabilité de son personnel et propose une montée en compétence régulière et des actions favorisant la mobilité interne, même externe ou encore de GPEC",
         justificatifs: [
           "Proposition de formations orientées sur les soft-skills (prise de parole en public, management, gestion du stress...)",
           "Accompagnement des salariés grâce à la mise en place d'un bilan de compétences si nécessaire"
@@ -292,7 +292,7 @@ export const QUESTIONS: Question[] = [
       },
       {
         value: "option3",
-        label: "L'entreprise dispose d'une personne dédiée ou d'un DPO, et remplit les obligations du RGPD quant à l'accès et au stockage des données personnelles",
+        label: "L'entreprise dispose d'une personne dédiée ou d'un DPO, et remplie les obligations du RGPD quand à l'accès et au stockage des données personnelles",
         justificatifs: [
           "Identification du DPO",
           "Description des actions de mise en conformité avec le RGPD"
