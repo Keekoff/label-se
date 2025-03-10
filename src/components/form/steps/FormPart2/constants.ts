@@ -1,184 +1,228 @@
 
-export const QUESTIONS = [
+import { Question } from "./types";
+
+export const QUESTIONS: Question[] = [
+  {
+    id: "associativeContribution",
+    title: "1 - Contribution associative",
+    description: "Soutien à des projets associatifs ou pro bono.",
+    options: [
+      { 
+        value: "A", 
+        label: "L'entreprise apporte un soutien (non-financier) à un ou plusieurs projets associatifs",
+        justificatifs: [
+          "Description des projets et preuves des soutiens (mentions par l'association, mentions site web, témoignages collaborateurs...)"
+        ]
+      },
+      { 
+        value: "B", 
+        label: "L'entreprise prévoit que ses salariés prennent sur le temps de travail pour s'engager auprès d'une ONG ou d'une association",
+        justificatifs: [
+          "Liste des ONG/associations/événements partenaires",
+          "Preuves de l'existence de ces journées par des photos, témoignages collaborateurs, vidéos...",
+          "Mention dans les annonces d'emploi",
+          "Mention dans les contrats de travail et/ou dans tout autre document transmis par l'entreprise"
+        ]
+      },
+      { 
+        value: "C", 
+        label: "L'entreprise contribue financièrement à des initiatives, projets, ONG, associations",
+        justificatifs: [
+          "Liste des ONG/associations/événements partenaires",
+          "Preuves administratives des dons"
+        ]
+      },
+      { 
+        value: "D", 
+        label: "Ce critère ne s'applique pas à mon entreprise",
+        justificatifs: ["N/A"]
+      }
+    ]
+  },
   {
     id: "responsiblePurchasing",
-    title: "Politique d'achats responsables",
-    description: "Comment l'entreprise intègre-t-elle des critères éthiques, sociaux et environnementaux dans ses achats ?",
+    title: "2 - Politique d'achats responsables",
+    description: "Sélection de fournisseurs éthiques et écoresponsables.",
     options: [
-      {
-        value: "option1",
-        label: "Ce critère ne s'applique pas à mon entreprise",
-        justificatifs: []
-      },
-      {
-        value: "option2",
-        label: "L'entreprise prend en compte des critères sociaux et environnementaux dans le choix de certains fournisseurs",
+      { 
+        value: "A", 
+        label: "L'entreprise favorise le mobilier et les équipements informatiques de seconde-main, privilégie les ampoules à faible consommation et à longue durée et les piles rechargeables plutôt que les piles jetables",
         justificatifs: [
-          "Liste des critères pris en compte",
-          "Exemples de fournisseurs sélectionnés sur ces critères"
+          "Lettre d'engagement",
+          "Preuves d'achat des équipements responsables",
+          "Contrats fournisseurs"
         ]
       },
-      {
-        value: "option3",
+      { 
+        value: "B", 
+        label: "L'entreprise privilégie les fournisseurs qui s'inscrivent dans une démarche éco-responsable et inclusive (ESAT) et/ou ayant une bonne performance RSE. Elle privilégie des produits faits de matières recyclées et recyclables",
+        justificatifs: [
+          "Identification du/des fournisseurs",
+          "Identification d'un processus de sourcing produits/matières premières responsables"
+        ]
+      },
+      { 
+        value: "C", 
         label: "L'entreprise a déployé une politique RSE et diffuse les normes d'achats responsables décrétées par l'AFNOR sous le n°NFX 50-135, déclinaison de la norme ISO 26000 auprès des collaborateurs",
         justificatifs: [
-          "Document présentant la politique d'achats responsables",
-          "Charte fournisseurs"
+          "Identification du responsable RSE",
+          "Présence du sujet et des actions RSE dans la feuille de route de l'année passée et à venir"
         ]
       },
-      {
-        value: "option4",
-        label: "L'entreprise a intégré des critères RSE dans tous ses appels d'offres et évalue régulièrement ses fournisseurs sur ces critères",
+      { 
+        value: "D", 
+        label: "Ce critère ne s'applique pas à mon entreprise",
+        justificatifs: ["N/A"]
+      }
+    ]
+  },
+  {
+    id: "responsibleDigital",
+    title: "3 - Numérique responsable",
+    description: "Réduction de l'empreinte sociale et environnementale du numérique.",
+    options: [
+      { 
+        value: "A", 
+        label: "L'entreprise favorise une communication dématérialisée responsable et encourage l'utilisation de moteurs de recherche engagés",
         justificatifs: [
-          "Exemples d'appels d'offres incluant des critères RSE",
-          "Méthodologie d'évaluation des fournisseurs"
+          "Évite les mails internes au maximum",
+          "Limite le stockage des données inutiles",
+          "Nettoyage régulier des boites mail",
+          "Propose les alternatives telles qu'Ecosia ou Lilo comme moteur de recherche"
         ]
+      },
+      { 
+        value: "B", 
+        label: "L'entreprise développe une démarche d'achats éco-responsable pour ses achats d'équipements en favorisant notamment le recours à du matériel reconditionné, la location, le matériel écolabellisé…",
+        justificatifs: [
+          "Usage modéré de l'impression",
+          "Choix de consommables pouvant être recyclés",
+          "Choix de fournisseurs engagés",
+          "Achats de matériels reconditionnés"
+        ]
+      },
+      { 
+        value: "C", 
+        label: "L'entreprise est engagée dans une démarche de sobriété numérique, elle s'informe, monitor et contrôle l'impact qu'a ses choix en termes d'outils, de plateformes, d'hébergement",
+        justificatifs: [
+          "Choix de prestataires et de solutions engagés",
+          "Analyse de son impact numérique (scoring, label, outils, audit ....)",
+          "Recherche de solutions pour améliorer l'existant (benchmark, solutions proposées en interne ...)"
+        ]
+      },
+      { 
+        value: "D", 
+        label: "Ce critère ne s'applique pas à mon entreprise",
+        justificatifs: ["N/A"]
+      }
+    ]
+  },
+  {
+    id: "communication",
+    title: "4 - Communication",
+    description: "Messages et supports adressés aux consommateurs.",
+    options: [
+      { 
+        value: "A", 
+        label: "L'entreprise met en avant ses actions pour réduire son empreinte écologique",
+        justificatifs: [
+          "Preuves des actions de communication, campagnes, articles, prises de parole...."
+        ]
+      },
+      { 
+        value: "B", 
+        label: "L'entreprise privilégie des moyens de communication plus responsables : supports, PLV, goodies...",
+        justificatifs: [
+          "Preuve de l'évaluation de l'impact écologique et social de la production des supports de communication",
+          "Choix de consommables pouvant être recyclés",
+          "Choix de fournisseurs engagés"
+        ]
+      },
+      { 
+        value: "C", 
+        label: "L'entreprise encourage les comportements plus responsables auprès de son audience et de ses consommateurs dans sa communication",
+        justificatifs: [
+          "Partage de bonnes pratiques auprès des collaborateurs et/ou en externe",
+          "Publication d'études ou benchmark",
+          "Présentation des actions et de leur ROI"
+        ]
+      },
+      { 
+        value: "D", 
+        label: "Ce critère ne s'applique pas à mon entreprise",
+        justificatifs: ["N/A"]
+      }
+    ]
+  },
+  {
+    id: "supplierRelations",
+    title: "5 - Relations fournisseurs et prestataires",
+    description: "Collaboration équilibrée et durable avec les partenaires.",
+    options: [
+      { 
+        value: "A", 
+        label: "L'entreprise apporte un soin particulier au choix de ses fournisseurs et notamment de leur impact. Elle privilégie les entreprises ayant un impact positif sur l'économie locale, limitant les intermédiaires, autant que possible",
+        justificatifs: [
+          "Benchmark incluant la dimension durable et responsable",
+          "Audit des prestataires et fournisseurs",
+          "Mise en concurrence d'offres en incluant les paramètres durable et responsable pour privilégier les offres de prestataires engagés"
+        ]
+      },
+      { 
+        value: "B", 
+        label: "L'entreprise accompagne ses fournisseurs et prestataires dans le développement d'une démarche plus durable et responsable. Elle créé, contribue et/ou participe au développement d'un écosystème et/ou d'une communauté engagés au niveau local",
+        justificatifs: [
+          "Contribution ou participation à des initiatives durables et responsables locales",
+          "Organisations d'événements pour réunir la communauté",
+          "Partage de bonnes pratiques auprès des collaborateurs et/ou en externe"
+        ]
+      },
+      { 
+        value: "C", 
+        label: "Ce critère ne s'applique pas à mon entreprise",
+        justificatifs: ["N/A"]
       }
     ]
   },
   {
     id: "socialImpact",
-    title: "Prise en compte de l'impact social",
-    description: "Comment l'entreprise contribue-t-elle positivement à la société ?",
+    title: "6 - Prise en compte de l'impact social",
+    description: "Effets de l'activité sur la société et les parties prenantes.",
     options: [
-      {
-        value: "option1",
-        label: "Ce critère ne s'applique pas à mon entreprise",
-        justificatifs: []
-      },
-      {
-        value: "option2",
-        label: "L'entreprise soutient ponctuellement des causes sociales ou environnementales (dons, mécénat, bénévolat)",
+      { 
+        value: "A", 
+        label: "L'entreprise a analysé sa chaîne de valeur et sensibilise ses collaborateurs à la notion d'impact social à tous les niveaux de la chaîne",
         justificatifs: [
-          "Liste des actions de soutien",
-          "Montant des dons"
+          "Information et communication en interne et en externe sur le sujet",
+          "Audit des prestataires et fournisseurs"
         ]
       },
-      {
-        value: "option3",
+      { 
+        value: "B", 
         label: "L'entreprise investit et/ou met à disposition des ressources pour développer des projets/produits pour le bien commun. Elle déploie des actions de prévention ou un investissement social qui permet d'éviter une dépense de réparation ou de compensation",
         justificatifs: [
-          "Document présentant les projets et investissements",
-          "Budget alloué à ces actions"
+          "Benchmark incluant la dimension durable et responsable",
+          "Descriptions des projets, initiatives, actions...."
         ]
       },
-      {
-        value: "option4",
-        label: "L'entreprise a intégré l'impact social positif dans son modèle d'affaires et mesure régulièrement sa contribution sociétale",
+      { 
+        value: "C", 
+        label: "L'entreprise a le statut d'ESS, d'entreprise à mission, de collectif ou tout autre statut attestant de son engagement et de son impact sociétal",
         justificatifs: [
-          "Description du modèle d'affaires à impact",
-          "Méthode de mesure de l'impact social"
+          "Statut d'ESS de l'entreprise ou déclaration du caractère d'entreprise à mission",
+          "Code éthique",
+          "Charte sociale",
+          "Affichage dans les locaux",
+          "Messages diffusés à tous les collaborateurs (welcome pack, emails, messagerie interne, réseaux sociaux, vidéo...)",
+          "Règlement intérieur",
+          "Présence sur le site web",
+          "Messages diffusés à l'externe (réseaux sociaux, vidéo, articles de blog, tribunes, communiqués de toutes sortes...)"
         ]
-      }
-    ]
-  },
-  {
-    id: "qualityOfLife",
-    title: "Qualité de vie au travail",
-    description: "Comment l'entreprise favorise-t-elle le bien-être et l'épanouissement de ses collaborateurs ?",
-    options: [
-      {
-        value: "option1",
+      },
+      { 
+        value: "D", 
         label: "Ce critère ne s'applique pas à mon entreprise",
-        justificatifs: []
-      },
-      {
-        value: "option2",
-        label: "L'entreprise respecte les obligations légales en matière de conditions de travail et de santé-sécurité",
-        justificatifs: [
-          "Document unique d'évaluation des risques",
-          "Mesures de prévention mises en place"
-        ]
-      },
-      {
-        value: "option3",
-        label: "L'entreprise a mis en place des actions spécifiques pour améliorer la qualité de vie au travail (équilibre vie pro/perso, prévention des RPS, aménagement des espaces)",
-        justificatifs: [
-          "Document présentant les actions mises en place",
-          "Résultats d'enquêtes de satisfaction"
-        ]
-      },
-      {
-        value: "option4",
-        label: "L'entreprise a une politique globale de QVT et mesure régulièrement la satisfaction et l'engagement de ses collaborateurs",
-        justificatifs: [
-          "Politique de QVT",
-          "Indicateurs de suivi",
-          "Plan d'action suite aux enquêtes"
-        ]
-      }
-    ]
-  },
-  {
-    id: "localDevelopment",
-    title: "Développement local et ancrage territorial",
-    description: "Comment l'entreprise contribue-t-elle au développement de son territoire d'implantation ?",
-    options: [
-      {
-        value: "option1",
-        label: "Ce critère ne s'applique pas à mon entreprise",
-        justificatifs: []
-      },
-      {
-        value: "option2",
-        label: "L'entreprise privilégie, quand c'est possible, les fournisseurs et prestataires locaux",
-        justificatifs: [
-          "Liste des fournisseurs locaux",
-          "Part des achats réalisés localement"
-        ]
-      },
-      {
-        value: "option3",
-        label: "L'entreprise participe activement à la vie locale (partenariats avec des écoles, associations, collectivités) et crée des emplois sur son territoire",
-        justificatifs: [
-          "Document présentant les partenariats locaux",
-          "Nombre d'emplois créés localement"
-        ]
-      },
-      {
-        value: "option4",
-        label: "L'entreprise a une stratégie d'ancrage territorial et mesure son impact économique local",
-        justificatifs: [
-          "Stratégie d'ancrage territorial",
-          "Étude d'impact économique local"
-        ]
-      }
-    ]
-  },
-  {
-    id: "ethicalGovernance",
-    title: "Gouvernance éthique et transparente",
-    description: "Comment l'entreprise assure-t-elle une gouvernance éthique et transparente ?",
-    options: [
-      {
-        value: "option1",
-        label: "Ce critère ne s'applique pas à mon entreprise",
-        justificatifs: []
-      },
-      {
-        value: "option2",
-        label: "L'entreprise respecte les lois et réglementations en vigueur et communique clairement sur ses activités",
-        justificatifs: [
-          "Documents légaux (statuts, K-bis, etc.)",
-          "Communication institutionnelle"
-        ]
-      },
-      {
-        value: "option3",
-        label: "L'entreprise a mis en place un code éthique et des procédures anti-corruption, et forme ses collaborateurs sur ces sujets",
-        justificatifs: [
-          "Code éthique ou charte d'entreprise",
-          "Procédures anti-corruption",
-          "Programme de formation"
-        ]
-      },
-      {
-        value: "option4",
-        label: "L'entreprise intègre des parties prenantes externes dans sa gouvernance et publie des informations extra-financières",
-        justificatifs: [
-          "Structure de gouvernance",
-          "Rapport RSE ou extra-financier"
-        ]
+        justificatifs: ["N/A"]
       }
     ]
   }
