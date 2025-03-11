@@ -34,10 +34,10 @@ serve(async (req) => {
 
     console.log('Fetching payment with ID:', paymentId)
 
-    // Fetch payment information using maybeSingle() instead of single()
+    // Fetch payment information
     const { data: payment, error } = await supabase
       .from('label_submissions')
-      .select('id, created_at, nom_entreprise, payment_id')
+      .select('id, created_at, nom_entreprise, payment_id, adresse_facturation')
       .eq('payment_id', paymentId)
       .maybeSingle()
 
@@ -48,10 +48,29 @@ serve(async (req) => {
 
     if (!payment) {
       console.error('Payment not found for ID:', paymentId)
-      throw new Error('Paiement introuvable')
+      
+      // Vérification supplémentaire - recherche par ID partiel si la première requête échoue
+      // Certains IDs Stripe peuvent être tronqués ou modifiés lors du stockage
+      const { data: partialMatches, error: partialError } = await supabase
+        .from('label_submissions')
+        .select('id, created_at, nom_entreprise, payment_id, adresse_facturation')
+        .ilike('payment_id', `%${paymentId.substring(0, 20)}%`)
+        .limit(1)
+      
+      if (partialError || !partialMatches || partialMatches.length === 0) {
+        throw new Error('Paiement introuvable')
+      }
+      
+      console.log('Payment found with partial match:', partialMatches[0])
+      payment = partialMatches[0]
     }
 
     console.log('Payment found:', payment)
+
+    // Extract address from payment if available
+    const addressLines = payment.adresse_facturation ? 
+      payment.adresse_facturation.split(',').map((line: string) => line.trim()) : 
+      ['Adresse non disponible']
 
     // Generate PDF invoice
     const doc = new jsPDF()
@@ -79,6 +98,15 @@ serve(async (req) => {
     doc.text('Facturé à:', 130, 50)
     doc.setFont('helvetica', 'normal')
     doc.text(payment.nom_entreprise || 'Client', 130, 57)
+    
+    // Add address lines if available
+    if (addressLines && addressLines.length > 0 && addressLines[0] !== 'Adresse non disponible') {
+      let yPos = 64
+      addressLines.slice(0, 3).forEach((line: string) => {
+        doc.text(line, 130, yPos)
+        yPos += 7
+      })
+    }
     
     // Invoice details
     doc.setFontSize(11)
@@ -136,7 +164,7 @@ serve(async (req) => {
         headers: { 
           ...corsHeaders,
           'Content-Type': 'application/pdf',
-          'Content-Disposition': `attachment; filename="facture_${paymentId}.pdf"` 
+          'Content-Disposition': `attachment; filename="facture_${payment.id.substring(0, 8)}.pdf"` 
         } 
       }
     )

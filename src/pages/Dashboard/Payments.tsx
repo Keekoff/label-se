@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface Payment {
   id: string;
@@ -28,6 +29,8 @@ const Payments = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState<string | null>(null);
+  const [errorDetails, setErrorDetails] = useState<string | null>(null);
+  const [showErrorDialog, setShowErrorDialog] = useState(false);
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -93,7 +96,7 @@ const Payments = () => {
       // Créer un élément a temporaire pour déclencher le téléchargement
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `facture_${paymentId}.pdf`);
+      link.setAttribute('download', `facture_${paymentId.substring(0, 8)}.pdf`);
       document.body.appendChild(link);
       link.click();
       
@@ -106,6 +109,8 @@ const Payments = () => {
       });
     } catch (error) {
       console.error('Error downloading invoice:', error);
+      setErrorDetails(error instanceof Error ? error.message : "Erreur inconnue");
+      setShowErrorDialog(true);
       toast.error("Une erreur est survenue lors du téléchargement de la facture");
     } finally {
       setIsDownloading(null);
@@ -151,7 +156,7 @@ const Payments = () => {
                       {payment.nom_entreprise || 'Label Startup Engagée'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {payment.payment_id}
+                      {payment.payment_id.substring(0, 20)}...
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 
@@ -186,6 +191,23 @@ const Payments = () => {
           </CardContent>
         </Card>
       )}
+
+      <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Erreur de téléchargement</DialogTitle>
+            <DialogDescription>
+              Une erreur est survenue lors du téléchargement de la facture. Détails techniques:
+            </DialogDescription>
+          </DialogHeader>
+          <div className="bg-gray-100 p-4 rounded-md text-sm">
+            <code>{errorDetails}</code>
+          </div>
+          <p className="text-sm text-gray-500">
+            Veuillez contacter le support si ce problème persiste.
+          </p>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
