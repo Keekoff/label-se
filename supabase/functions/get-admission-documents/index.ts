@@ -10,7 +10,7 @@ serve(async (req) => {
   }
 
   try {
-    // Autorisation
+    // Vérification de l'autorisation
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       return new Response(
@@ -19,30 +19,48 @@ serve(async (req) => {
       )
     }
 
-    // Documents factices pour le moment
-    const mockDocuments = [
-      {
-        id: "1",
-        identifier: "Politique d'inclusion",
-        response: "Diversité",
-        document: "Charte de diversité"
-      },
-      {
-        id: "2",
-        identifier: "Économie d'énergie",
-        response: "Gestion énergétique",
-        document: "Rapport de consommation énergétique"
-      },
-      {
-        id: "3",
-        identifier: "Achats responsables",
-        response: "Charte fournisseurs",
-        document: "Liste de fournisseurs certifiés"
-      }
-    ]
+    // Récupérer les paramètres de la requête
+    const url = new URL(req.url)
+    const submissionId = url.searchParams.get('submissionId')
+
+    // Valider les paramètres obligatoires
+    if (!submissionId) {
+      return new Response(
+        JSON.stringify({ error: 'ID de soumission requis' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    // Configuration du client Supabase
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')
+    
+    if (!supabaseUrl || !supabaseKey) {
+      console.error('Variables d\'environnement Supabase manquantes')
+      return new Response(
+        JSON.stringify({ error: 'Erreur de configuration du serveur' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey)
+
+    // Récupération des documents pour la soumission spécifiée
+    const { data, error } = await supabase
+      .from('form_justificatifs')
+      .select('*')
+      .eq('submission_id', submissionId)
+
+    if (error) {
+      console.error('Erreur lors de la récupération des documents:', error)
+      return new Response(
+        JSON.stringify({ error: 'Erreur lors de la récupération des documents' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     return new Response(
-      JSON.stringify(mockDocuments),
+      JSON.stringify(data),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   } catch (error) {

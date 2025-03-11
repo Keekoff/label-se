@@ -1,10 +1,14 @@
+
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, FileCheck, CheckCircle } from "lucide-react";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Input } from "@/components/ui/input";
+
 type JustificatifStatus = 'pending' | 'uploaded' | 'validated';
 type Justificatif = {
   id: string;
@@ -15,11 +19,14 @@ type Justificatif = {
   file_name?: string;
   status: JustificatifStatus;
 };
+
 const Justificatifs = () => {
   const [justificatifs, setJustificatifs] = useState<Justificatif[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [uploading, setUploading] = useState<Record<string, boolean>>({});
+
   useEffect(() => {
     const fetchJustificatifs = async () => {
       try {
@@ -97,67 +104,113 @@ const Justificatifs = () => {
     };
     fetchJustificatifs();
   }, []);
+
   const handleFileUpload = async (justificatifId: string, file: File) => {
     try {
       if (!submissionId) {
         toast.error("Aucune soumission active trouvée");
         return;
       }
+      
+      setUploading(prev => ({ ...prev, [justificatifId]: true }));
+      
       const justificatif = justificatifs.find(j => j.id === justificatifId);
       if (!justificatif) throw new Error("Justificatif non trouvé");
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${justificatifId}-${Date.now()}.${fileExt}`;
-
-      // S'assurer que le bucket existe avant de télécharger
-      try {
-        const {
-          data: buckets
-        } = await supabase.storage.listBuckets();
-        const justificatifsBucket = buckets?.find(b => b.name === 'justificatifs');
-        if (!justificatifsBucket) {
-          console.log('Création du bucket justificatifs...');
-          await supabase.storage.createBucket('justificatifs', {
-            public: false,
-            fileSizeLimit: 10485760 // 10MB limit
-          });
-        }
-      } catch (bucketError) {
-        console.error('Erreur lors de la vérification/création du bucket:', bucketError);
+      
+      // Vérification du type de fichier
+      const acceptedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
+      const fileExt = file.name.split('.').pop()?.toLowerCase();
+      if (!fileExt || !acceptedTypes.some(type => type.includes(fileExt))) {
+        toast.error("Type de fichier non accepté. Veuillez utiliser PDF, DOC, DOCX, JPG ou PNG.");
+        return;
+      }
+      
+      // Vérification de la taille du fichier (max 10 MB)
+      if (file.size > 10 * 1024 * 1024) {
+        toast.error("Le fichier est trop volumineux. Taille maximale: 10 MB");
+        return;
       }
 
+      const fileName = `${justificatifId}-${Date.now()}.${fileExt}`;
       // Créer un chemin qui inclut l'ID de soumission
       const filePath = `${submissionId}/${fileName}`;
-      const {
-        data: uploadData,
-        error: uploadError
-      } = await supabase.storage.from('justificatifs').upload(filePath, file);
-      if (uploadError) throw uploadError;
+      
+      // Téléchargement du fichier
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('justificatifs')
+        .upload(filePath, file, {
+          cacheControl: '3600',
+          upsert: true,
+        });
+        
+      if (uploadError) {
+        console.error('Erreur lors du téléchargement:', uploadError);
+        throw uploadError;
+      }
+      
       console.log('Fichier téléchargé avec succès:', uploadData);
 
       // Mettre à jour le statut du justificatif dans la base de données
-      const {
-        error: updateError
-      } = await supabase.from('form_justificatifs').update({
-        file_path: filePath,
-        file_name: file.name,
-        status: 'uploaded'
-      }).eq('id', justificatifId);
+      const { error: updateError } = await supabase
+        .from('form_justificatifs')
+        .update({
+          file_path: filePath,
+          file_name: file.name,
+          status: 'uploaded'
+        })
+        .eq('id', justificatifId);
+        
       if (updateError) {
         console.error('Erreur lors de la mise à jour du statut du justificatif:', updateError);
         throw updateError;
       }
-      setJustificatifs(docs => docs.map(doc => doc.id === justificatifId ? {
-        ...doc,
-        file_path: filePath,
-        file_name: file.name,
-        status: 'uploaded' as JustificatifStatus
-      } : doc));
+      
+      // Mettre à jour l'état local
+      setJustificatifs(docs => docs.map(doc => 
+        doc.id === justificatifId 
+          ? {
+              ...doc,
+              file_path: filePath,
+              file_name: file.name,
+              status: 'uploaded' as JustificatifStatus
+            } 
+          : doc
+      ));
+      
       toast.success(`Le fichier ${file.name} a été téléchargé avec succès`);
     } catch (error) {
       console.error('Erreur de téléchargement:', error);
       toast.error("Une erreur est survenue lors du téléchargement");
+    } finally {
+      setUploading(prev => ({ ...prev, [justificatifId]: false }));
     }
   };
+
+  const renderStatus = (doc: Justificatif) => {
+    if (uploading[doc.id]) {
+      return <span className="text-sm text-amber-600 flex items-center">
+        <Skeleton className="h-4 w-4 mr-2 rounded-full animate-pulse" />
+        Téléchargement...
+      </span>;
+    }
+    
+    if (doc.status === 'uploaded') {
+      return <span className="text-sm text-green-600 flex items-center">
+        <CheckCircle className="h-4 w-4 mr-2" />
+        Téléchargé
+      </span>;
+    }
+    
+    if (doc.status === 'validated') {
+      return <span className="text-sm text-blue-600 flex items-center">
+        <FileCheck className="h-4 w-4 mr-2" />
+        Validé
+      </span>;
+    }
+    
+    return null;
+  };
+
   if (isLoading) {
     return <div className="flex items-center justify-center h-64">
         <p>Chargement des justificatifs...</p>
@@ -191,6 +244,7 @@ const Justificatifs = () => {
         </Card>
       </div>;
   }
+
   return <div className="space-y-6 animate-fadeIn">
       <div>
         <h1 className="text-3xl font-bold">Pièces justificatives</h1>
@@ -224,15 +278,26 @@ const Justificatifs = () => {
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex items-center justify-end gap-2">
-                    {doc.status === 'uploaded' && <span className="text-sm text-green-600 mr-2">
-                        ✓ Téléchargé
-                      </span>}
+                    {renderStatus(doc)}
                     <label>
-                      <input type="file" className="hidden" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" onChange={e => {
-                    const file = e.target.files?.[0];
-                    if (file) handleFileUpload(doc.id, file);
-                  }} aria-label="Télécharger un justificatif" />
-                      <Button variant={doc.status === 'uploaded' ? "outline" : "default"} className={`${doc.status !== 'uploaded' ? 'bg-[#35DA56] hover:bg-[#27017F]' : ''} hover:bg-gray-100`}>
+                      <Input 
+                        type="file" 
+                        className="hidden" 
+                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" 
+                        onChange={e => {
+                          const file = e.target.files?.[0];
+                          if (file) handleFileUpload(doc.id, file);
+                          // Réinitialiser l'input pour permettre le téléchargement du même fichier
+                          e.target.value = '';
+                        }} 
+                        aria-label="Télécharger un justificatif" 
+                        disabled={uploading[doc.id]}
+                      />
+                      <Button 
+                        variant={doc.status === 'uploaded' ? "outline" : "default"} 
+                        className={`${doc.status !== 'uploaded' ? 'bg-[#35DA56] hover:bg-[#27017F]' : ''} hover:bg-gray-100`}
+                        disabled={uploading[doc.id]}
+                      >
                         <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
                         {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
                       </Button>
@@ -245,4 +310,5 @@ const Justificatifs = () => {
       </Card>
     </div>;
 };
+
 export default Justificatifs;

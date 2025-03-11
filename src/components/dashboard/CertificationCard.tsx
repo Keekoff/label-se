@@ -23,7 +23,7 @@ export const CertificationCard = ({ companyData, isPremium = false }: Certificat
   console.log('Données de certification:', companyData);
   
   return (
-    <div className="bg-white/90 backdrop-blur-sm border-2 border-[#35DA56] rounded-lg p-4 shadow-md animate-fadeIn transition-all duration-300 hover:shadow-lg">
+    <div className="bg-white/80 backdrop-blur-md border-2 border-[#35DA56] rounded-lg p-4 shadow-md animate-fadeIn transition-all duration-300 hover:shadow-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
