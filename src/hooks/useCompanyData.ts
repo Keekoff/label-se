@@ -84,12 +84,6 @@ export const useCompanyData = (): FetchCompanyDataResult => {
       setError(null);
       setErrorDetails(null);
       
-      // Si l'utilisateur n'est pas premium, ne pas appeler l'Edge Function
-      if (!isPremium) {
-        setIsLoading(false);
-        return;
-      }
-      
       try {
         console.log(`Fetching Airtable data for company: ${companyName}`);
         
@@ -162,7 +156,7 @@ export const useCompanyData = (): FetchCompanyDataResult => {
     } else {
       setIsLoading(false);
     }
-  }, [companyName, isPremium, toast]);
+  }, [companyName, toast]);
 
   return {
     isLoading,

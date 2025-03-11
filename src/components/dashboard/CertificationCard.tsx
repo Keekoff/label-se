@@ -20,6 +20,8 @@ export const formatDate = (dateString: string | undefined) => {
 };
 
 export const CertificationCard = ({ companyData, isPremium = false }: CertificationCardProps) => {
+  console.log('Données de certification:', companyData);
+  
   return (
     <div className="bg-white/90 backdrop-blur-sm border-2 border-[#35DA56] rounded-lg p-4 shadow-md animate-fadeIn transition-all duration-300 hover:shadow-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
