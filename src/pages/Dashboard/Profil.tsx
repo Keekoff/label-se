@@ -101,7 +101,7 @@ const Profil = () => {
         <CardHeader className="bg-white">
           <CardTitle>Informations personnelles</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6 bg-slate-50">
+        <CardContent className="space-y-6 bg-white">
           <div className="flex items-start gap-4">
             <User className="h-6 w-6 text-gray-500 mt-1" />
             <div className="space-y-3">
