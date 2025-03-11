@@ -2,7 +2,7 @@
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, FileCheck, CheckCircle } from "lucide-react";
+import { Upload, FileCheck, CheckCircle, Download, File } from "lucide-react";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
@@ -186,6 +186,38 @@ const Justificatifs = () => {
     }
   };
 
+  const handleFileDownload = async (filePath: string, fileName: string) => {
+    try {
+      if (!filePath) {
+        toast.error("Aucun fichier disponible");
+        return;
+      }
+
+      const { data, error } = await supabase.storage
+        .from('justificatifs')
+        .download(filePath);
+
+      if (error) {
+        console.error('Erreur lors du téléchargement du fichier:', error);
+        toast.error("Erreur lors du téléchargement du fichier");
+        return;
+      }
+
+      // Créer un URL pour le fichier et déclencher le téléchargement
+      const url = URL.createObjectURL(data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = fileName || 'document';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Erreur lors du téléchargement:', error);
+      toast.error("Une erreur est survenue lors du téléchargement");
+    }
+  };
+
   const renderStatus = (doc: Justificatif) => {
     if (uploading[doc.id]) {
       return <span className="text-sm text-amber-600 flex items-center">
@@ -277,31 +309,48 @@ const Justificatifs = () => {
                   </ul>
                 </TableCell>
                 <TableCell className="text-right">
-                  <div className="flex items-center justify-end gap-2">
-                    {renderStatus(doc)}
-                    <label>
-                      <Input 
-                        type="file" 
-                        className="hidden" 
-                        accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" 
-                        onChange={e => {
-                          const file = e.target.files?.[0];
-                          if (file) handleFileUpload(doc.id, file);
-                          // Réinitialiser l'input pour permettre le téléchargement du même fichier
-                          e.target.value = '';
-                        }} 
-                        aria-label="Télécharger un justificatif" 
-                        disabled={uploading[doc.id]}
-                      />
+                  <div className="flex flex-col items-end gap-2">
+                    <div className="flex items-center justify-end gap-2">
+                      {renderStatus(doc)}
+                      <div className="relative">
+                        <Input 
+                          type="file" 
+                          id={`file-upload-${doc.id}`}
+                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" 
+                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" 
+                          onChange={e => {
+                            const file = e.target.files?.[0];
+                            if (file) handleFileUpload(doc.id, file);
+                            // Réinitialiser l'input pour permettre le téléchargement du même fichier
+                            e.target.value = '';
+                          }} 
+                          aria-label="Télécharger un justificatif" 
+                          disabled={uploading[doc.id]}
+                        />
+                        <Button 
+                          variant={doc.status === 'uploaded' ? "outline" : "default"} 
+                          className={`${doc.status !== 'uploaded' ? 'bg-[#35DA56] hover:bg-[#27017F]' : ''} hover:bg-gray-100`}
+                          disabled={uploading[doc.id]}
+                          type="button"
+                        >
+                          <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
+                          {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
+                        </Button>
+                      </div>
+                    </div>
+                    
+                    {doc.file_name && doc.file_path && (
                       <Button 
-                        variant={doc.status === 'uploaded' ? "outline" : "default"} 
-                        className={`${doc.status !== 'uploaded' ? 'bg-[#35DA56] hover:bg-[#27017F]' : ''} hover:bg-gray-100`}
-                        disabled={uploading[doc.id]}
+                        variant="ghost" 
+                        size="sm" 
+                        className="text-[#27017F] hover:text-[#35DA56] hover:bg-transparent"
+                        onClick={() => handleFileDownload(doc.file_path!, doc.file_name!)}
                       >
-                        <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
-                        {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
+                        <File className="h-4 w-4 mr-2" />
+                        <span className="text-xs truncate max-w-[150px]">{doc.file_name}</span>
+                        <Download className="h-3 w-3 ml-2" />
                       </Button>
-                    </label>
+                    )}
                   </div>
                 </TableCell>
               </TableRow>)}
