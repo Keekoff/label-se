@@ -1,12 +1,14 @@
+
 import { useState, useEffect } from "react";
-import { Card } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Upload, FileCheck, CheckCircle, Download, File } from "lucide-react";
+import { Upload, FileCheck, CheckCircle, Download, File, ChevronDown, ChevronUp } from "lucide-react";
 import { toast } from "sonner";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
+import { getJustificatifs } from "@/components/form/steps/FormPart1";
 
 type JustificatifStatus = 'pending' | 'uploaded' | 'validated';
 type Justificatif = {
@@ -19,12 +21,49 @@ type Justificatif = {
   status: JustificatifStatus;
 };
 
+type GroupedJustificatifs = {
+  [questionId: string]: {
+    questionId: string;
+    questionTitle: string;
+    items: Justificatif[];
+  }
+};
+
 const Justificatifs = () => {
   const [justificatifs, setJustificatifs] = useState<Justificatif[]>([]);
+  const [groupedJustificatifs, setGroupedJustificatifs] = useState<GroupedJustificatifs>({});
   const [isLoading, setIsLoading] = useState(true);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [uploading, setUploading] = useState<Record<string, boolean>>({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  
+  const toggleGroup = (questionId: string) => {
+    setExpandedGroups(prev => ({
+      ...prev,
+      [questionId]: !prev[questionId]
+    }));
+  };
+
+  const groupJustificatifs = (items: Justificatif[]) => {
+    const grouped: GroupedJustificatifs = {};
+    
+    items.forEach(item => {
+      if (!grouped[item.question_identifier]) {
+        grouped[item.question_identifier] = {
+          questionId: item.question_identifier,
+          questionTitle: item.question_identifier,
+          items: []
+        };
+        // Par défaut, tous les groupes sont ouverts
+        setExpandedGroups(prev => ({...prev, [item.question_identifier]: true}));
+      }
+      
+      grouped[item.question_identifier].items.push(item);
+    });
+    
+    return grouped;
+  };
 
   useEffect(() => {
     const fetchJustificatifs = async () => {
@@ -86,7 +125,9 @@ const Justificatifs = () => {
           file_name: item.file_name,
           status: item.status as JustificatifStatus || 'pending'
         }));
+        
         setJustificatifs(mappedJustificatifs);
+        setGroupedJustificatifs(groupJustificatifs(mappedJustificatifs));
       } catch (error) {
         console.error('Erreur lors du chargement des justificatifs:', error);
         toast.error("Erreur lors du chargement des justificatifs");
@@ -146,7 +187,8 @@ const Justificatifs = () => {
         
       if (updateError) throw updateError;
       
-      setJustificatifs(docs => docs.map(doc => 
+      // Mise à jour du state local
+      const updatedJustificatifs = justificatifs.map(doc => 
         doc.id === justificatifId 
           ? {
               ...doc,
@@ -155,7 +197,10 @@ const Justificatifs = () => {
               status: 'uploaded' as JustificatifStatus
             } 
           : doc
-      ));
+      );
+      
+      setJustificatifs(updatedJustificatifs);
+      setGroupedJustificatifs(groupJustificatifs(updatedJustificatifs));
       
       toast.success(`Le fichier ${file.name} a été téléchargé avec succès`);
     } catch (error) {
@@ -263,77 +308,100 @@ const Justificatifs = () => {
         </p>
       </div>
 
-      <Card className="p-6 bg-white">
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Critère</TableHead>
-              <TableHead>Réponse</TableHead>
-              <TableHead>Justificatifs demandés</TableHead>
-              <TableHead className="text-right">Action</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {justificatifs.map(doc => <TableRow key={doc.id}>
-                <TableCell className="font-medium">{doc.question_identifier}</TableCell>
-                <TableCell>
-                  <div className="max-w-md">
-                    {doc.response}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <ul className="list-disc pl-5 text-sm">
-                    {doc.justificatifs.map((justificatif, index) => <li key={index}>{justificatif}</li>)}
-                  </ul>
-                </TableCell>
-                <TableCell className="text-right">
-                  <div className="flex flex-col items-end gap-2">
-                    <div className="flex items-center justify-end gap-2">
-                      {renderStatus(doc)}
-                      <div className="relative">
-                        <Input 
-                          type="file" 
-                          id={`file-upload-${doc.id}`}
-                          className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" 
-                          accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" 
-                          onChange={e => {
-                            const file = e.target.files?.[0];
-                            if (file) handleFileUpload(doc.id, file);
-                            e.target.value = '';
-                          }} 
-                          aria-label="Télécharger un justificatif" 
-                          disabled={uploading[doc.id]}
-                        />
-                        <Button 
-                          variant={doc.status === 'uploaded' ? "outline" : "default"} 
-                          className={`${doc.status !== 'uploaded' ? 'bg-[#35DA56] hover:bg-[#27017F]' : ''} hover:bg-gray-100`}
-                          disabled={uploading[doc.id]}
-                          type="button"
-                        >
-                          <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
-                          {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
-                        </Button>
-                      </div>
-                    </div>
-                    
-                    {doc.file_name && doc.file_path && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="text-[#27017F] hover:text-[#35DA56] hover:bg-transparent"
-                        onClick={() => handleFileDownload(doc.file_path!, doc.file_name!)}
-                      >
-                        <File className="h-4 w-4 mr-2" />
-                        <span className="text-xs truncate max-w-[150px]">{doc.file_name}</span>
-                        <Download className="h-3 w-3 ml-2" />
-                      </Button>
-                    )}
-                  </div>
-                </TableCell>
-              </TableRow>)}
-          </TableBody>
-        </Table>
-      </Card>
+      <div className="space-y-6">
+        {Object.values(groupedJustificatifs).map(group => (
+          <Card key={group.questionId} className="p-0 bg-white">
+            <CardHeader 
+              className="p-4 cursor-pointer border-b flex flex-row items-center justify-between" 
+              onClick={() => toggleGroup(group.questionId)}
+            >
+              <CardTitle className="text-lg font-semibold">{group.questionTitle}</CardTitle>
+              <div className="flex items-center">
+                {expandedGroups[group.questionId] ? 
+                  <ChevronUp className="h-5 w-5 text-[#27017F]" /> : 
+                  <ChevronDown className="h-5 w-5 text-[#27017F]" />
+                }
+              </div>
+            </CardHeader>
+            
+            {expandedGroups[group.questionId] && (
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead className="w-1/3">Réponse</TableHead>
+                      <TableHead className="w-1/3">Justificatifs demandés</TableHead>
+                      <TableHead className="text-right w-1/3">Action</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {group.items.map(doc => (
+                      <TableRow key={doc.id}>
+                        <TableCell className="font-medium">
+                          <div className="max-w-md">
+                            {doc.response}
+                          </div>
+                        </TableCell>
+                        <TableCell>
+                          <ul className="list-disc pl-5 text-sm">
+                            {doc.justificatifs.map((justificatif, index) => (
+                              <li key={index}>{justificatif}</li>
+                            ))}
+                          </ul>
+                        </TableCell>
+                        <TableCell className="text-right">
+                          <div className="flex flex-col items-end gap-2">
+                            <div className="flex items-center justify-end gap-2">
+                              {renderStatus(doc)}
+                              <div className="relative">
+                                <Input 
+                                  type="file" 
+                                  id={`file-upload-${doc.id}`}
+                                  className="absolute inset-0 opacity-0 cursor-pointer w-full h-full z-10" 
+                                  accept=".pdf,.doc,.docx,.jpg,.jpeg,.png" 
+                                  onChange={e => {
+                                    const file = e.target.files?.[0];
+                                    if (file) handleFileUpload(doc.id, file);
+                                    e.target.value = '';
+                                  }} 
+                                  aria-label="Télécharger un justificatif" 
+                                  disabled={uploading[doc.id]}
+                                />
+                                <Button 
+                                  variant={doc.status === 'uploaded' ? "outline" : "default"} 
+                                  className={`${doc.status !== 'uploaded' ? 'bg-[#35DA56] hover:bg-[#27017F]' : ''} hover:bg-gray-100`}
+                                  disabled={uploading[doc.id]}
+                                  type="button"
+                                >
+                                  <Upload className="mr-2 h-4 w-4" aria-hidden="true" />
+                                  {doc.status === 'uploaded' ? 'Remplacer' : 'Télécharger'}
+                                </Button>
+                              </div>
+                            </div>
+                            
+                            {doc.file_name && doc.file_path && (
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="text-[#27017F] hover:text-[#35DA56] hover:bg-transparent"
+                                onClick={() => handleFileDownload(doc.file_path!, doc.file_name!)}
+                              >
+                                <File className="h-4 w-4 mr-2" />
+                                <span className="text-xs truncate max-w-[150px]">{doc.file_name}</span>
+                                <Download className="h-3 w-3 ml-2" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            )}
+          </Card>
+        ))}
+      </div>
     </div>;
 };
 
