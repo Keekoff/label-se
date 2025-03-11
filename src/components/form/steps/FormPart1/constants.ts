@@ -1,4 +1,3 @@
-
 import { Question } from "./types";
 
 export const QUESTIONS: Question[] = [
@@ -101,7 +100,7 @@ export const QUESTIONS: Question[] = [
       },
       {
         value: "option3",
-        label: "L'entreprise a plus de 20 salariés et répond positivement à l'obligation d'emploi de travailleurs handicapés (OETH). Les salariés handicapés représentent bien 6 % de l'effectif de l'entreprise",
+        label: "L’entreprise a plus de 20 salariés et répond positivement à l’obligation d’emploi de travailleurs handicapés (OETH). Les salariés handicapés représentent bien 6 % de l’effectif de l’entreprise",
         justificatifs: [
           "Preuve administrative de la réponse positive à l'OETH"
         ]

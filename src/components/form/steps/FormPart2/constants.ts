@@ -1,4 +1,3 @@
-
 import { Question } from "./types";
 
 export const QUESTIONS: Question[] = [
@@ -63,7 +62,7 @@ export const QUESTIONS: Question[] = [
       },
       { 
         value: "C", 
-        label: "L'entreprise a déployé une politique RSE et diffuse les normes d'achats responsables décrétées par l'AFNOR sous le n°NFX 50-135, déclinaison de la norme ISO 26000 auprès des collaborateurs",
+        label: "L'entreprise a déployé une politique RSE et diffuse les normes d'achats responsables décrétées par l’AFNOR sous le n°NFX 50-135, déclinaison de la norme ISO 26000 auprès des collaborateurs",
         justificatifs: [
           "Identification du responsable RSE",
           "Présence du sujet et des actions RSE dans la feuille de route de l'année passée et à venir"
@@ -199,7 +198,7 @@ export const QUESTIONS: Question[] = [
       },
       { 
         value: "B", 
-        label: "L'entreprise investit et/ou met à disposition des ressources pour développer des projets/produits pour le bien commun. Elle déploie des actions de prévention ou un investissement social qui permet d'éviter une dépense de réparation ou de compensation",
+        label: "L'entreprise investit et/ou met à disposition des ressources pour développer des projets/produits pour le bien commun. Elle déploie des actions de prévention ou un investissement social qui permet d’éviter une dépense de réparation ou de compensation",
         justificatifs: [
           "Benchmark incluant la dimension durable et responsable",
           "Descriptions des projets, initiatives, actions...."

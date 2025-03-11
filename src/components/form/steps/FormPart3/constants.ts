@@ -1,4 +1,3 @@
-
 import { Question } from "./types";
 
 export const QUESTIONS: Question[] = [
@@ -158,7 +157,7 @@ export const QUESTIONS: Question[] = [
     options: [
       {
         value: "A",
-        label: "Éteindre son ordinateur et son écran à la fin de la journée, et débrancher tous les appareils électriques qui consomment de l'électricité en mode veille",
+        label: "Éteindre son ordinateur et son écran à la fin de la journée, et débrancher tous les appareils électriques qui consomment de l’électricité en mode veille",
         justificatifs: [
           "Preuves des actions concrètes (photos, vidéos, témoignages ...)"
         ]
@@ -272,7 +271,7 @@ export const QUESTIONS: Question[] = [
       },
       {
         value: "C",
-        label: "L'entreprise a déployé une politique RSE et diffuse les normes d'achats responsables décrétées par l'AFNOR sous le n°NFX 50-135, déclinaison de la norme ISO 26000 auprès des collaborateurs",
+        label: "L'entreprise a déployé une politique RSE et diffuse les normes d'achats responsables décrétées par l’AFNOR sous le n°NFX 50-135, déclinaison de la norme ISO 26000 auprès des collaborateurs",
         justificatifs: [
           "Identification du responsable RSE",
           "Présence du sujet et des actions RSE dans la feuille de route de l'année passée et à venir"
