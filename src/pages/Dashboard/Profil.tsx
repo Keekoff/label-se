@@ -97,7 +97,7 @@ const Profil = () => {
         Vos informations personnelles
       </p>
       
-      <Card className="shadow-md bg-slate-50">
+      <Card className="shadow-md bg-white">
         <CardHeader className="bg-white">
           <CardTitle>Informations personnelles</CardTitle>
         </CardHeader>
