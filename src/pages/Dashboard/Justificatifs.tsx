@@ -29,23 +29,19 @@ const Justificatifs = () => {
   useEffect(() => {
     const fetchJustificatifs = async () => {
       try {
-        const {
-          data: {
-            session
-          }
-        } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
           toast.error("Session expirée");
           return;
         }
-        console.log("Récupération des justificatifs pour l'utilisateur:", session.user.id);
 
-        const {
-          data: submissions,
-          error: submissionError
-        } = await supabase.from('label_submissions').select('id, status, payment_status').eq('user_id', session.user.id).order('created_at', {
-          ascending: false
-        }).limit(1);
+        const { data: submissions, error: submissionError } = await supabase
+          .from('label_submissions')
+          .select('id, status, payment_status')
+          .eq('user_id', session.user.id)
+          .order('created_at', { ascending: false })
+          .limit(1);
+
         if (submissionError) {
           console.error('Erreur lors de la récupération des soumissions:', submissionError);
           setSubmitError("Erreur lors de la récupération des soumissions");
@@ -68,17 +64,18 @@ const Justificatifs = () => {
           return;
         }
 
-        const {
-          data: justificatifsData,
-          error: justificatifsError
-        } = await supabase.from('form_justificatifs').select('*').eq('submission_id', latestSubmission.id);
+        const { data: justificatifsData, error: justificatifsError } = await supabase
+          .from('form_justificatifs')
+          .select('*')
+          .eq('user_id', session.user.id)
+          .eq('submission_id', latestSubmission.id);
+
         if (justificatifsError) {
           console.error('Erreur lors du chargement des justificatifs:', justificatifsError);
           toast.error("Erreur lors du chargement des justificatifs");
           setIsLoading(false);
           return;
         }
-        console.log("Données des justificatifs récupérées:", justificatifsData);
 
         const mappedJustificatifs = justificatifsData.map(item => ({
           id: item.id,
@@ -102,8 +99,9 @@ const Justificatifs = () => {
 
   const handleFileUpload = async (justificatifId: string, file: File) => {
     try {
-      if (!submissionId) {
-        toast.error("Aucune soumission active trouvée");
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Session expirée");
         return;
       }
       
@@ -141,7 +139,8 @@ const Justificatifs = () => {
         .update({
           file_path: filePath,
           file_name: file.name,
-          status: 'uploaded'
+          status: 'uploaded',
+          user_id: session.user.id
         })
         .eq('id', justificatifId);
         
