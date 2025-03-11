@@ -34,7 +34,11 @@ export const SubmissionCard = ({
                   2 / Partager vos documents pour valider votre demande de label
                 </>
               ) : (
-                "Vous pouvez maintenant accéder aux pièces justificatives nécessaires à la validation de votre dossier."
+                <>
+                  Votre paiement a bien été effectué, merci ! 🙂
+                  <br /><br />
+                  Pour finaliser votre demande de label, veuillez télécharger tous les documents requis. Une fois vérifiés, notre équipe validera votre demande de label Startup Engagée ! 🥳
+                </>
               )}
             </p>
           </div>
