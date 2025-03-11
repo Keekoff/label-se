@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -41,7 +40,6 @@ const Justificatifs = () => {
         }
         console.log("Récupération des justificatifs pour l'utilisateur:", session.user.id);
 
-        // Récupérer la dernière soumission de l'utilisateur
         const {
           data: submissions,
           error: submissionError
@@ -63,7 +61,6 @@ const Justificatifs = () => {
         console.log("Soumission trouvée:", latestSubmission);
         setSubmissionId(latestSubmission.id);
 
-        // Vérifier si la soumission est dans un état approprié
         if (latestSubmission.status !== 'submitted' && latestSubmission.payment_status !== 'paid') {
           console.log("La soumission n'est pas dans un état approprié pour les justificatifs");
           setSubmitError("Votre soumission n'est pas encore finalisée ou payée");
@@ -71,7 +68,6 @@ const Justificatifs = () => {
           return;
         }
 
-        // Récupérer les justificatifs associés à cette soumission
         const {
           data: justificatifsData,
           error: justificatifsError
@@ -84,7 +80,6 @@ const Justificatifs = () => {
         }
         console.log("Données des justificatifs récupérées:", justificatifsData);
 
-        // Transformer les données pour l'affichage
         const mappedJustificatifs = justificatifsData.map(item => ({
           id: item.id,
           question_identifier: item.question_identifier,
@@ -117,7 +112,6 @@ const Justificatifs = () => {
       const justificatif = justificatifs.find(j => j.id === justificatifId);
       if (!justificatif) throw new Error("Justificatif non trouvé");
       
-      // Vérification du type de fichier
       const acceptedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
       const fileExt = file.name.split('.').pop()?.toLowerCase();
       if (!fileExt || !acceptedTypes.some(type => type.includes(fileExt))) {
@@ -125,32 +119,23 @@ const Justificatifs = () => {
         return;
       }
       
-      // Vérification de la taille du fichier (max 10 MB)
       if (file.size > 10 * 1024 * 1024) {
         toast.error("Le fichier est trop volumineux. Taille maximale: 10 MB");
         return;
       }
 
       const fileName = `${justificatifId}-${Date.now()}.${fileExt}`;
-      // Créer un chemin qui inclut l'ID de soumission
       const filePath = `${submissionId}/${fileName}`;
       
-      // Téléchargement du fichier
-      const { data: uploadData, error: uploadError } = await supabase.storage
+      const { error: uploadError } = await supabase.storage
         .from('justificatifs')
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: true,
         });
         
-      if (uploadError) {
-        console.error('Erreur lors du téléchargement:', uploadError);
-        throw uploadError;
-      }
-      
-      console.log('Fichier téléchargé avec succès:', uploadData);
+      if (uploadError) throw uploadError;
 
-      // Mettre à jour le statut du justificatif dans la base de données
       const { error: updateError } = await supabase
         .from('form_justificatifs')
         .update({
@@ -160,12 +145,8 @@ const Justificatifs = () => {
         })
         .eq('id', justificatifId);
         
-      if (updateError) {
-        console.error('Erreur lors de la mise à jour du statut du justificatif:', updateError);
-        throw updateError;
-      }
+      if (updateError) throw updateError;
       
-      // Mettre à jour l'état local
       setJustificatifs(docs => docs.map(doc => 
         doc.id === justificatifId 
           ? {
@@ -203,7 +184,6 @@ const Justificatifs = () => {
         return;
       }
 
-      // Créer un URL pour le fichier et déclencher le téléchargement
       const url = URL.createObjectURL(data);
       const link = document.createElement('a');
       link.href = url;
@@ -249,7 +229,6 @@ const Justificatifs = () => {
       </div>;
   }
 
-  // Si aucun justificatif n'est trouvé, afficher un message d'erreur ou des données d'exemple
   if (justificatifs.length === 0) {
     return <div className="space-y-6 animate-fadeIn">
         <div>
@@ -321,7 +300,6 @@ const Justificatifs = () => {
                           onChange={e => {
                             const file = e.target.files?.[0];
                             if (file) handleFileUpload(doc.id, file);
-                            // Réinitialiser l'input pour permettre le téléchargement du même fichier
                             e.target.value = '';
                           }} 
                           aria-label="Télécharger un justificatif" 
