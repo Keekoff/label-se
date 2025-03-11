@@ -37,7 +37,7 @@ export const DashboardCharts = () => {
 
   return (
     <div className="space-y-6">
-      {hasSubmittedForm && <CertificationCard companyData={companyData} />}
+      {hasSubmittedForm && <CertificationCard companyData={companyData} isPremium={isPremium} />}
 
       <div className="flex justify-end mb-4">
         <Button 

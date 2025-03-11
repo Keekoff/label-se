@@ -4,6 +4,7 @@ import { CompanyData } from "@/hooks/useCompanyData";
 
 interface CertificationCardProps {
   companyData: CompanyData | null;
+  isPremium?: boolean;
 }
 
 export const formatDate = (dateString: string | undefined) => {
@@ -18,7 +19,7 @@ export const formatDate = (dateString: string | undefined) => {
   }
 };
 
-export const CertificationCard = ({ companyData }: CertificationCardProps) => {
+export const CertificationCard = ({ companyData, isPremium = false }: CertificationCardProps) => {
   return (
     <div className="bg-white/90 backdrop-blur-sm border-2 border-[#35DA56] rounded-lg p-4 shadow-md animate-fadeIn transition-all duration-300 hover:shadow-lg">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
@@ -28,8 +29,13 @@ export const CertificationCard = ({ companyData }: CertificationCardProps) => {
             <h3 className="font-semibold text-gray-800">Certification : Label Startup Engagée</h3>
           </div>
           <p className="text-gray-600">Niveau : {companyData?.echelonTexte || "Non défini"}</p>
-          <p className="text-gray-600">Début de validité : {formatDate(companyData?.dateValidation)}</p>
-          <p className="text-gray-600">Fin de validité : {formatDate(companyData?.dateFinValidite)}</p>
+          <div className={`${!isPremium ? 'filter blur-[3px] pointer-events-none' : ''}`}>
+            <p className="text-gray-600">Début de validité : {formatDate(companyData?.dateValidation)}</p>
+            <p className="text-gray-600">Fin de validité : {formatDate(companyData?.dateFinValidite)}</p>
+          </div>
+          {!isPremium && (
+            <p className="text-xs text-[#27017F] font-medium mt-1">Dates disponibles après paiement</p>
+          )}
         </div>
         <div className="h-24 w-40 bg-gray-100/80 backdrop-blur-sm rounded flex items-center justify-center overflow-hidden shadow-inner">
           {companyData?.logoUrl ? (
