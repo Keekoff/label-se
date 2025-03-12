@@ -59,7 +59,7 @@ const Login = () => {
                 <Button type="button" variant="link" onClick={() => navigate("/signup")} className="text-sm text-primary hover:text-primary/80">
                   Créer un compte
                 </Button>
-                <Button type="button" variant="link" className="text-sm text-primary hover:text-primary/80">
+                <Button type="button" variant="link" className="text-sm text-secondary-hover">
                   Mot de passe oublié ?
                 </Button>
               </div>
