@@ -63,7 +63,7 @@ const Login = () => {
                   Mot de passe oublié ?
                 </Button>
               </div>
-              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-green-500">
+              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white">
                 {loading ? "Connexion..." : "Se connecter"}
               </Button>
             </form>
