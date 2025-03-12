@@ -103,14 +103,14 @@ export const RadarChartCard = () => {
   });
   
   if (isLoading) {
-    return <Card className="p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-[600px] md:col-span-2 chart-card bg-slate-50/90 backdrop-blur-sm">
+    return <Card className="p-4 sm:p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-[400px] sm:h-[500px] md:h-[600px] md:col-span-2 chart-card bg-slate-50/90 backdrop-blur-sm">
         <div className="flex items-center justify-center h-full">
           <p className="text-gray-500">Chargement des données...</p>
         </div>
       </Card>;
   }
   
-  return <Card className="p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-[600px] md:col-span-2 chart-card backdrop-blur-sm bg-white">
+  return <Card className="p-4 sm:p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-[400px] sm:h-[500px] md:h-[600px] md:col-span-2 chart-card backdrop-blur-sm bg-white">
       <SustainabilityRadarChart title="Analyse comparative des critères de durabilité" data={radarData} myScoreColor="#35DA56" maxScoreColor="#27017F" />
     </Card>;
 };

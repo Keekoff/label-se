@@ -66,3 +66,29 @@
   transform: translateY(10px);
   transition: opacity 300ms, transform 300ms;
 }
+
+/* Responsive adjustments for small screens */
+@media (max-width: 768px) {
+  .radar-chart-label {
+    display: none;
+  }
+}
+
+/* Make the tooltip more visible on small screens */
+.recharts-tooltip-wrapper {
+  z-index: 1000 !important;
+}
+
+.recharts-tooltip-item {
+  font-size: 0.875rem !important;
+}
+
+/* Ensure form elements don't overflow on small screens */
+input, select, textarea {
+  max-width: 100%;
+}
+
+/* Ensure buttons wrap text properly on small screens */
+button {
+  white-space: normal;
+}

@@ -40,16 +40,37 @@ export const SustainabilityRadarChart = ({
           <span>Scores max</span>
         </div>
       </div>
-      <div className="flex-grow w-full h-[500px]">
+      <div className="flex-grow w-full h-[300px] sm:h-[400px] md:h-[500px]">
         <ResponsiveContainer width="100%" height="100%">
           <RechartsRadarChart outerRadius="80%" data={data}>
             <PolarGrid gridType="polygon" />
             <PolarAngleAxis 
               dataKey="subject" 
-              tick={{ 
-                fontSize: 10, 
-                fill: "#4B5563",
-                dy: 3
+              tick={(props) => {
+                // On mobile, we hide the text labels completely, showing on tooltip hover only
+                if (window.innerWidth < 768) {
+                  return null;
+                }
+                // On tablet and larger, render the labels
+                return (
+                  <text 
+                    {...props} 
+                    className="radar-chart-label"
+                    fontSize={10}
+                    fill="#4B5563"
+                    dy={3}
+                    textAnchor={props.textAnchor}
+                    x={props.x}
+                    y={props.y}
+                  >
+                    <tspan x={props.x} dy={props.dy}>
+                      {props.payload.value}
+                    </tspan>
+                  </text>
+                );
+              }}
+              style={{
+                fontSize: "10px"
               }}
             />
             <PolarRadiusAxis 
@@ -75,7 +96,9 @@ export const SustainabilityRadarChart = ({
               formatter={(value, name) => [
                 `${value}`, 
                 name === "myScore" ? "Mes résultats" : "Score max"
-              ]} 
+              ]}
+              labelFormatter={(label) => `Critère: ${label}`}
+              wrapperStyle={{ zIndex: 1000 }}
             />
           </RechartsRadarChart>
         </ResponsiveContainer>

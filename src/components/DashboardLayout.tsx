@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt, Upload, HelpCircle } from "lucide-react";
@@ -5,12 +6,34 @@ import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [hasPaid, setHasPaid] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+
+  useEffect(() => {
+    // Handle responsiveness - close sidebar on small screens by default
+    const handleResize = () => {
+      if (window.innerWidth < 768) {
+        setSidebarOpen(false);
+      } else {
+        setSidebarOpen(true);
+      }
+    };
+
+    // Set initial state
+    handleResize();
+
+    // Add event listener
+    window.addEventListener('resize', handleResize);
+
+    // Clean up
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -67,6 +90,7 @@ const DashboardLayout = () => {
     });
     return () => subscription.unsubscribe();
   }, [navigate, location.pathname]);
+
   const baseMenuItems = [{
     icon: LayoutDashboard,
     label: "Tableau de bord",
@@ -80,6 +104,7 @@ const DashboardLayout = () => {
     label: "Paramètres",
     path: "/dashboard/settings"
   }];
+
   const menuItems = hasPaid ? [...baseMenuItems.slice(0, 2), {
     icon: Upload,
     label: "Justificatifs",
@@ -89,13 +114,16 @@ const DashboardLayout = () => {
     label: "Mes paiements",
     path: "/dashboard/payments"
   }, ...baseMenuItems.slice(2)] : baseMenuItems;
+
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
       Chargement...
     </div>;
   }
+
   return <div className="min-h-screen bg-background">
-      <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-30 shadow-lg`}>
+      {/* Fixed positioned sidebar with higher z-index to ensure it's above content on small screens */}
+      <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-40 shadow-lg`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10 backdrop-blur-sm bg-primary/95">
           <div className="text-slate-50 text-base font-bold">
             {sidebarOpen ? <img src="/lovable-uploads/de6325b8-2d80-4327-963c-d4a068f337fe.png" alt="Logo" className="h-10" /> : <img src="/lovable-uploads/de6325b8-2d80-4327-963c-d4a068f337fe.png" alt="Logo" className="h-6" />}
@@ -152,4 +180,5 @@ const DashboardLayout = () => {
       </div>
     </div>;
 };
+
 export default DashboardLayout;
