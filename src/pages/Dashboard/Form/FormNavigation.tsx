@@ -54,7 +54,7 @@ export const FormNavigation = ({
       <Button
         variant="outline"
         onClick={onPrevious}
-        disabled={currentStep === 1}
+        disabled={currentStep === 1 || currentStep === 6}
         className="flex items-center gap-2"
       >
         <ArrowLeft className="w-4 h-4" />

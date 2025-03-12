@@ -4,11 +4,14 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { CreditCard, LayoutDashboard } from "lucide-react";
 import { Card } from "@/components/ui/card";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface FormThanksProps {
   onValidityChange: (isValid: boolean) => void;
   formState: Record<string, any>;
   setFormState: (state: Record<string, any>) => void;
+  submissionId?: string | null;
 }
 
 const pricingTiers = [
@@ -26,7 +29,7 @@ const getPricingTier = (employeeCount: string) => {
   return "Plus de 100 salariés";
 };
 
-const FormThanks = ({ onValidityChange, formState }: FormThanksProps) => {
+const FormThanks = ({ onValidityChange, formState, submissionId }: FormThanksProps) => {
   const navigate = useNavigate();
   const currentTier = getPricingTier(formState.employeeCount || "0");
 
@@ -34,8 +37,44 @@ const FormThanks = ({ onValidityChange, formState }: FormThanksProps) => {
     onValidityChange(true);
   }, [onValidityChange]);
 
-  const handlePay = () => {
-    console.log("Redirecting to payment...");
+  const handlePayment = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        toast.error("Veuillez vous connecter pour continuer");
+        navigate("/login");
+        return;
+      }
+
+      if (!submissionId) {
+        toast.error("Une erreur est survenue");
+        return;
+      }
+
+      const response = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ submissionId }),
+        }
+      );
+
+      const { url, error } = await response.json();
+      
+      if (error) {
+        throw new Error(error);
+      }
+
+      // Redirect to Stripe Checkout
+      window.location.href = url;
+    } catch (error) {
+      console.error("Payment error:", error);
+      toast.error("Une erreur est survenue lors de la redirection vers le paiement");
+    }
   };
 
   return (
@@ -43,6 +82,7 @@ const FormThanks = ({ onValidityChange, formState }: FormThanksProps) => {
       <h2 className="text-2xl font-semibold">Merci pour votre candidature !</h2>
       <p className="text-gray-600">
         Nous avons bien reçu votre dossier et nous reviendrons vers vous dans les plus brefs délais.
+        Vous trouverez les documents à fournir dans votre Dashboard.
       </p>
 
       <Card className="p-6 mt-8 shadow-md bg-white/95 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
@@ -68,7 +108,7 @@ const FormThanks = ({ onValidityChange, formState }: FormThanksProps) => {
 
       <div className="flex justify-center gap-4 pt-4">
         <Button 
-          onClick={handlePay}
+          onClick={handlePayment}
           className="bg-[#35DA56] hover:bg-[#35DA56]/90 shadow-sm hover:shadow-md"
         >
           <CreditCard className="mr-2 h-4 w-4" />
