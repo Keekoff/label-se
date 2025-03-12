@@ -55,7 +55,7 @@ const Signup = () => {
                 </label>
                 <Input id="password" type="password" value={password} onChange={e => setPassword(e.target.value)} required className="w-full" minLength={6} />
               </div>
-              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-green-500">
+              <Button type="submit" disabled={loading} className="w-full bg-primary hover:bg-primary/90 text-white">
                 {loading ? "Création en cours..." : "Créer un compte"}
               </Button>
               <p className="text-center text-sm text-gray-500">
