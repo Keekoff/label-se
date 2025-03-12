@@ -65,11 +65,6 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         }
       } catch (error) {
         console.error('Error fetching company name:', error);
-        toast({
-          title: "Erreur",
-          description: "Impossible de récupérer les données de votre entreprise",
-          variant: "destructive"
-        });
       }
     };
 
@@ -141,11 +136,7 @@ export const useCompanyData = (): FetchCompanyDataResult => {
       } catch (error) {
         console.error('Error fetching Airtable data:', error);
         setError(error.message || "Impossible de récupérer vos données depuis Airtable");
-        toast({
-          title: "Erreur de connexion à Airtable",
-          description: "Problème de connexion à la base de données. Veuillez vérifier les autorisations et identifiants Airtable.",
-          variant: "destructive"
-        });
+        // Suppression du toast d'erreur pour ne pas afficher la notification
       } finally {
         setIsLoading(false);
       }

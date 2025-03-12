@@ -36,7 +36,7 @@ export const CertificationCard = ({ companyData, isPremium = false }: Certificat
             <p className="text-gray-600">Fin de validité : {formatDate(companyData?.dateFinValidite)}</p>
           </div>
           {!isPremium && (
-            <p className="text-xs text-[#27017F] font-medium mt-1">Dates disponibles après paiement</p>
+            <p className="text-xs text-[#27017F] font-medium mt-1">Dates disponibles après paiement et envoi des pièces justificatives</p>
           )}
         </div>
         <div className="h-24 w-40 bg-gray-100/80 backdrop-blur-sm rounded flex items-center justify-center overflow-hidden shadow-inner">
