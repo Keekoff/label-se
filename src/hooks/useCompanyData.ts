@@ -9,7 +9,7 @@ export type CompanyData = {
   environmentalScore?: number;
   socialImpactScore?: number;
   averageScore?: number;
-  echelonTexte?: string;
+  echelonTexte?: string | string[];
   logoUrl?: string;
   dateValidation?: string;
   dateFinValidite?: string;

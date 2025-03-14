@@ -120,7 +120,14 @@ const DashboardLayout = () => {
   const getKitMediaUrl = () => {
     if (!companyData || !companyData.echelonTexte) return "";
     
-    const echelon = companyData.echelonTexte;
+    // Gérer le cas où echelonTexte est un tableau
+    let echelon = companyData.echelonTexte;
+    
+    // Si c'est un tableau, prendre le premier élément
+    if (Array.isArray(echelon)) {
+      echelon = echelon[0];
+      console.log("Échelon extrait du tableau:", echelon);
+    }
     
     if (echelon === "1") {
       return "https://startupengagee.notion.site/chelon-1-Kit-de-communication-fced9a87298f466786bb2346f2e66a51";
