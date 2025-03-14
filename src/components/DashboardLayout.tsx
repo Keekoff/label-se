@@ -8,6 +8,26 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompanyData } from "@/hooks/useCompanyData";
 
+// Définir des types distincts pour les éléments de menu
+type BaseMenuItem = {
+  icon: React.FC<any>;
+  label: string;
+};
+
+type InternalMenuItem = BaseMenuItem & {
+  path: string;
+  isExternalLink?: false;
+  onClick?: never;
+};
+
+type ExternalMenuItem = BaseMenuItem & {
+  path?: never;
+  isExternalLink: true;
+  onClick: () => void;
+};
+
+type MenuItem = InternalMenuItem | ExternalMenuItem;
+
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
@@ -121,46 +141,54 @@ const DashboardLayout = () => {
     }
   };
 
-  const baseMenuItems = [{
-    icon: LayoutDashboard,
-    label: "Tableau de bord",
-    path: "/dashboard"
-  }, {
-    icon: HelpCircle,
-    label: "FAQ",
-    path: "/dashboard/faq"
-  }, {
-    icon: Settings,
-    label: "Paramètres",
-    path: "/dashboard/settings"
-  }];
+  const baseMenuItems: MenuItem[] = [
+    {
+      icon: LayoutDashboard,
+      label: "Tableau de bord",
+      path: "/dashboard"
+    }, 
+    {
+      icon: HelpCircle,
+      label: "FAQ",
+      path: "/dashboard/faq"
+    }, 
+    {
+      icon: Settings,
+      label: "Paramètres",
+      path: "/dashboard/settings"
+    }
+  ];
 
   // Ajouter l'option Kit media si la soumission est validée
-  const menuItemsWithKitMedia = isValidated && companyData?.echelonTexte ? [
-    ...baseMenuItems.slice(0, 2), 
-    {
-      icon: FileText,
-      label: "Kit media",
-      onClick: openKitMedia,
-      isExternalLink: true
-    }, 
-    ...baseMenuItems.slice(2)
-  ] : baseMenuItems;
+  const menuItemsWithKitMedia: MenuItem[] = isValidated && companyData?.echelonTexte 
+    ? [
+        ...baseMenuItems.slice(0, 2), 
+        {
+          icon: FileText,
+          label: "Kit media",
+          isExternalLink: true,
+          onClick: openKitMedia
+        }, 
+        ...baseMenuItems.slice(2)
+      ] 
+    : baseMenuItems;
 
-  const menuItems = hasPaid ? [
-    ...menuItemsWithKitMedia.slice(0, menuItemsWithKitMedia.length - 1), 
-    {
-      icon: Upload,
-      label: "Justificatifs",
-      path: "/dashboard/justificatifs"
-    }, 
-    {
-      icon: Receipt,
-      label: "Mes paiements",
-      path: "/dashboard/payments"
-    }, 
-    ...menuItemsWithKitMedia.slice(menuItemsWithKitMedia.length - 1)
-  ] : menuItemsWithKitMedia;
+  const menuItems: MenuItem[] = hasPaid 
+    ? [
+        ...menuItemsWithKitMedia.slice(0, menuItemsWithKitMedia.length - 1), 
+        {
+          icon: Upload,
+          label: "Justificatifs",
+          path: "/dashboard/justificatifs"
+        }, 
+        {
+          icon: Receipt,
+          label: "Mes paiements",
+          path: "/dashboard/payments"
+        }, 
+        ...menuItemsWithKitMedia.slice(menuItemsWithKitMedia.length - 1)
+      ] 
+    : menuItemsWithKitMedia;
 
   if (loading) {
     return <div className="min-h-screen flex items-center justify-center">
@@ -180,15 +208,17 @@ const DashboardLayout = () => {
           </Button>
         </div>
         <nav className="p-4 space-y-2">
-          {menuItems.map(item => 
+          {menuItems.map((item, index) => 
             <Button 
-              key={item.label}
+              key={`${item.label}-${index}`}
               variant="ghost" 
-              className={`w-full justify-start text-white hover:bg-[#8985FF] ${!sidebarOpen && "justify-center"} ${item.path && location.pathname === item.path ? "bg-[#35DA56]" : ""} transition-all duration-300`} 
+              className={`w-full justify-start text-white hover:bg-[#8985FF] ${!sidebarOpen && "justify-center"} ${
+                'path' in item && location.pathname === item.path ? "bg-[#35DA56]" : ""
+              } transition-all duration-300`} 
               onClick={() => {
-                if (item.isExternalLink && item.onClick) {
+                if ('isExternalLink' in item && item.isExternalLink) {
                   item.onClick();
-                } else if (item.path) {
+                } else if ('path' in item) {
                   navigate(item.path);
                 }
               }}
