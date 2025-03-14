@@ -34,10 +34,20 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
   const handleChange = (field: string, value: any) => {
     if (readOnly) return;
     
-    setFormState((prev: Record<string, any>) => ({
-      ...prev,
-      [field]: value
-    }));
+    if (field === "sector") {
+      // When sector is changed, update both sector and secteurs_activite
+      setFormState((prev: Record<string, any>) => ({
+        ...prev,
+        [field]: value,
+        // Update secteurs_activite as an array with the selected sector
+        secteurs_activite: [value]
+      }));
+    } else {
+      setFormState((prev: Record<string, any>) => ({
+        ...prev,
+        [field]: value
+      }));
+    }
   };
 
   // Check if the current legal form is valid for the label submission
