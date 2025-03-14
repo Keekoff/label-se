@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import BasicInformation from "./BasicInformation";
@@ -78,6 +79,7 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
           };
           
           setFormState(updatedFormState);
+          console.log('Updated form state:', updatedFormState);
         }
       } catch (error) {
         console.error('Error in fetchEligibilityData:', error);

@@ -54,6 +54,13 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
   // This helps handle cases where the legal form from eligibility might not be in our label form options
   const isValidLegalForm = (form: string) => LABEL_LEGAL_FORMS.includes(form);
 
+  // Determine what to display in the sector dropdown
+  // If there is no sector but there are secteurs_activite, use the first one
+  const displaySector = formState?.sector || 
+    (Array.isArray(formState?.secteurs_activite) && formState?.secteurs_activite.length > 0 
+      ? formState.secteurs_activite[0] 
+      : "");
+
   return (
     <div className="space-y-6">
       <h3 className="text-lg font-medium">Informations société</h3>
@@ -77,7 +84,7 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
             Quel est le secteur d'activité de l'entreprise ? <span className="text-red-500">*</span>
           </Label>
           <Select
-            value={formState?.sector || ""}
+            value={displaySector}
             onValueChange={(value) => handleChange("sector", value)}
             disabled={readOnly}
           >
@@ -92,6 +99,7 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
               ))}
             </SelectContent>
           </Select>
+          {errors.sector && <p className="text-sm text-red-500">{errors.sector}</p>}
         </div>
 
         <div className="space-y-3">
@@ -122,6 +130,7 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
               La forme juridique "{formState.legalForm}" n'est pas éligible pour le label. Veuillez sélectionner une forme juridique valide.
             </p>
           )}
+          {errors.legalForm && <p className="text-sm text-red-500">{errors.legalForm}</p>}
         </div>
       </div>
     </div>
