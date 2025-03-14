@@ -230,10 +230,10 @@ export const ImprovementSuggestions = () => {
                   {index + 1}
                 </span>
                 {suggestion.criteria}
-                <span className="ml-auto text-sm bg-red-50 text-red-700 px-2 py-1 rounded-full">
-                  Score: {suggestion.score}
-                </span>
               </CardTitle>
+              <div className="text-sm bg-red-50 text-red-700 px-2 py-1 rounded-full w-fit">
+                Score: {suggestion.score}
+              </div>
             </CardHeader>
             <CardContent>
               <p className="text-gray-700">{suggestion.axis}</p>

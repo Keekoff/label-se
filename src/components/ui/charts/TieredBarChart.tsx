@@ -45,6 +45,12 @@ export const TieredBarChart = ({
   barColor?: string;
   tierLabels?: TierLabels;
 }) => {
+  // Renommer les données pour supprimer "Moyenne globale"
+  const renamedData = data.map(item => ({
+    ...item,
+    name: item.name === 'Moyenne globale' ? 'Moyenne' : item.name
+  }));
+
   return (
     <div className="flex flex-col h-full w-full">
       <h3 className="text-lg font-semibold mb-2">{title}</h3>
@@ -74,19 +80,19 @@ export const TieredBarChart = ({
       </div>
       <div className="flex-grow w-full h-[240px]">
         <ResponsiveContainer width="100%" height="100%">
-          <RechartsBarChart data={data} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+          <RechartsBarChart data={renamedData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="name" />
             <YAxis domain={[0, 100]} />
             <Tooltip />
             {tiers.tier1 !== undefined && (
-              <ReferenceLine y={tiers.tier1} stroke="#35DA56" strokeDasharray="3 3" label={{ value: `${tierLabels.tier1}: ${tiers.tier1}`, position: 'right', style: { fontSize: '11px' } }} />
+              <ReferenceLine y={tiers.tier1} stroke="#35DA56" strokeDasharray="3 3" />
             )}
             {tiers.tier2 !== undefined && (
-              <ReferenceLine y={tiers.tier2} stroke="#27017F" strokeDasharray="3 3" label={{ value: `${tierLabels.tier2}: ${tiers.tier2}`, position: 'right', style: { fontSize: '11px' } }} />
+              <ReferenceLine y={tiers.tier2} stroke="#27017F" strokeDasharray="3 3" />
             )}
             {tiers.tier3 !== undefined && (
-              <ReferenceLine y={tiers.tier3} stroke="#000000" strokeDasharray="3 3" label={{ value: `${tierLabels.tier3}: ${tiers.tier3}`, position: 'right', style: { fontSize: '11px' } }} />
+              <ReferenceLine y={tiers.tier3} stroke="#000000" strokeDasharray="3 3" />
             )}
             <Bar dataKey="value" fill={barColor} fillOpacity={0.7} />
           </RechartsBarChart>
