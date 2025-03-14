@@ -98,6 +98,7 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         }
         
         console.log('Airtable data received:', data);
+        console.log('Echelon texte reçu:', data.echelonTexte);
 
         // Transformation des données pour s'assurer que les valeurs sont en pourcentages
         const processedData = {
@@ -128,7 +129,10 @@ export const useCompanyData = (): FetchCompanyDataResult => {
             : undefined,
             
           // On conserve les scores des critères tels quels
-          criteriaScores: data.criteriaScores || {}
+          criteriaScores: data.criteriaScores || {},
+          
+          // S'assurer que echelonTexte est bien passé
+          echelonTexte: data.echelonTexte || ''
         };
         
         console.log('Processed company data:', processedData);

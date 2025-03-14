@@ -111,6 +111,9 @@ Deno.serve(async (req) => {
     const socialImpactField = record.fields['Développement d\'impact social positif (%)'];
     console.log("Valeur brute du champ développement d'impact social positif:", socialImpactField);
     
+    // Déboguer spécifiquement la valeur Echelon_texte
+    console.log("Valeur de Echelon_texte:", record.fields['Echelon_texte']);
+    
     // Liste des critères pour le radar chart
     const criteriaFields = [
       { name: "Diversité", field: "Score Diversité" },
