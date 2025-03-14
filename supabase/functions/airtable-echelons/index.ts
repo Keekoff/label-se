@@ -101,23 +101,31 @@ serve(async (req) => {
           : parseFloat(fields[TOTAL_AVERAGE_FIELD] || '0');
       }
       
-      // Extraire les valeurs des tiers pour la moyenne totale
       if (TIER1_TOTAL_FIELD in fields) {
         tier1Total = typeof fields[TIER1_TOTAL_FIELD] === 'number'
           ? fields[TIER1_TOTAL_FIELD]
           : parseFloat(fields[TIER1_TOTAL_FIELD] || '0');
+        
+        // Log pour vérifier la valeur brute
+        console.log('Valeur brute du champ tier1:', fields[TIER1_TOTAL_FIELD]);
       }
       
       if (TIER2_TOTAL_FIELD in fields) {
         tier2Total = typeof fields[TIER2_TOTAL_FIELD] === 'number'
           ? fields[TIER2_TOTAL_FIELD]
           : parseFloat(fields[TIER2_TOTAL_FIELD] || '0');
+        
+        // Log pour vérifier la valeur brute
+        console.log('Valeur brute du champ tier2:', fields[TIER2_TOTAL_FIELD]);
       }
       
       if (TIER3_TOTAL_FIELD in fields) {
         tier3Total = typeof fields[TIER3_TOTAL_FIELD] === 'number'
           ? fields[TIER3_TOTAL_FIELD]
           : parseFloat(fields[TIER3_TOTAL_FIELD] || '0');
+        
+        // Log pour vérifier la valeur brute
+        console.log('Valeur brute du champ tier3:', fields[TIER3_TOTAL_FIELD]);
       }
       
       // Convertir en valeurs entières pour les pourcentages

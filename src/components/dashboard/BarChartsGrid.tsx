@@ -81,11 +81,51 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
 
   // Récupérer les valeurs des tiers depuis echelonData ou utiliser des valeurs par défaut
   const getAverageTierValues = () => {
-    return {
-      tier1: echelonData?.tier1Total || 95,
-      tier2: echelonData?.tier2Total || 75, 
-      tier3: echelonData?.tier3Total || 55
-    };
+    if (!echelonData || !Array.isArray(echelonData)) {
+      return {
+        tier1: 95,
+        tier2: 75, 
+        tier3: 55
+      };
+    }
+
+    // Si nous avons les données mais que l'entreprise n'a pas d'échelon spécifié
+    if (!companyData?.echelonTexte) {
+      // Par défaut, on prend le premier élément disponible
+      const firstEchelon = echelonData[0];
+      return {
+        tier1: firstEchelon?.tier1Total || 95,
+        tier2: firstEchelon?.tier2Total || 75,
+        tier3: firstEchelon?.tier3Total || 55
+      };
+    }
+
+    // Récupérer l'échelon de l'entreprise
+    let echelonValue = Array.isArray(companyData.echelonTexte) 
+      ? companyData.echelonTexte[0] 
+      : companyData.echelonTexte;
+
+    console.log('Recherche des valeurs de tiers pour échelon:', echelonValue);
+    console.log('Données d\'échelon disponibles:', echelonData);
+
+    // Trouver l'entrée d'échelon correspondante
+    const matchingEchelon = echelonData.find(item => item.echelon === echelonValue);
+    
+    if (matchingEchelon) {
+      console.log('Échelon correspondant trouvé:', matchingEchelon);
+      return {
+        tier1: matchingEchelon.tier1Total || 95,
+        tier2: matchingEchelon.tier2Total || 75,
+        tier3: matchingEchelon.tier3Total || 55
+      };
+    } else {
+      console.log('Aucun échelon correspondant trouvé, utilisation des valeurs par défaut');
+      return {
+        tier1: 95,
+        tier2: 75,
+        tier3: 55
+      };
+    }
   };
 
   return <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

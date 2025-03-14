@@ -20,16 +20,11 @@ export const useEchelonData = () => {
   const { toast } = useToast();
   const { companyData, isPremium } = useCompanyData();
   const [isLoading, setIsLoading] = useState(true);
-  const [echelonData, setEchelonData] = useState<EchelonData | null>(null);
+  const [echelonData, setEchelonData] = useState<EchelonData[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchEchelonData = async () => {
-      if (!companyData?.echelonTexte) {
-        setIsLoading(false);
-        return;
-      }
-      
       setIsLoading(true);
       setError(null);
       
@@ -40,18 +35,11 @@ export const useEchelonData = () => {
       }
       
       try {
-        // Gérer le cas où echelonTexte pourrait être un tableau
-        let echelonValue: string;
-        if (Array.isArray(companyData.echelonTexte)) {
-          echelonValue = companyData.echelonTexte[0] || '';
-        } else {
-          echelonValue = companyData.echelonTexte;
-        }
+        console.log('Récupération des données d\'échelon depuis Airtable');
         
-        console.log('Récupération des données d\'échelon depuis Airtable pour l\'échelon:', echelonValue);
-        
+        // Appeler l'Edge Function sans filtre pour récupérer toutes les données d'échelons
         const { data, error } = await supabase.functions.invoke('airtable-echelons', {
-          body: { echelon: echelonValue }
+          body: { echelon: null } // Pas de filtre pour récupérer tous les échelons
         });
 
         if (error) {
@@ -66,62 +54,28 @@ export const useEchelonData = () => {
         
         console.log('Données d\'échelon reçues:', data);
         
-        // Si nous avons des données et c'est un tableau avec au moins un élément
+        // Si nous avons des données et c'est un tableau
         if (Array.isArray(data) && data.length > 0) {
-          // Filtrer les données par l'échelon de l'entreprise
-          const matchingEchelonData = data.find(item => item.echelon === echelonValue);
+          // S'assurer que les valeurs sont des nombres
+          const processedData = data.map(item => ({
+            ...item,
+            governanceAverage: typeof item.governanceAverage === 'number' ? item.governanceAverage : 0,
+            socialImpactAverage: typeof item.socialImpactAverage === 'number' ? item.socialImpactAverage : 0,
+            environmentalAverage: typeof item.environmentalAverage === 'number' ? item.environmentalAverage : 0,
+            totalAverage: typeof item.totalAverage === 'number' ? item.totalAverage : 0,
+            tier1Total: typeof item.tier1Total === 'number' ? item.tier1Total : 95,
+            tier2Total: typeof item.tier2Total === 'number' ? item.tier2Total : 75,
+            tier3Total: typeof item.tier3Total === 'number' ? item.tier3Total : 55
+          }));
           
-          if (matchingEchelonData) {
-            console.log(`Données d'échelon correspondantes trouvées pour l'échelon ${echelonValue}:`, matchingEchelonData);
-            
-            // Convertir les valeurs en nombres et s'assurer qu'elles sont bien des pourcentages
-            const processedData = {
-              ...matchingEchelonData,
-              // S'assurer que les valeurs sont des nombres
-              governanceAverage: typeof matchingEchelonData.governanceAverage === 'number' ? matchingEchelonData.governanceAverage : 0,
-              socialImpactAverage: typeof matchingEchelonData.socialImpactAverage === 'number' ? matchingEchelonData.socialImpactAverage : 0,
-              environmentalAverage: typeof matchingEchelonData.environmentalAverage === 'number' ? matchingEchelonData.environmentalAverage : 0,
-              totalAverage: typeof matchingEchelonData.totalAverage === 'number' ? matchingEchelonData.totalAverage : 0,
-              tier1Total: typeof matchingEchelonData.tier1Total === 'number' ? matchingEchelonData.tier1Total : 95,
-              tier2Total: typeof matchingEchelonData.tier2Total === 'number' ? matchingEchelonData.tier2Total : 75,
-              tier3Total: typeof matchingEchelonData.tier3Total === 'number' ? matchingEchelonData.tier3Total : 55
-            };
-            
-            console.log('Valeurs d\'échelon à utiliser:', {
-              gouvernance: processedData.governanceAverage,
-              socialImpact: processedData.socialImpactAverage,
-              environmental: processedData.environmentalAverage,
-              total: processedData.totalAverage,
-              tier1Total: processedData.tier1Total,
-              tier2Total: processedData.tier2Total,
-              tier3Total: processedData.tier3Total
-            });
-            
-            setEchelonData(processedData);
-          } else {
-            // Si aucune correspondance exacte n'est trouvée, utiliser le premier élément (comportement précédent)
-            console.warn(`Aucune donnée exacte trouvée pour l'échelon ${echelonValue}, utilisation des valeurs par défaut.`);
-            
-            const processedData = {
-              ...data[0],
-              // S'assurer que les valeurs sont des nombres
-              governanceAverage: typeof data[0].governanceAverage === 'number' ? data[0].governanceAverage : 0,
-              socialImpactAverage: typeof data[0].socialImpactAverage === 'number' ? data[0].socialImpactAverage : 0,
-              environmentalAverage: typeof data[0].environmentalAverage === 'number' ? data[0].environmentalAverage : 0,
-              totalAverage: typeof data[0].totalAverage === 'number' ? data[0].totalAverage : 0,
-              tier1Total: typeof data[0].tier1Total === 'number' ? data[0].tier1Total : 95,
-              tier2Total: typeof data[0].tier2Total === 'number' ? data[0].tier2Total : 75,
-              tier3Total: typeof data[0].tier3Total === 'number' ? data[0].tier3Total : 55
-            };
-            
-            setEchelonData(processedData);
-          }
+          console.log('Données d\'échelon traitées:', processedData);
+          setEchelonData(processedData);
         } else {
-          console.warn('Aucune donnée d\'échelon trouvée pour:', echelonValue);
-          // Si aucune donnée n'est trouvée, créer un ensemble de données par défaut pour éviter les erreurs
-          setEchelonData({
+          console.warn('Aucune donnée d\'échelon trouvée');
+          // Créer des données par défaut
+          setEchelonData([{
             id: "default",
-            echelon: echelonValue,
+            echelon: "Default",
             governanceAverage: 0,
             socialImpactAverage: 0,
             environmentalAverage: 0,
@@ -129,7 +83,7 @@ export const useEchelonData = () => {
             tier1Total: 95,
             tier2Total: 75,
             tier3Total: 55
-          });
+          }]);
         }
       } catch (error) {
         console.error('Erreur lors de la récupération des données d\'échelon Airtable:', error);
@@ -145,7 +99,7 @@ export const useEchelonData = () => {
     };
 
     fetchEchelonData();
-  }, [companyData?.echelonTexte, isPremium, toast]);
+  }, [isPremium, toast]);
 
   return {
     isLoading,
