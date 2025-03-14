@@ -122,9 +122,7 @@ const DashboardLayout = () => {
     
     const echelon = companyData.echelonTexte;
     
-    if (echelon === "1") {
-      return "https://startupengagee.notion.site/chelon-1-Kit-de-communication-5c47dde769bd49e4a2aec72bb6bce236";
-    } else if (echelon === "2") {
+    if (echelon === "2") {
       return "https://startupengagee.notion.site/chelon-2-Kit-de-communication-dbed159dadd240b697239e6af1f2fdd8";
     } else if (echelon === "3") {
       return "https://startupengagee.notion.site/chelon-3-Kit-de-communication-9865c5e63eb94cf1bb6df6f28d2893a8";
