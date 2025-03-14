@@ -51,26 +51,20 @@ const FormThanks = ({ onValidityChange, formState, submissionId }: FormThanksPro
         return;
       }
 
-      const response = await fetch(
-        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/create-checkout-session`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${session.access_token}`,
-          },
-          body: JSON.stringify({ submissionId }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: { submissionId }
+      });
 
-      const { url, error } = await response.json();
-      
       if (error) {
-        throw new Error(error);
+        throw error;
+      }
+
+      if (!data?.url) {
+        throw new Error('URL de paiement non reçue');
       }
 
       // Redirect to Stripe Checkout
-      window.location.href = url;
+      window.location.href = data.url;
     } catch (error) {
       console.error("Payment error:", error);
       toast.error("Une erreur est survenue lors de la redirection vers le paiement");
