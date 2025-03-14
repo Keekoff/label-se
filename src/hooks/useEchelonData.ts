@@ -11,6 +11,9 @@ export type EchelonData = {
   socialImpactAverage: number;
   environmentalAverage: number;
   totalAverage: number;
+  tier1Total: number;
+  tier2Total: number;
+  tier3Total: number;
 };
 
 export const useEchelonData = () => {
@@ -78,14 +81,20 @@ export const useEchelonData = () => {
               governanceAverage: typeof matchingEchelonData.governanceAverage === 'number' ? matchingEchelonData.governanceAverage : 0,
               socialImpactAverage: typeof matchingEchelonData.socialImpactAverage === 'number' ? matchingEchelonData.socialImpactAverage : 0,
               environmentalAverage: typeof matchingEchelonData.environmentalAverage === 'number' ? matchingEchelonData.environmentalAverage : 0,
-              totalAverage: typeof matchingEchelonData.totalAverage === 'number' ? matchingEchelonData.totalAverage : 0
+              totalAverage: typeof matchingEchelonData.totalAverage === 'number' ? matchingEchelonData.totalAverage : 0,
+              tier1Total: typeof matchingEchelonData.tier1Total === 'number' ? matchingEchelonData.tier1Total : 95,
+              tier2Total: typeof matchingEchelonData.tier2Total === 'number' ? matchingEchelonData.tier2Total : 75,
+              tier3Total: typeof matchingEchelonData.tier3Total === 'number' ? matchingEchelonData.tier3Total : 55
             };
             
             console.log('Valeurs d\'échelon à utiliser:', {
               gouvernance: processedData.governanceAverage,
               socialImpact: processedData.socialImpactAverage,
               environmental: processedData.environmentalAverage,
-              total: processedData.totalAverage
+              total: processedData.totalAverage,
+              tier1Total: processedData.tier1Total,
+              tier2Total: processedData.tier2Total,
+              tier3Total: processedData.tier3Total
             });
             
             setEchelonData(processedData);
@@ -99,7 +108,10 @@ export const useEchelonData = () => {
               governanceAverage: typeof data[0].governanceAverage === 'number' ? data[0].governanceAverage : 0,
               socialImpactAverage: typeof data[0].socialImpactAverage === 'number' ? data[0].socialImpactAverage : 0,
               environmentalAverage: typeof data[0].environmentalAverage === 'number' ? data[0].environmentalAverage : 0,
-              totalAverage: typeof data[0].totalAverage === 'number' ? data[0].totalAverage : 0
+              totalAverage: typeof data[0].totalAverage === 'number' ? data[0].totalAverage : 0,
+              tier1Total: typeof data[0].tier1Total === 'number' ? data[0].tier1Total : 95,
+              tier2Total: typeof data[0].tier2Total === 'number' ? data[0].tier2Total : 75,
+              tier3Total: typeof data[0].tier3Total === 'number' ? data[0].tier3Total : 55
             };
             
             setEchelonData(processedData);
@@ -113,7 +125,10 @@ export const useEchelonData = () => {
             governanceAverage: 0,
             socialImpactAverage: 0,
             environmentalAverage: 0,
-            totalAverage: 0
+            totalAverage: 0,
+            tier1Total: 95,
+            tier2Total: 75,
+            tier3Total: 55
           });
         }
       } catch (error) {

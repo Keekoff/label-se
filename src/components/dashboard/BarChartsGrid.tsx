@@ -79,6 +79,15 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
     }];
   };
 
+  // Récupérer les valeurs des tiers depuis echelonData ou utiliser des valeurs par défaut
+  const getAverageTierValues = () => {
+    return {
+      tier1: echelonData?.tier1Total || 95,
+      tier2: echelonData?.tier2Total || 75, 
+      tier3: echelonData?.tier3Total || 55
+    };
+  };
+
   return <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-white">
         <TieredBarChart title="Gouvernance juste et inclusive" data={getGovernanceChartData()} tiers={{
@@ -117,11 +126,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       </Card>
 
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-white">
-        <TieredBarChart title="Moyenne des labellisés" data={getAverageChartData()} tiers={{
-        tier1: 95,
-        tier2: 75,
-        tier3: 55
-      }} barColor="#35DA56" tierLabels={{
+        <TieredBarChart title="Moyenne des labellisés" data={getAverageChartData()} tiers={getAverageTierValues()} barColor="#35DA56" tierLabels={{
         tier1: "Échelon 1",
         tier2: "Échelon 2",
         tier3: "Échelon 3"

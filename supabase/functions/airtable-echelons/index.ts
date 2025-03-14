@@ -15,6 +15,9 @@ const GOVERNANCE_FIELD = "Moyenne gouvernance juste et inclusive (%)";
 const SOCIAL_IMPACT_FIELD = "Moyenne développement d'impact social positif (%)";
 const ENVIRONMENTAL_FIELD = "Moyenne maitrise d'impact environnemental et développement durable (%)";
 const TOTAL_AVERAGE_FIELD = "Moyenne TOTAL (%)";
+const TIER1_TOTAL_FIELD = "Echelon 1 moyenne totale";
+const TIER2_TOTAL_FIELD = "Echelon 2 moyenne totale";
+const TIER3_TOTAL_FIELD = "Echelon 3 moyenne totale";
 
 serve(async (req) => {
   // Gestion des requêtes CORS preflight
@@ -63,13 +66,15 @@ serve(async (req) => {
       
       // Log tous les champs disponibles pour le débogage
       console.log('Champs disponibles dans Airtable pour l\'échelon', fields.Echelon, ':', Object.keys(fields));
-      console.log('Valeur brute du champ environnemental:', fields[ENVIRONMENTAL_FIELD]);
       
       // Extraire les valeurs des champs avec vérification
       let governanceAverage = 0;
       let socialImpactAverage = 0;
       let environmentalAverage = 0;
       let totalAverage = 0;
+      let tier1Total = 0;
+      let tier2Total = 0;
+      let tier3Total = 0;
       
       // Vérifier si les champs existent et extraire leur valeur
       if (GOVERNANCE_FIELD in fields) {
@@ -96,17 +101,42 @@ serve(async (req) => {
           : parseFloat(fields[TOTAL_AVERAGE_FIELD] || '0');
       }
       
+      // Extraire les valeurs des tiers pour la moyenne totale
+      if (TIER1_TOTAL_FIELD in fields) {
+        tier1Total = typeof fields[TIER1_TOTAL_FIELD] === 'number'
+          ? fields[TIER1_TOTAL_FIELD]
+          : parseFloat(fields[TIER1_TOTAL_FIELD] || '0');
+      }
+      
+      if (TIER2_TOTAL_FIELD in fields) {
+        tier2Total = typeof fields[TIER2_TOTAL_FIELD] === 'number'
+          ? fields[TIER2_TOTAL_FIELD]
+          : parseFloat(fields[TIER2_TOTAL_FIELD] || '0');
+      }
+      
+      if (TIER3_TOTAL_FIELD in fields) {
+        tier3Total = typeof fields[TIER3_TOTAL_FIELD] === 'number'
+          ? fields[TIER3_TOTAL_FIELD]
+          : parseFloat(fields[TIER3_TOTAL_FIELD] || '0');
+      }
+      
       // Convertir en valeurs entières pour les pourcentages
       governanceAverage = Math.round(governanceAverage * 100);
       socialImpactAverage = Math.round(socialImpactAverage * 100);
       environmentalAverage = Math.round(environmentalAverage * 100);
       totalAverage = Math.round(totalAverage * 100);
+      tier1Total = Math.round(tier1Total * 100);
+      tier2Total = Math.round(tier2Total * 100);
+      tier3Total = Math.round(tier3Total * 100);
       
       console.log('Valeurs transformées pour échelon', fields.Echelon, ':', {
         governanceAverage,
         socialImpactAverage,
         environmentalAverage,
-        totalAverage
+        totalAverage,
+        tier1Total,
+        tier2Total,
+        tier3Total
       });
       
       return {
@@ -115,7 +145,10 @@ serve(async (req) => {
         governanceAverage,
         socialImpactAverage,
         environmentalAverage,
-        totalAverage
+        totalAverage,
+        tier1Total,
+        tier2Total,
+        tier3Total
       };
     });
     
