@@ -1,4 +1,3 @@
-
 import { Button } from "@/components/ui/button";
 import { Download, Lock } from "lucide-react";
 import { useCompanyData } from "@/hooks/useCompanyData";
@@ -23,6 +22,16 @@ export const DashboardCharts = () => {
     chartsContainerRef 
   } = usePdfGenerator();
 
+  const getEchelonTextValue = (echelonTexte?: string | string[]): string => {
+    if (!echelonTexte) return "";
+    
+    if (Array.isArray(echelonTexte)) {
+      return echelonTexte[0] || "";
+    }
+    
+    return echelonTexte;
+  };
+
   if (isLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -44,7 +53,7 @@ export const DashboardCharts = () => {
           variant="outline" 
           onClick={() => handleDownloadPDF({
             companyName,
-            echelonTexte: companyData?.echelonTexte,
+            echelonTexte: getEchelonTextValue(companyData?.echelonTexte),
             dateValidation: companyData?.dateValidation,
             dateFinValidite: companyData?.dateFinValidite
           })}
