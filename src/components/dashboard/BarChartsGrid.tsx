@@ -82,9 +82,9 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
   return <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-white">
         <TieredBarChart title="Gouvernance juste et inclusive" data={getGovernanceChartData()} tiers={{
-        tier1: 80,
-        tier2: 60,
-        tier3: 40
+        tier1: 33,
+        tier2: 54,
+        tier3: 87
       }} barColor="#8985FF" tierLabels={{
         tier1: "Échelon 1",
         tier2: "Échelon 2",
@@ -94,9 +94,9 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
 
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-white">
         <TieredBarChart title="Développement d'impact social positif" data={getSocialImpactChartData()} tiers={{
-        tier1: 85,
-        tier2: 65,
-        tier3: 45
+        tier1: 29,
+        tier2: 57,
+        tier3: 80
       }} barColor="#8985FF" tierLabels={{
         tier1: "Échelon 1",
         tier2: "Échelon 2",
@@ -106,9 +106,9 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
 
       <Card className="p-6 transition-all duration-200 hover:shadow-lg hover:-translate-y-1 h-[400px] chart-card bg-white">
         <TieredBarChart title="Maitrise d'impact environnemental et développement durable" data={getEnvironmentalChartData()} tiers={{
-        tier1: 90,
-        tier2: 70,
-        tier3: 50
+        tier1: 41,
+        tier2: 59,
+        tier3: 81
       }} barColor="#8985FF" tierLabels={{
         tier1: "Échelon 1",
         tier2: "Échelon 2",
