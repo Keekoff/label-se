@@ -17,10 +17,19 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
     { name: 'Moyenne globale', value: 65 }
   ];
 
+  // Trouver les données d'échelon par défaut (utilise le premier élément si disponible)
+  const getDefaultEchelonValues = () => {
+    if (!echelonData || !Array.isArray(echelonData) || echelonData.length === 0) {
+      return { governanceAverage: 0, socialImpactAverage: 0, environmentalAverage: 0, totalAverage: 0 };
+    }
+    return echelonData[0];
+  };
+
   const getGovernanceChartData = () => {
     if (!companyData) return defaultData;
     
-    const governanceAverage = echelonData?.governanceAverage || 0;
+    const defaultEchelon = getDefaultEchelonValues();
+    const governanceAverage = defaultEchelon.governanceAverage || 0;
     console.log('Valeur moyenne de gouvernance à afficher:', governanceAverage);
     return [{
       name: 'Vos résultats',
@@ -34,7 +43,8 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
   const getEnvironmentalChartData = () => {
     if (!companyData) return defaultData;
     
-    const environmentalAverage = echelonData?.environmentalAverage || 0;
+    const defaultEchelon = getDefaultEchelonValues();
+    const environmentalAverage = defaultEchelon.environmentalAverage || 0;
     console.log('Valeur moyenne environnementale à afficher:', environmentalAverage);
     return [{
       name: 'Vos résultats',
@@ -53,7 +63,9 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
       : companyData?.socialImpactScore 
         ? Math.round(companyData.socialImpactScore * 100) 
         : 0;
-    const socialImpactAverage = echelonData?.socialImpactAverage || 0;
+        
+    const defaultEchelon = getDefaultEchelonValues();
+    const socialImpactAverage = defaultEchelon.socialImpactAverage || 0;
     console.log("Social Impact Value for chart:", socialImpactValue);
     console.log("Social Impact Average for chart:", socialImpactAverage);
     return [{
@@ -68,7 +80,8 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
   const getAverageChartData = () => {
     if (!companyData) return defaultData;
     
-    const totalAverage = echelonData?.totalAverage || 0;
+    const defaultEchelon = getDefaultEchelonValues();
+    const totalAverage = defaultEchelon.totalAverage || 0;
     console.log('Valeur moyenne totale à afficher:', totalAverage);
     return [{
       name: 'Vos résultats',
@@ -81,7 +94,7 @@ export const BarChartsGrid = ({ companyData }: BarChartsGridProps) => {
 
   // Récupérer les valeurs des tiers depuis echelonData ou utiliser des valeurs par défaut
   const getAverageTierValues = () => {
-    if (!echelonData || !Array.isArray(echelonData)) {
+    if (!echelonData || !Array.isArray(echelonData) || echelonData.length === 0) {
       return {
         tier1: 95,
         tier2: 75, 
