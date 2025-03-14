@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import BasicInformation from "./BasicInformation";
@@ -55,6 +54,7 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
           }
 
           console.log('Legal form from eligibility:', data.legal_form);
+          console.log('Sectors from eligibility:', data.sectors);
 
           // Populate form with eligibility data
           const updatedFormState = {
@@ -63,7 +63,9 @@ const FormContact = ({ onValidityChange, formState, setFormState }: FormContactP
             lastName: data.last_name || formState.lastName,
             email: data.email || formState.email,
             companyName: data.company_name || formState.companyName,
-            // Convert array to single value for sector
+            // Set the sectors from eligibility data to secteurs_activite
+            secteurs_activite: Array.isArray(data.sectors) ? data.sectors : formState.secteurs_activite,
+            // Keep the existing sector field for the form UI elements
             sector: Array.isArray(data.sectors) && data.sectors.length > 0 
               ? data.sectors[0] 
               : formState.sector,

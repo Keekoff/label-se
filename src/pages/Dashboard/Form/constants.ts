@@ -15,6 +15,7 @@ export const INITIAL_FORM_STATE = {
   email: "",
   companyName: "",
   sectors: [],
+  secteurs_activite: [], // Add the field for the Supabase table
   legalForm: "",
   streetAddress: "",
   postalCode: "",
