@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,6 +9,8 @@ import { getJustificatifsForPart3 } from "@/components/form/steps/FormPart3";
 
 // Make.com webhook URL
 const MAKE_WEBHOOK_URL = "https://hook.eu1.make.com/20xuorrw61s481mz4f7lwqrdfgotq5qj";
+// Airtable webhook URL
+const AIRTABLE_WEBHOOK_URL = "https://hooks.airtable.com/workflows/v1/genericWebhook/app7al7op0zAJYssh/wflbARC3gzJSHop4x/wtrKWQPw2IQft4ctV";
 
 export const useFormSubmission = (
   formState: FormState,
@@ -301,12 +302,12 @@ export const useFormSubmission = (
       });
     }
     
-    if (data.parentalite && data.parentalite.length > 0) {
+    if (data.parentality && data.parentality.length > 0) {
       réponses.push({
         question: "Parentalité",
         catégorie: "Humain & Social",
         partie: 1,
-        réponses: data.parentalite
+        réponses: data.parentality
       });
     }
     
@@ -544,6 +545,49 @@ export const useFormSubmission = (
     }
   };
 
+  const sendToAirtableWebhook = async (data: any) => {
+    try {
+      console.log('Envoi des données au webhook Airtable');
+      
+      // Format the data for Airtable webhook
+      const webhookPayload = {
+        company_name: data.nom_entreprise || "Non spécifié",
+        company_sector: Array.isArray(data.secteurs_activite) && data.secteurs_activite.length > 0 
+          ? data.secteurs_activite.join(", ") 
+          : "Non spécifié",
+        legal_form: data.forme_juridique || "Non spécifié",
+        employee_count: data.nombre_employes || "Non spécifié",
+        contact_email: data.courriel || "Non spécifié",
+        submission_date: new Date().toISOString(),
+        submission_id: data.id || null
+      };
+      
+      console.log('Payload pour Airtable:', webhookPayload);
+      
+      const response = await fetch(AIRTABLE_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookPayload)
+      });
+      
+      if (!response.ok) {
+        console.error('Erreur lors de l\'envoi au webhook Airtable:', response.status);
+        const responseText = await response.text();
+        console.error('Détails de l\'erreur:', responseText);
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      
+      console.log('Données envoyées avec succès au webhook Airtable');
+      return true;
+    } catch (error) {
+      console.error('Erreur lors de l\'envoi au webhook Airtable:', error);
+      // Continue with form submission even if webhook call fails
+      return false;
+    }
+  };
+
   const handleSave = async () => {
     if (!isAuthenticated) {
       toast({
@@ -625,7 +669,11 @@ export const useFormSubmission = (
 
       // Send data to Make.com webhook first
       const webhookSuccess = await sendToMakeWebhook(submissionData);
-      console.log('Résultat de l\'envoi au webhook:', webhookSuccess ? 'Succès' : 'Échec');
+      console.log('Résultat de l\'envoi au webhook Make.com:', webhookSuccess ? 'Succès' : 'Échec');
+      
+      // Send data to Airtable webhook
+      const airtableWebhookSuccess = await sendToAirtableWebhook(submissionData);
+      console.log('Résultat de l\'envoi au webhook Airtable:', airtableWebhookSuccess ? 'Succès' : 'Échec');
 
       let finalSubmissionId = submissionId;
 
