@@ -266,12 +266,12 @@ export const useFormSubmission = (
     
     // Regrouper toutes les questions et leurs réponses dans des collections
     // Partie 1: Questions humaines et sociales
-    if (data.diversite && data.diversite.length > 0) {
+    if (data.diversity && data.diversity.length > 0) {
       réponses.push({
         question: "Diversité",
         catégorie: "Humain & Social",
         partie: 1,
-        réponses: data.diversite
+        réponses: data.diversity
       });
     }
     
@@ -666,10 +666,6 @@ export const useFormSubmission = (
       // Send data to Make.com webhook first
       const webhookSuccess = await sendToMakeWebhook(submissionData);
       console.log('Résultat de l\'envoi au webhook Make.com:', webhookSuccess ? 'Succès' : 'Échec');
-
-      // Send data to Airtable webhook
-      const airtableWebhookSuccess = await sendToAirtableWebhook(submissionData);
-      console.log('Résultat de l\'envoi au webhook Airtable:', airtableWebhookSuccess ? 'Succès' : 'Échec');
 
       let finalSubmissionId = submissionId;
 
