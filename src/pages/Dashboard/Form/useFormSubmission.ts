@@ -545,31 +545,24 @@ export const useFormSubmission = (
     }
   };
 
-  const sendToAirtableWebhook = async (data: any) => {
+  // Function to send company name to Airtable webhook
+  const sendToAirtableWebhook = async () => {
     try {
-      console.log('Envoi des données au webhook Airtable');
+      console.log('Envoi du nom de l\'entreprise au webhook Airtable');
       
-      // Format the data for Airtable webhook
-      const webhookPayload = {
-        company_name: data.nom_entreprise || "Non spécifié",
-        company_sector: Array.isArray(data.secteurs_activite) && data.secteurs_activite.length > 0 
-          ? data.secteurs_activite.join(", ") 
-          : "Non spécifié",
-        legal_form: data.forme_juridique || "Non spécifié",
-        employee_count: data.nombre_employes || "Non spécifié",
-        contact_email: data.courriel || "Non spécifié",
-        submission_date: new Date().toISOString(),
-        submission_id: data.id || null
+      // Create simple payload with just the company name
+      const payload = {
+        company_name: formState.companyName || ""
       };
       
-      console.log('Payload pour Airtable:', webhookPayload);
+      console.log('Payload pour Airtable:', payload);
       
       const response = await fetch(AIRTABLE_WEBHOOK_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(webhookPayload)
+        body: JSON.stringify(payload)
       });
       
       if (!response.ok) {
@@ -579,7 +572,7 @@ export const useFormSubmission = (
         throw new Error(`Erreur HTTP: ${response.status}`);
       }
       
-      console.log('Données envoyées avec succès au webhook Airtable');
+      console.log('Nom de l\'entreprise envoyé avec succès au webhook Airtable');
       return true;
     } catch (error) {
       console.error('Erreur lors de l\'envoi au webhook Airtable:', error);
@@ -664,13 +657,16 @@ export const useFormSubmission = (
     setIsSubmitting(true);
 
     try {
+      // Send company name to Airtable webhook
+      await sendToAirtableWebhook();
+      
       const submissionData = await formatSubmissionData(formState, 'submitted');
       console.log('Submitting form with data:', submissionData);
 
       // Send data to Make.com webhook first
       const webhookSuccess = await sendToMakeWebhook(submissionData);
       console.log('Résultat de l\'envoi au webhook Make.com:', webhookSuccess ? 'Succès' : 'Échec');
-      
+
       // Send data to Airtable webhook
       const airtableWebhookSuccess = await sendToAirtableWebhook(submissionData);
       console.log('Résultat de l\'envoi au webhook Airtable:', airtableWebhookSuccess ? 'Succès' : 'Échec');
