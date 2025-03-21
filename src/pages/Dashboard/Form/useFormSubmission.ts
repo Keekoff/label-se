@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -565,32 +564,23 @@ export const useFormSubmission = (
       
       console.log('Payload pour Airtable:', webhookPayload);
       
-      // Utiliser XMLHttpRequest au lieu de fetch pour éviter les problèmes CORS
-      return new Promise((resolve) => {
-        const xhr = new XMLHttpRequest();
-        xhr.open('POST', AIRTABLE_WEBHOOK_URL, true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        
-        xhr.onload = function() {
-          if (this.status >= 200 && this.status < 300) {
-            console.log('Données envoyées avec succès au webhook Airtable');
-            resolve(true);
-          } else {
-            console.error('Erreur lors de l\'envoi au webhook Airtable:', this.status);
-            console.error('Détails de l\'erreur:', this.responseText);
-            // On continue quand même
-            resolve(false);
-          }
-        };
-        
-        xhr.onerror = function() {
-          console.error('Erreur réseau lors de l\'envoi au webhook Airtable');
-          // On continue quand même
-          resolve(false);
-        };
-        
-        xhr.send(JSON.stringify(webhookPayload));
+      const response = await fetch(AIRTABLE_WEBHOOK_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(webhookPayload)
       });
+      
+      if (!response.ok) {
+        console.error('Erreur lors de l\'envoi au webhook Airtable:', response.status);
+        const responseText = await response.text();
+        console.error('Détails de l\'erreur:', responseText);
+        throw new Error(`Erreur HTTP: ${response.status}`);
+      }
+      
+      console.log('Données envoyées avec succès au webhook Airtable');
+      return true;
     } catch (error) {
       console.error('Erreur lors de l\'envoi au webhook Airtable:', error);
       // Continue with form submission even if webhook call fails
