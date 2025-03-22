@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -127,6 +128,8 @@ const Justificatifs = () => {
             // Récupérer l'URL de l'API Supabase depuis l'environnement
             const baseUrl = import.meta.env.VITE_SUPABASE_URL || "https://xrruijuepuglkguryzlp.supabase.co";
             const apiUrl = `${baseUrl}/functions/v1/get-admission-documents?submissionId=${latestSubmission.id}`;
+            
+            console.log("Appel de la fonction edge avec l'URL:", apiUrl);
             
             const response = await fetch(
               apiUrl,

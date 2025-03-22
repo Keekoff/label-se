@@ -30,6 +30,7 @@ serve(async (req) => {
 
     // Valider les paramètres obligatoires
     if (!submissionId) {
+      console.error('Paramètre submissionId manquant dans la requête')
       return new Response(
         JSON.stringify({ error: 'ID de soumission requis' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -47,7 +48,7 @@ serve(async (req) => {
     if (error) {
       console.error('Erreur lors de la récupération des documents:', error);
       return new Response(
-        JSON.stringify({ error: 'Erreur lors de la récupération des documents' }),
+        JSON.stringify({ error: 'Erreur lors de la récupération des documents', details: error }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
@@ -67,7 +68,7 @@ serve(async (req) => {
   } catch (error) {
     console.error('Erreur:', error.message);
     return new Response(
-      JSON.stringify({ error: 'Une erreur est survenue lors du traitement de votre demande' }),
+      JSON.stringify({ error: 'Une erreur est survenue lors du traitement de votre demande', details: error.message }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
