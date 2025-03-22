@@ -3,7 +3,7 @@ import { Question } from "../types";
 
 export const communicationQuestion: Question = {
   id: "communication",
-  title: "4 - Communication",
+  title: "Communication",
   description: "Messages et supports adressés aux consommateurs.",
   options: [
     { 

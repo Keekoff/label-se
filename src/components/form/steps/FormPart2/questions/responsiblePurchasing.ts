@@ -3,7 +3,7 @@ import { Question } from "../types";
 
 export const responsiblePurchasingQuestion: Question = {
   id: "responsiblePurchasing",
-  title: "2 - Politique d'achats responsables",
+  title: "Politique d'achats responsables",
   description: "Sélection de fournisseurs éthiques et écoresponsables.",
   options: [
     { 

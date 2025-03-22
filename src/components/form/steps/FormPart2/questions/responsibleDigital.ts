@@ -3,7 +3,7 @@ import { Question } from "../types";
 
 export const responsibleDigitalQuestion: Question = {
   id: "responsibleDigital",
-  title: "3 - Numérique responsable",
+  title: "Numérique responsable",
   description: "Réduction de l'empreinte sociale et environnementale du numérique.",
   options: [
     { 

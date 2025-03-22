@@ -3,7 +3,7 @@ import { Question } from "../types";
 
 export const associativeContributionQuestion: Question = {
   id: "associativeContribution",
-  title: "1 - Contribution associative",
+  title: "Contribution associative",
   description: "Soutien à des projets associatifs ou pro bono.",
   options: [
     { 

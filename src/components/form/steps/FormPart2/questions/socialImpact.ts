@@ -3,7 +3,7 @@ import { Question } from "../types";
 
 export const socialImpactQuestion: Question = {
   id: "socialImpact",
-  title: "6 - Prise en compte de l'impact social",
+  title: "Prise en compte de l'impact social",
   description: "Effets de l'activité sur la société et les parties prenantes.",
   options: [
     { 

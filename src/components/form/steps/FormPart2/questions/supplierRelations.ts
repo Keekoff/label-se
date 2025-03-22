@@ -3,7 +3,7 @@ import { Question } from "../types";
 
 export const supplierRelationsQuestion: Question = {
   id: "supplierRelations",
-  title: "5 - Relations fournisseurs et prestataires",
+  title: "Relations fournisseurs et prestataires",
   description: "Collaboration équilibrée et durable avec les partenaires.",
   options: [
     { 
