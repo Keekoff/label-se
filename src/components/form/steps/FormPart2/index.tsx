@@ -1,6 +1,5 @@
-
 import { useEffect, useState } from "react";
-import { QUESTIONS } from "./constants";
+import { QUESTIONS, getJustificatifsForQuestion } from "./questions";
 import QuestionCard from "./QuestionCard";
 import { FormPart2Props } from "./types";
 
@@ -8,19 +7,7 @@ import { FormPart2Props } from "./types";
  * Récupère les justificatifs pour une question et une réponse spécifiques de la Partie 2
  */
 export const getJustificatifsForPart2 = (questionId: string, optionLabel: string): string[] => {
-  const question = QUESTIONS.find(q => q.id === questionId);
-  if (!question) {
-    console.warn(`Question not found with id: ${questionId}`);
-    return [];
-  }
-  
-  const option = question.options.find(o => o.label === optionLabel);
-  if (!option || !option.justificatifs) {
-    console.warn(`Option not found with label "${optionLabel}" for question "${questionId}" or it has no justificatifs`);
-    return [];
-  }
-  
-  return option.justificatifs;
+  return getJustificatifsForQuestion(questionId, optionLabel);
 };
 
 const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props) => {
