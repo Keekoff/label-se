@@ -1,6 +1,5 @@
 
 import { QUESTIONS } from "./constants";
-import FormPart2Component from "../FormPart2";
 
 /**
  * Récupère les justificatifs pour une question et une réponse spécifiques de la Partie 2
@@ -18,5 +17,3 @@ export const getJustificatifsForPart2 = (questionId: string, response: string): 
   return option.justificatifs || [];
 };
 
-// Exporter le composant par défaut
-export default FormPart2Component;
