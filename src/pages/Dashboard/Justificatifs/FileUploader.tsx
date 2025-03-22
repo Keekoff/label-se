@@ -144,6 +144,7 @@ const FileUploader: React.FC<FileUploaderProps> = ({ submissionId, onFilesUpload
             <UploadButton 
               isUploading={isUploading}
               onUpload={uploadFiles}
+              submissionId={submissionId}
             />
           )}
         </div>
