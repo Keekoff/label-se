@@ -1,10 +1,11 @@
 
 import { useState, useCallback } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Upload, X, Check, File, Paperclip } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import DragDropArea from "./components/DragDropArea";
+import SelectedFilesList from "./components/SelectedFilesList";
+import UploadButton from "./components/UploadButton";
 
 interface FileUploaderProps {
   submissionId: string | null;
@@ -129,78 +130,21 @@ const FileUploader: React.FC<FileUploaderProps> = ({ submissionId, onFilesUpload
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <Paperclip className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-            <p className="text-sm text-gray-500 mb-4">
-              Déposez ici vos documents ou cliquez pour parcourir
-            </p>
-            <div className="relative">
-              <input
-                type="file"
-                multiple
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                onChange={handleFileSelect}
-                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                disabled={isUploading}
-              />
-              <Button 
-                variant="outline" 
-                className="relative pointer-events-none"
-                disabled={isUploading}
-              >
-                <Upload className="mr-2 h-4 w-4" />
-                Parcourir les fichiers
-              </Button>
-            </div>
-            <p className="mt-2 text-xs text-gray-500">
-              Types acceptés: PDF, DOC, DOCX, JPG, PNG | Max: 10MB par fichier
-            </p>
-          </div>
+          <DragDropArea 
+            isUploading={isUploading}
+            onFileSelect={handleFileSelect}
+          />
+
+          <SelectedFilesList 
+            files={selectedFiles}
+            onRemoveFile={removeFile}
+          />
 
           {selectedFiles.length > 0 && (
-            <div className="space-y-2">
-              <div className="text-sm font-medium">Fichiers sélectionnés ({selectedFiles.length}):</div>
-              <ul className="space-y-2 max-h-[200px] overflow-y-auto p-2">
-                {selectedFiles.map((file, index) => (
-                  <li key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded-md">
-                    <div className="flex items-center space-x-2 overflow-hidden">
-                      <File className="h-4 w-4 flex-shrink-0 text-[#27017F]" />
-                      <span className="text-sm truncate">{file.name}</span>
-                      <span className="text-xs text-gray-500">
-                        ({(file.size / 1024).toFixed(1)} Ko)
-                      </span>
-                    </div>
-                    <Button 
-                      variant="ghost" 
-                      size="sm" 
-                      className="h-8 w-8 p-0"
-                      onClick={() => removeFile(index)}
-                    >
-                      <X className="h-4 w-4 text-gray-500" />
-                    </Button>
-                  </li>
-                ))}
-              </ul>
-              <div className="flex justify-end">
-                <Button 
-                  onClick={uploadFiles} 
-                  disabled={isUploading}
-                  className="bg-[#35DA56] hover:bg-[#27017F]"
-                >
-                  {isUploading ? (
-                    <>
-                      <div className="animate-spin mr-2 h-4 w-4 border-2 border-current border-t-transparent rounded-full" />
-                      Téléchargement en cours...
-                    </>
-                  ) : (
-                    <>
-                      <Check className="mr-2 h-4 w-4" />
-                      Envoyer les documents
-                    </>
-                  )}
-                </Button>
-              </div>
-            </div>
+            <UploadButton 
+              isUploading={isUploading}
+              onUpload={uploadFiles}
+            />
           )}
         </div>
       </CardContent>
