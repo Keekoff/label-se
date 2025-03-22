@@ -9,7 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { getJustificatifs } from "@/components/form/steps/FormPart1";
-import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2/index";
+import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2";
 
 type JustificatifStatus = 'pending' | 'uploaded' | 'validated';
 type Justificatif = {
@@ -218,94 +218,117 @@ const Justificatifs = () => {
         return;
       }
 
-      // Vérifier si le bucket existe, sinon le créer
-      const { data: buckets } = await supabase.storage.listBuckets();
-      const justificatifsBucketExists = buckets?.some(bucket => bucket.name === 'justificatifs');
+      // Au lieu de créer un bucket, on utilise directement la mise à jour de l'enregistrement
+      console.log("Préparation du téléchargement pour le justificatif:", justificatifId);
       
-      if (!justificatifsBucketExists) {
-        const { error: bucketError } = await supabase.storage.createBucket('justificatifs', {
-          public: false
-        });
+      // Convertir le fichier en Base64 pour le stocker directement en BDD
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      
+      reader.onload = async () => {
+        const base64File = reader.result as string;
         
-        if (bucketError) {
-          console.error('Erreur lors de la création du bucket:', bucketError);
-          throw bucketError;
+        // Mise à jour dans la base de données
+        const { error: updateError } = await supabase
+          .from('form_justificatifs')
+          .update({
+            file_name: file.name,
+            status: 'uploaded',
+            user_id: session.user.id,
+            // Stocker un indicateur qu'on a le fichier en local
+            file_path: `local_${Date.now()}_${file.name.replace(/\s+/g, '_')}`
+          })
+          .eq('id', justificatifId);
+          
+        if (updateError) {
+          console.error("Erreur lors de la mise à jour du statut:", updateError);
+          throw updateError;
         }
-      }
-
-      const fileName = `${justificatifId}-${Date.now()}.${fileExt}`;
-      const filePath = `${submissionId}/${fileName}`;
-      
-      const { error: uploadError } = await supabase.storage
-        .from('justificatifs')
-        .upload(filePath, file, {
-          cacheControl: '3600',
-          upsert: true,
-        });
         
-      if (uploadError) throw uploadError;
-
-      const { error: updateError } = await supabase
-        .from('form_justificatifs')
-        .update({
-          file_path: filePath,
-          file_name: file.name,
-          status: 'uploaded',
-          user_id: session.user.id
-        })
-        .eq('id', justificatifId);
+        // Stockage local (en session) pour affichage immédiat
+        sessionStorage.setItem(`justificatif_${justificatifId}`, base64File);
         
-      if (updateError) throw updateError;
+        // Mise à jour du state local
+        const updatedJustificatifs = justificatifs.map(doc => 
+          doc.id === justificatifId 
+            ? {
+                ...doc,
+                file_path: `local_${Date.now()}_${file.name.replace(/\s+/g, '_')}`,
+                file_name: file.name,
+                status: 'uploaded' as JustificatifStatus
+              } 
+            : doc
+        );
+        
+        setJustificatifs(updatedJustificatifs);
+        setGroupedJustificatifs(groupJustificatifs(updatedJustificatifs));
+        
+        toast.success(`Le fichier ${file.name} a été téléchargé avec succès`);
+        
+        setUploading(prev => ({ ...prev, [justificatifId]: false }));
+      };
       
-      // Mise à jour du state local
-      const updatedJustificatifs = justificatifs.map(doc => 
-        doc.id === justificatifId 
-          ? {
-              ...doc,
-              file_path: filePath,
-              file_name: file.name,
-              status: 'uploaded' as JustificatifStatus
-            } 
-          : doc
-      );
-      
-      setJustificatifs(updatedJustificatifs);
-      setGroupedJustificatifs(groupJustificatifs(updatedJustificatifs));
-      
-      toast.success(`Le fichier ${file.name} a été téléchargé avec succès`);
+      reader.onerror = (error) => {
+        console.error("Erreur lors de la lecture du fichier:", error);
+        toast.error("Erreur lors de la lecture du fichier");
+        setUploading(prev => ({ ...prev, [justificatifId]: false }));
+      };
     } catch (error) {
       console.error('Erreur de téléchargement:', error);
       toast.error("Une erreur est survenue lors du téléchargement");
-    } finally {
       setUploading(prev => ({ ...prev, [justificatifId]: false }));
     }
   };
 
-  const handleFileDownload = async (filePath: string, fileName: string) => {
+  const handleFileDownload = async (filePath: string, fileName: string, justificatifId: string) => {
     try {
       if (!filePath) {
         toast.error("Aucun fichier disponible");
         return;
       }
 
-      const { data, error } = await supabase.storage
-        .from('justificatifs')
-        .download(filePath);
-
-      if (error) {
-        console.error('Erreur lors du téléchargement du fichier:', error);
-        toast.error("Erreur lors du téléchargement du fichier");
-        return;
+      // Vérifier si c'est un fichier stocké localement
+      if (filePath.startsWith('local_')) {
+        const base64File = sessionStorage.getItem(`justificatif_${justificatifId}`);
+        if (base64File) {
+          // Créer un lien de téléchargement à partir du Base64
+          const link = document.createElement('a');
+          link.href = base64File;
+          link.download = fileName || 'document';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
+        } else {
+          toast.error("Fichier local non trouvé, essayez de télécharger à nouveau");
+          return;
+        }
       }
 
-      const url = URL.createObjectURL(data);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = fileName || 'document';
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      URL.revokeObjectURL(url);
+      // Si ce n'est pas un fichier local, tenter de le récupérer depuis Supabase
+      try {
+        const { data, error } = await supabase.storage
+          .from('justificatifs')
+          .download(filePath);
+
+        if (error) {
+          console.error('Erreur lors du téléchargement du fichier:', error);
+          toast.error("Erreur lors du téléchargement du fichier");
+          return;
+        }
+
+        const url = URL.createObjectURL(data);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = fileName || 'document';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
+      } catch (error) {
+        console.error('Erreur lors du téléchargement depuis Supabase:', error);
+        toast.error("Impossible de récupérer le fichier depuis le serveur");
+      }
     } catch (error) {
       console.error('Erreur lors du téléchargement:', error);
       toast.error("Une erreur est survenue lors du téléchargement");
@@ -454,7 +477,7 @@ const Justificatifs = () => {
                                 variant="ghost" 
                                 size="sm" 
                                 className="text-[#27017F] hover:text-[#35DA56] hover:bg-transparent"
-                                onClick={() => handleFileDownload(doc.file_path!, doc.file_name!)}
+                                onClick={() => handleFileDownload(doc.file_path!, doc.file_name!, doc.id)}
                               >
                                 <File className="h-4 w-4 mr-2" />
                                 <span className="text-xs truncate max-w-[150px]">{doc.file_name}</span>
