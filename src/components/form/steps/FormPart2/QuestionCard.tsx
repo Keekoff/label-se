@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { QuestionProps } from "./types";
+import { QuestionProps } from "../types";
 import QuestionOption from "./QuestionOption";
 
 const QuestionCard: React.FC<QuestionProps> = ({ question, selectedAnswers, onAnswerToggle }) => {
