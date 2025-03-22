@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Calculator } from "lucide-react";
 
 interface SubmissionModalProps {
   open: boolean;
@@ -60,6 +62,15 @@ export function SubmissionModal({ open, onOpenChange, submissionId }: Submission
         <DialogDescription className="py-4 text-gray-700">
           Merci d'avoir soumis votre demande. Vous trouverez les documents à fournir dans votre Dashboard.
         </DialogDescription>
+        
+        <Alert className="bg-[#27017F]/5 border border-[#27017F]/20 mb-4">
+          <Calculator className="h-4 w-4 text-[#27017F]" />
+          <AlertDescription className="ml-2 text-[#27017F] text-sm">
+            Notre outil est en train de calculer votre échelon. 
+            Il sera visible sur votre tableau de bord d'ici 2 minutes.
+          </AlertDescription>
+        </Alert>
+        
         <div className="flex gap-4 justify-end">
           <Button 
             variant="outline" 

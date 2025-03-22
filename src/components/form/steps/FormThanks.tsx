@@ -2,10 +2,11 @@
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
-import { CreditCard, LayoutDashboard } from "lucide-react";
+import { CreditCard, LayoutDashboard, Calculator } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 
 interface FormThanksProps {
   onValidityChange: (isValid: boolean) => void;
@@ -78,6 +79,14 @@ const FormThanks = ({ onValidityChange, formState, submissionId }: FormThanksPro
         Nous avons bien reçu votre dossier et nous reviendrons vers vous dans les plus brefs délais.
         Vous trouverez les documents à fournir dans votre Dashboard.
       </p>
+
+      <Alert className="bg-[#27017F]/5 border border-[#27017F]/20">
+        <Calculator className="h-5 w-5 text-[#27017F]" />
+        <AlertDescription className="ml-2 text-[#27017F]">
+          Notre outil est en train de calculer votre échelon. 
+          Il sera visible sur votre tableau de bord d'ici 2 minutes.
+        </AlertDescription>
+      </Alert>
 
       <Card className="p-6 mt-8 shadow-md bg-white/95 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
         <h3 className="text-xl font-semibold mb-6">Grille tarifaire</h3>
