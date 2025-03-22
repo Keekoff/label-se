@@ -1,8 +1,7 @@
-
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Justificatif, GroupedJustificatifs } from "./types";
+import { Justificatif, GroupedJustificatifs, JustificatifStatus } from "./types";
 import { getJustificatifs } from "@/components/form/steps/FormPart1";
 import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2";
 
@@ -81,7 +80,6 @@ export const useJustificatifs = () => {
         }
 
         console.log("Récupération des justificatifs depuis la base de données pour la soumission:", latestSubmission.id);
-        // Appel direct à la base de données Supabase
         const { data: justificatifsData, error: justificatifsError } = await supabase
           .from('form_justificatifs')
           .select('*')
@@ -99,9 +97,7 @@ export const useJustificatifs = () => {
         if (!justificatifsData || justificatifsData.length === 0) {
           console.log("Aucun justificatif trouvé dans la base de données, essai via la fonction edge");
           
-          // Essai de récupération via la fonction edge
           try {
-            // Récupérer l'URL de l'API Supabase depuis l'environnement
             const baseUrl = import.meta.env.VITE_SUPABASE_URL || "https://xrruijuepuglkguryzlp.supabase.co";
             const apiUrl = `${baseUrl}/functions/v1/get-admission-documents?submissionId=${latestSubmission.id}`;
             
@@ -196,10 +192,8 @@ export const useJustificatifs = () => {
         return;
       }
 
-      // Générer un chemin organisé par soumission et justificatif
       if (!submissionId) throw new Error("ID de soumission non trouvé");
       
-      // Créer un chemin de fichier unique et organisé: submissionId/questionId/responseId_filename
       const sanitizedQuestionId = justificatif.question_identifier.replace(/\s+/g, '_').toLowerCase();
       const sanitizedResponse = justificatif.response.substring(0, 20).replace(/\s+/g, '_').toLowerCase();
       const timestamp = Date.now();
@@ -208,7 +202,6 @@ export const useJustificatifs = () => {
       
       console.log(`Téléchargement du fichier vers le chemin: ${filePath}`);
       
-      // Télécharger le fichier vers Supabase Storage
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('justificatifs')
         .upload(filePath, file, {
@@ -223,7 +216,6 @@ export const useJustificatifs = () => {
       
       console.log("Fichier téléchargé avec succès:", uploadData);
       
-      // Mise à jour dans la base de données
       const { error: updateError } = await supabase
         .from('form_justificatifs')
         .update({
@@ -239,7 +231,6 @@ export const useJustificatifs = () => {
         throw updateError;
       }
       
-      // Mise à jour du state local
       const updatedJustificatifs = justificatifs.map(doc => 
         doc.id === justificatifId 
           ? {
@@ -270,11 +261,9 @@ export const useJustificatifs = () => {
         return;
       }
 
-      // Vérifier si c'est un fichier stocké localement (compatible avec l'ancien système)
       if (filePath.startsWith('local_')) {
         const base64File = sessionStorage.getItem(`justificatif_${justificatifId}`);
         if (base64File) {
-          // Créer un lien de téléchargement à partir du Base64
           const link = document.createElement('a');
           link.href = base64File;
           link.download = fileName || 'document';
@@ -290,7 +279,6 @@ export const useJustificatifs = () => {
 
       console.log(`Téléchargement du fichier depuis le chemin: ${filePath}`);
       
-      // Télécharger depuis Supabase Storage
       const { data, error } = await supabase.storage
         .from('justificatifs')
         .download(filePath);

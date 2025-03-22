@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,17 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { getJustificatifs } from "@/components/form/steps/FormPart1";
 import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2";
-
-type JustificatifStatus = 'pending' | 'uploaded' | 'validated';
-type Justificatif = {
-  id: string;
-  question_identifier: string;
-  response: string;
-  justificatifs: string[];
-  file_path?: string;
-  file_name?: string;
-  status: JustificatifStatus;
-};
+import { Justificatif, JustificatifStatus } from "./types";
 
 type GroupedJustificatifs = {
   [questionId: string]: {
