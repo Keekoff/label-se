@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { getJustificatifs } from "@/components/form/steps/FormPart1";
+import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2";
 
 type JustificatifStatus = 'pending' | 'uploaded' | 'validated';
 type Justificatif = {
@@ -74,6 +75,7 @@ const Justificatifs = () => {
           return;
         }
 
+        console.log("Récupération des soumissions pour l'utilisateur:", session.user.id);
         const { data: submissions, error: submissionError } = await supabase
           .from('label_submissions')
           .select('id, status, payment_status')
@@ -103,10 +105,11 @@ const Justificatifs = () => {
           return;
         }
 
+        console.log("Récupération des justificatifs depuis la base de données pour la soumission:", latestSubmission.id);
+        // Appel direct à la base de données Supabase
         const { data: justificatifsData, error: justificatifsError } = await supabase
           .from('form_justificatifs')
           .select('*')
-          .eq('user_id', session.user.id)
           .eq('submission_id', latestSubmission.id);
 
         if (justificatifsError) {
@@ -116,7 +119,54 @@ const Justificatifs = () => {
           return;
         }
 
-        const mappedJustificatifs = justificatifsData.map(item => ({
+        console.log("Justificatifs récupérés:", justificatifsData?.length || 0);
+        
+        if (!justificatifsData || justificatifsData.length === 0) {
+          console.log("Aucun justificatif trouvé dans la base de données, essai via la fonction edge");
+          
+          // Essai de récupération via la fonction edge
+          try {
+            const response = await fetch(
+              `${supabase.supabaseUrl}/functions/v1/get-admission-documents?submissionId=${latestSubmission.id}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${session.access_token}`,
+                  'Content-Type': 'application/json',
+                }
+              }
+            );
+            
+            if (!response.ok) {
+              const errorData = await response.json();
+              console.error('Erreur lors de l\'appel à la fonction edge:', errorData);
+              throw new Error(errorData.error || "Erreur lors de la récupération des justificatifs");
+            }
+            
+            const edgeData = await response.json();
+            console.log("Justificatifs récupérés via edge function:", edgeData?.length || 0);
+            
+            if (edgeData && edgeData.length > 0) {
+              const mappedEdgeData = edgeData.map(item => ({
+                id: item.id,
+                question_identifier: item.question_identifier,
+                response: item.response,
+                justificatifs: item.justificatifs,
+                file_path: item.file_path,
+                file_name: item.file_name,
+                status: item.status as JustificatifStatus || 'pending'
+              }));
+              
+              setJustificatifs(mappedEdgeData);
+              setGroupedJustificatifs(groupJustificatifs(mappedEdgeData));
+              setIsLoading(false);
+              return;
+            }
+          } catch (edgeError) {
+            console.error("Erreur lors de l'appel à la fonction edge:", edgeError);
+          }
+        }
+
+        const mappedJustificatifs = (justificatifsData || []).map(item => ({
           id: item.id,
           question_identifier: item.question_identifier,
           response: item.response,
@@ -161,6 +211,21 @@ const Justificatifs = () => {
       if (file.size > 10 * 1024 * 1024) {
         toast.error("Le fichier est trop volumineux. Taille maximale: 10 MB");
         return;
+      }
+
+      // Vérifier si le bucket existe, sinon le créer
+      const { data: buckets } = await supabase.storage.listBuckets();
+      const justificatifsBucketExists = buckets?.some(bucket => bucket.name === 'justificatifs');
+      
+      if (!justificatifsBucketExists) {
+        const { error: bucketError } = await supabase.storage.createBucket('justificatifs', {
+          public: false
+        });
+        
+        if (bucketError) {
+          console.error('Erreur lors de la création du bucket:', bucketError);
+          throw bucketError;
+        }
       }
 
       const fileName = `${justificatifId}-${Date.now()}.${fileExt}`;

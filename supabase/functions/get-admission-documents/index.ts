@@ -10,27 +10,6 @@ serve(async (req) => {
   }
 
   try {
-    // Vérification de l'autorisation
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Aucun jeton d\'authentification fourni' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    // Récupérer les paramètres de la requête
-    const url = new URL(req.url)
-    const submissionId = url.searchParams.get('submissionId')
-
-    // Valider les paramètres obligatoires
-    if (!submissionId) {
-      return new Response(
-        JSON.stringify({ error: 'ID de soumission requis' }),
-        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
     // Configuration du client Supabase
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY')
@@ -45,29 +24,45 @@ serve(async (req) => {
 
     const supabase = createClient(supabaseUrl, supabaseKey)
 
-    // Récupération des documents pour la soumission spécifiée
-    const { data, error } = await supabase
-      .from('form_justificatifs')
-      .select('*')
-      .eq('submission_id', submissionId)
+    // Récupérer les paramètres de la requête
+    const url = new URL(req.url)
+    const submissionId = url.searchParams.get('submissionId')
 
-    if (error) {
-      console.error('Erreur lors de la récupération des documents:', error)
+    // Valider les paramètres obligatoires
+    if (!submissionId) {
       return new Response(
-        JSON.stringify({ error: 'Erreur lors de la récupération des documents' }),
-        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+        JSON.stringify({ error: 'ID de soumission requis' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
+    // Récupération des documents pour la soumission spécifiée
+    console.log(`Récupération des justificatifs pour la soumission: ${submissionId}`);
+    
+    const { data, error } = await supabase
+      .from('form_justificatifs')
+      .select('*')
+      .eq('submission_id', submissionId);
+
+    if (error) {
+      console.error('Erreur lors de la récupération des documents:', error);
+      return new Response(
+        JSON.stringify({ error: 'Erreur lors de la récupération des documents' }),
+        { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    console.log(`Nombre de justificatifs trouvés: ${data ? data.length : 0}`);
+    
     return new Response(
-      JSON.stringify(data),
+      JSON.stringify(data || []),
       { status: 200, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    );
   } catch (error) {
-    console.error('Erreur:', error.message)
+    console.error('Erreur:', error.message);
     return new Response(
       JSON.stringify({ error: 'Une erreur est survenue lors du traitement de votre demande' }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-    )
+    );
   }
-})
+});
