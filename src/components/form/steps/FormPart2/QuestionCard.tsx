@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { QuestionProps } from "../types";
 import { RadioGroup } from "@/components/ui/radio-group";
 import QuestionOption from "./QuestionOption";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const QuestionCard: React.FC<QuestionProps> = ({ question, selectedAnswers, onAnswerToggle }) => {
   const handleToggle = (label: string, selected: boolean) => {
