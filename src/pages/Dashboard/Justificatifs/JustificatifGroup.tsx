@@ -3,7 +3,6 @@ import { ChevronDown, ChevronUp } from "lucide-react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { GroupedJustificatifs, Justificatif } from "./types";
-import FileActions from "./FileActions";
 
 interface JustificatifGroupProps {
   group: GroupedJustificatifs[string];
@@ -40,9 +39,8 @@ const JustificatifGroup = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-2/5">Réponse</TableHead>
-                <TableHead className="w-2/5">Justificatifs demandés</TableHead>
-                <TableHead className="text-right w-1/5">Statut / Fichier</TableHead>
+                <TableHead className="w-1/2">Réponse</TableHead>
+                <TableHead className="w-1/2">Justificatifs demandés</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -59,13 +57,6 @@ const JustificatifGroup = ({
                         <li key={index}>{justificatif}</li>
                       ))}
                     </ul>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    <FileActions 
-                      doc={doc} 
-                      uploading={uploading} 
-                      onDownload={onDownload} 
-                    />
                   </TableCell>
                 </TableRow>
               ))}
