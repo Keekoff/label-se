@@ -1,7 +1,7 @@
 
 import React from "react";
 import { Label } from "@/components/ui/label";
-import { RadioGroup, Radio } from "@/components/ui/radio-group";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 
 interface QuestionOptionProps {
   option: {
@@ -21,7 +21,7 @@ const QuestionOption: React.FC<QuestionOptionProps> = ({ option, isSelected, onT
   return (
     <div className="flex items-start space-x-2 p-2 rounded hover:bg-gray-50">
       <div className="flex items-center h-5">
-        <Radio
+        <RadioGroupItem
           id={`option-${option.value}`}
           checked={isSelected}
           onClick={handleToggle}
