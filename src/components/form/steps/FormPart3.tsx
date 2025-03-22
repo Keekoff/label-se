@@ -33,7 +33,14 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
     return initialAnswers;
   });
 
-  const toggleAnswer = (questionId: string, value: string, label: string) => {
+  const toggleAnswer = (questionId: string, value: string) => {
+    const question = QUESTIONS.find(q => q.id === questionId);
+    if (!question) return;
+    
+    const option = question.options.find(opt => opt.value === value);
+    if (!option) return;
+    
+    const label = option.label;
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
@@ -127,12 +134,7 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
             key={question.id}
             question={question}
             selectedAnswers={answers[question.id] || []}
-            onAnswerToggle={(questionId, value) => {
-              const option = question.options.find(opt => opt.value === value);
-              if (option) {
-                toggleAnswer(questionId, value, option.label);
-              }
-            }}
+            onAnswerToggle={toggleAnswer}
           />
         ))}
       </div>

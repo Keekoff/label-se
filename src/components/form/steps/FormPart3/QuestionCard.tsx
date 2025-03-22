@@ -1,8 +1,6 @@
 
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { ChevronsUpDown } from "lucide-react";
+import React from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Question } from "./types";
 import QuestionOption from "./QuestionOption";
 
@@ -13,47 +11,46 @@ interface QuestionCardProps {
 }
 
 const QuestionCard = ({ question, selectedAnswers, onAnswerToggle }: QuestionCardProps) => {
-  return (
-    <div className="space-y-4 pb-6 border-b last:border-0">
-      <div>
-        <h3 className="text-lg font-medium flex items-start gap-1">
-          {question.title}
-          <span className="text-red-500">*</span>
-        </h3>
-        <p className="text-gray-600 mt-1 text-sm">{question.description}</p>
-      </div>
+  const notApplicableOption = question.options.find(opt => 
+    opt.label.includes("Ce critère ne s'applique pas")
+  );
 
-      <div className="space-y-2">
-        <Label>Votre réponse</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              role="combobox"
-              className="w-full justify-between"
-            >
-              {selectedAnswers?.length > 0
-                ? `${selectedAnswers.length} réponse${selectedAnswers.length > 1 ? 's' : ''} sélectionnée${selectedAnswers.length > 1 ? 's' : ''}`
-                : "Sélectionner vos réponses"}
-              <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
-            <div className="max-h-[300px] overflow-auto p-1">
-              {question.options.map((option) => (
-                <QuestionOption
-                  key={option.value}
-                  value={option.value}
-                  label={option.label}
-                  isSelected={selectedAnswers?.includes(option.label)}
-                  onClick={() => onAnswerToggle(question.id, option.value)}
-                />
-              ))}
+  const standardOptions = question.options.filter(opt => 
+    !opt.label.includes("Ce critère ne s'applique pas")
+  );
+
+  return (
+    <Card className="bg-white mb-6">
+      <CardHeader className="pb-3">
+        <CardTitle className="text-lg font-semibold">{question.title}</CardTitle>
+        <p className="text-gray-600 text-sm">{question.description}</p>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-3">
+          {standardOptions.map((option) => (
+            <QuestionOption
+              key={option.value}
+              value={option.value}
+              label={option.label}
+              isSelected={selectedAnswers?.includes(option.label)}
+              onClick={() => onAnswerToggle(question.id, option.value)}
+            />
+          ))}
+          
+          {notApplicableOption && (
+            <div className="mt-4 pt-2 border-t border-gray-100">
+              <QuestionOption
+                key={notApplicableOption.value}
+                value={notApplicableOption.value}
+                label={notApplicableOption.label}
+                isSelected={selectedAnswers?.includes(notApplicableOption.label)}
+                onClick={() => onAnswerToggle(question.id, notApplicableOption.value)}
+              />
             </div>
-          </PopoverContent>
-        </Popover>
-      </div>
-    </div>
+          )}
+        </div>
+      </CardContent>
+    </Card>
   );
 };
 
