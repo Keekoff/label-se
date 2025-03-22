@@ -9,15 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { getJustificatifs } from "@/components/form/steps/FormPart1";
 import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2";
-import { Justificatif, JustificatifStatus } from "./types";
-
-type GroupedJustificatifs = {
-  [questionId: string]: {
-    questionId: string;
-    questionTitle: string;
-    items: Justificatif[];
-  }
-};
+import { Justificatif, JustificatifStatus, GroupedJustificatifs } from "./Justificatifs/types";
 
 const Justificatifs = () => {
   const [justificatifs, setJustificatifs] = useState<Justificatif[]>([]);
