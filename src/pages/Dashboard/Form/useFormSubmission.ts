@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -55,6 +56,11 @@ export const useFormSubmission = (
     try {
       console.log("Starting to save justificatifs for submission:", submissionId);
       
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        throw new Error("No active session found");
+      }
+      
       const questionsWithJustificatifs = [
         { id: "diversity", dbName: "diversite", displayName: "Diversité", part: 1 },
         { id: "equality", dbName: "egalite", displayName: "Égalité", part: 1 },
@@ -84,6 +90,7 @@ export const useFormSubmission = (
 
       const formJustificatifsData: Array<{
         submission_id: string;
+        user_id: string;
         question_identifier: string;
         response: string;
         justificatifs: string[];
@@ -117,6 +124,7 @@ export const useFormSubmission = (
             if (justificatifs && justificatifs.length > 0) {
               formJustificatifsData.push({
                 submission_id: submissionId,
+                user_id: session.user.id,
                 question_identifier: question.displayName,
                 response: response,
                 justificatifs: justificatifs
