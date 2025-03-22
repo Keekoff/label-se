@@ -16,4 +16,3 @@ export const getJustificatifsForPart2 = (questionId: string, response: string): 
   // Retourner les justificatifs
   return option.justificatifs || [];
 };
-
