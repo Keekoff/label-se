@@ -12,13 +12,17 @@ export const getJustificatifsForPart2 = (questionId: string, optionLabel: string
 };
 
 const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props) => {
+  // Initialiser l'état des réponses à partir du formState
   const [answers, setAnswers] = useState<Record<string, string[]>>(() => {
     const initialAnswers: Record<string, string[]> = {};
+    
+    // Remplir avec les réponses existantes ou des tableaux vides
     QUESTIONS.forEach(question => {
-      initialAnswers[question.id] = Array.isArray(formState[question.id]) 
-        ? formState[question.id] 
+      initialAnswers[question.id] = formState[question.id] 
+        ? [...formState[question.id]] 
         : [];
     });
+    
     return initialAnswers;
   });
 
@@ -38,6 +42,7 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
 
     // Gestion spéciale pour l'option "Ce critère ne s'applique pas"
     if (label.includes("Ce critère ne s'applique pas")) {
+      // Si cette option est sélectionnée, on efface toutes les autres
       newAnswers = selected ? [label] : [];
     } else {
       // Pour les autres options
@@ -53,14 +58,18 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
       }
     }
     
-    // Mettre à jour l'état local et l'état du formulaire parent
-    const updatedAnswers = { ...answers, [questionId]: newAnswers };
-    setAnswers(updatedAnswers);
+    // Mettre à jour l'état local de manière immutable
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
+      [questionId]: newAnswers
+    }));
     
-    // Mettre à jour l'état du formulaire avec les nouvelles réponses
-    setFormState({ ...formState, [questionId]: newAnswers });
+    // Mettre à jour l'état du formulaire parent
+    setFormState({
+      ...formState,
+      [questionId]: newAnswers
+    });
     
-    // Journal de débogage
     console.log(`FormPart2 - Updated ${questionId} answers:`, newAnswers);
   };
 
