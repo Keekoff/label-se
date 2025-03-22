@@ -14,12 +14,18 @@ interface QuestionOptionProps {
 }
 
 const QuestionOption: React.FC<QuestionOptionProps> = ({ option, isSelected, onToggle }) => {
+  const handleToggle = (checked: boolean | "indeterminate") => {
+    const isChecked = checked === true;
+    console.log(`QuestionOption - Checkbox toggled: ${option.label} to ${isChecked}`);
+    onToggle(isChecked);
+  };
+
   return (
     <div className="flex items-start space-x-2 p-2 rounded hover:bg-gray-50">
       <Checkbox
         id={`option-${option.value}`}
         checked={isSelected}
-        onCheckedChange={onToggle}
+        onCheckedChange={handleToggle}
         className="mt-1"
       />
       <div className="space-y-1 flex-1">

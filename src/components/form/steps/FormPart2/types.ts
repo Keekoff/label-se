@@ -13,7 +13,7 @@ export interface Question {
 export interface QuestionProps {
   question: Question;
   selectedAnswers: string[];
-  onAnswerToggle: (questionId: string, value: string, selected: boolean) => void;
+  onAnswerToggle: (questionId: string, label: string, selected: boolean) => void;
 }
 
 export interface FormPart2Props {

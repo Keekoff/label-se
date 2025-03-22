@@ -5,6 +5,8 @@ import { FormPart2Props } from "./FormPart2/types";
 
 // Composant FormPart2 avec les props nécessaires
 const FormPart2Component: React.FC<FormPart2Props> = ({ onValidityChange, formState, setFormState }) => {
+  console.log("FormPart2Component - Rendering with formState:", Object.keys(formState));
+  
   return (
     <FormPart2 
       onValidityChange={onValidityChange}

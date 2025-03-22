@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { QUESTIONS, getJustificatifsForQuestion } from "./questions";
 import QuestionCard from "./QuestionCard";
@@ -21,45 +22,53 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
     return initialAnswers;
   });
 
-  // Function to toggle answers with improved handling of exclusive options
+  // Fonction pour basculer les réponses avec une meilleure gestion des options exclusives
   const toggleAnswer = (questionId: string, label: string, selected: boolean) => {
-    console.log(`Toggling answer for ${questionId}, label: ${label}, selected: ${selected}`);
+    console.log(`FormPart2 - Toggling answer for ${questionId}, label: ${label}, selected: ${selected}`);
     
-    const currentAnswers = answers[questionId] || [];
+    // Trouver la question correspondante pour vérifier ses options
+    const question = QUESTIONS.find(q => q.id === questionId);
+    if (!question) {
+      console.warn(`Question non trouvée: ${questionId}`);
+      return;
+    }
+    
+    const currentAnswers = [...(answers[questionId] || [])];
     let newAnswers: string[];
 
-    // Handle "Ce critère ne s'applique pas" option specially
+    // Gestion spéciale pour l'option "Ce critère ne s'applique pas"
     if (label.includes("Ce critère ne s'applique pas")) {
       newAnswers = selected ? [label] : [];
     } else {
-      // For other options
+      // Pour les autres options
       if (selected) {
-        // Adding a normal option should remove the "Ce critère ne s'applique pas" if present
-        newAnswers = [...currentAnswers.filter(a => !a.includes("Ce critère ne s'applique pas")), label];
+        // Ajout d'une option normale doit supprimer "Ce critère ne s'applique pas" si présent
+        newAnswers = [
+          ...currentAnswers.filter(a => !a.includes("Ce critère ne s'applique pas")), 
+          label
+        ];
       } else {
-        // Removing a normal option
+        // Suppression d'une option normale
         newAnswers = currentAnswers.filter(a => a !== label);
       }
     }
     
-    // Update local state and parent form state
+    // Mettre à jour l'état local et l'état du formulaire parent
     const updatedAnswers = { ...answers, [questionId]: newAnswers };
     setAnswers(updatedAnswers);
     
-    // Update form state with the new answers
+    // Mettre à jour l'état du formulaire avec les nouvelles réponses
     setFormState({ ...formState, [questionId]: newAnswers });
     
-    // Debug logging
-    console.log(`Updated ${questionId} answers:`, newAnswers);
+    // Journal de débogage
+    console.log(`FormPart2 - Updated ${questionId} answers:`, newAnswers);
   };
 
-  // Check form validity whenever answers change
+  // Vérifier la validité du formulaire chaque fois que les réponses changent
   useEffect(() => {
     const isValid = Object.values(answers).every(answer => answer.length > 0);
+    console.log("FormPart2 - Checking validity:", isValid, answers);
     onValidityChange(isValid);
-    
-    // Log current answers state for debugging
-    console.log("Current form answers state:", answers);
   }, [answers, onValidityChange]);
 
   return (

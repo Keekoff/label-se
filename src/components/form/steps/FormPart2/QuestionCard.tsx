@@ -18,7 +18,10 @@ const QuestionCard: React.FC<QuestionProps> = ({ question, selectedAnswers, onAn
               key={option.value}
               option={option}
               isSelected={selectedAnswers.includes(option.label)}
-              onToggle={(selected) => onAnswerToggle(question.id, option.label, selected)}
+              onToggle={(selected) => {
+                console.log(`QuestionCard - Toggling ${option.label} to ${selected} for question ${question.id}`);
+                onAnswerToggle(question.id, option.label, selected);
+              }}
             />
           ))}
         </div>
