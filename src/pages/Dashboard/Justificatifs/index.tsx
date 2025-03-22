@@ -23,7 +23,6 @@ const Justificatifs = () => {
     uploading,
     expandedGroups,
     toggleGroup,
-    handleFileUpload,
     handleFileDownload
   } = useJustificatifs();
 
@@ -131,7 +130,6 @@ const Justificatifs = () => {
             expanded={expandedGroups[group.questionId]}
             uploading={uploading}
             onToggle={toggleGroup}
-            onUpload={handleFileUpload}
             onDownload={handleFileDownload}
           />
         ))}

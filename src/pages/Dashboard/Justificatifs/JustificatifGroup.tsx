@@ -10,7 +10,6 @@ interface JustificatifGroupProps {
   expanded: boolean;
   uploading: Record<string, boolean>;
   onToggle: (questionId: string) => void;
-  onUpload: (id: string, file: File) => void;
   onDownload: (filePath: string, fileName: string, id: string) => void;
 }
 
@@ -19,7 +18,6 @@ const JustificatifGroup = ({
   expanded, 
   uploading, 
   onToggle, 
-  onUpload, 
   onDownload 
 }: JustificatifGroupProps) => {
   return (
@@ -42,9 +40,9 @@ const JustificatifGroup = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-1/3">Réponse</TableHead>
-                <TableHead className="w-1/3">Justificatifs demandés</TableHead>
-                <TableHead className="text-right w-1/3">Action</TableHead>
+                <TableHead className="w-2/5">Réponse</TableHead>
+                <TableHead className="w-2/5">Justificatifs demandés</TableHead>
+                <TableHead className="text-right w-1/5">Statut / Fichier</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -66,7 +64,6 @@ const JustificatifGroup = ({
                     <FileActions 
                       doc={doc} 
                       uploading={uploading} 
-                      onUpload={onUpload} 
                       onDownload={onDownload} 
                     />
                   </TableCell>
