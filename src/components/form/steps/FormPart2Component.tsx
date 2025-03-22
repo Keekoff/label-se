@@ -8,11 +8,13 @@ const FormPart2Component: React.FC<FormPart2Props> = ({ onValidityChange, formSt
   console.log("FormPart2Component - Rendering with formState:", Object.keys(formState));
   
   return (
-    <FormPart2 
-      onValidityChange={onValidityChange}
-      formState={formState} 
-      setFormState={setFormState}
-    />
+    <div key="form-part-2-wrapper">
+      <FormPart2 
+        onValidityChange={onValidityChange}
+        formState={formState} 
+        setFormState={setFormState}
+      />
+    </div>
   );
 };
 

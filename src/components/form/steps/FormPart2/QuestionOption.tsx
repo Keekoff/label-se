@@ -50,4 +50,4 @@ const QuestionOption: React.FC<QuestionOptionProps> = ({ option, isSelected, onT
   );
 };
 
-export default QuestionOption;
+export default React.memo(QuestionOption);

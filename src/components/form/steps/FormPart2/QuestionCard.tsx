@@ -5,6 +5,11 @@ import { QuestionProps } from "./types";
 import QuestionOption from "./QuestionOption";
 
 const QuestionCard: React.FC<QuestionProps> = ({ question, selectedAnswers, onAnswerToggle }) => {
+  const handleOptionToggle = (label: string, selected: boolean) => {
+    console.log(`QuestionCard - Toggling ${label} to ${selected} for question ${question.id}`);
+    onAnswerToggle(question.id, label, selected);
+  };
+
   return (
     <Card className="bg-white">
       <CardHeader className="pb-3">
@@ -18,10 +23,7 @@ const QuestionCard: React.FC<QuestionProps> = ({ question, selectedAnswers, onAn
               key={option.value}
               option={option}
               isSelected={selectedAnswers.includes(option.label)}
-              onToggle={(selected) => {
-                console.log(`QuestionCard - Toggling ${option.label} to ${selected} for question ${question.id}`);
-                onAnswerToggle(question.id, option.label, selected);
-              }}
+              onToggle={(selected) => handleOptionToggle(option.label, selected)}
             />
           ))}
         </div>
@@ -30,4 +32,4 @@ const QuestionCard: React.FC<QuestionProps> = ({ question, selectedAnswers, onAn
   );
 };
 
-export default QuestionCard;
+export default React.memo(QuestionCard);
