@@ -36,6 +36,8 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
 
   // Function to toggle answers with improved handling of exclusive options
   const toggleAnswer = (questionId: string, label: string, selected: boolean) => {
+    console.log(`Toggling answer for ${questionId}, label: ${label}, selected: ${selected}`);
+    
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
