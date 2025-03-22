@@ -23,13 +23,15 @@ const UploadedFilesList: React.FC<UploadedFilesListProps> = ({ files, onFileDele
 
   const handleDownload = async (file: UploadedFile) => {
     try {
+      console.log(`Téléchargement du fichier: ${file.path}`);
+      
       const { data, error } = await supabase.storage
         .from('justificatifs')
         .download(file.path);
 
       if (error) {
         console.error('Erreur lors du téléchargement du fichier:', error);
-        toast.error("Erreur lors du téléchargement du fichier");
+        toast.error(`Erreur lors du téléchargement: ${error.message}`);
         return;
       }
 
@@ -55,13 +57,15 @@ const UploadedFilesList: React.FC<UploadedFilesListProps> = ({ files, onFileDele
     setDeletingFile(file.path);
     
     try {
+      console.log(`Suppression du fichier: ${file.path}`);
+      
       const { error } = await supabase.storage
         .from('justificatifs')
         .remove([file.path]);
 
       if (error) {
         console.error('Erreur lors de la suppression du fichier:', error);
-        toast.error("Erreur lors de la suppression du fichier");
+        toast.error(`Erreur lors de la suppression: ${error.message}`);
         return;
       }
 

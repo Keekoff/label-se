@@ -37,10 +37,12 @@ const Justificatifs = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
-        // Changement du chemin pour récupérer tous les fichiers liés à cette soumission
+        console.log(`Recherche des fichiers dans le dossier docs/${submissionId}`);
+        
+        // Mise à jour du chemin pour la nouvelle structure
         const { data, error } = await supabase.storage
           .from('justificatifs')
-          .list(`documents/${submissionId}`, {
+          .list(`docs/${submissionId}`, {
             limit: 100,
             offset: 0,
             sortBy: { column: 'name', order: 'desc' } // Les plus récents d'abord
@@ -51,24 +53,49 @@ const Justificatifs = () => {
           return;
         }
 
-        if (!data) {
+        if (!data || data.length === 0) {
           console.log('Aucun fichier trouvé');
           return;
         }
 
+        console.log('Fichiers trouvés:', data);
+
         const formattedFiles = data
           .filter(item => !item.name.includes('.emptyFolderPlaceholder'))
-          .map(item => ({
-            name: item.name.includes('_') ? item.name.split('_').slice(1).join('_') : item.name,
-            path: `documents/${submissionId}/${item.name}`,
-            uploadDate: new Date(item.created_at).toLocaleDateString('fr-FR', {
-              day: '2-digit',
-              month: '2-digit',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit'
-            })
-          }));
+          .map(item => {
+            // Extraction du nom original du fichier
+            let displayName = item.name;
+            
+            // Si le nom contient un préfixe comme file_1234567890_
+            if (displayName.match(/^(file|justif)_\d+_/)) {
+              // Récupérer le nom après le timestamp
+              const parts = displayName.split('_');
+              if (parts.length > 2) {
+                // Reconstruire le nom sans le préfixe
+                displayName = parts.slice(2).join('_');
+              }
+            }
+            
+            // Si le nom contient un ID de justificatif, le supprimer
+            if (displayName.includes('_')) {
+              const idMatch = displayName.match(/^[0-9a-f-]+_/);
+              if (idMatch) {
+                displayName = displayName.substring(idMatch[0].length);
+              }
+            }
+            
+            return {
+              name: displayName,
+              path: `docs/${submissionId}/${item.name}`,
+              uploadDate: new Date(item.created_at).toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+              })
+            };
+          });
 
         setUploadedFiles(formattedFiles);
       } catch (error) {

@@ -69,28 +69,37 @@ const FileUploader: React.FC<FileUploaderProps> = ({ submissionId, onFilesUpload
       }
 
       const uploadedFiles = [];
-      const timestamp = Date.now().toString();
       
       for (const file of selectedFiles) {
-        // Sanitize filename to avoid path issues
-        const fileName = file.name.replace(/\s+/g, '_');
-        const uniqueFileName = `${timestamp}_${fileName}`;
-        // Use a simpler path structure
-        const filePath = `documents/${submissionId}/${uniqueFileName}`;
+        // Nettoyer complètement le nom du fichier pour éviter tous caractères problématiques
+        const fileExt = file.name.split('.').pop() || '';
+        const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
         
-        console.log(`Tentative de téléchargement du fichier vers: ${filePath}`);
+        // Remplacer tous les caractères spéciaux et espaces par des underscores
+        const cleanBaseName = baseName
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+          .replace(/[^a-zA-Z0-9]/g, '_')   // Remplacer caractères spéciaux par _
+          .replace(/_+/g, '_')             // Éviter les underscores multiples
+          .replace(/^_|_$/g, '');          // Supprimer les underscores au début et à la fin
+          
+        const timestamp = Date.now();
+        const uniqueFileName = `file_${timestamp}_${cleanBaseName}.${fileExt}`;
+        const filePath = `docs/${submissionId}/${uniqueFileName}`;
+        
+        console.log(`Tentative de téléchargement du fichier "${file.name}" vers: ${filePath}`);
         
         // Upload to Supabase Storage
         const { data, error } = await supabase.storage
           .from('justificatifs')
           .upload(filePath, file, {
             cacheControl: '3600',
-            upsert: true // Changed to true to avoid conflicts
+            upsert: true
           });
         
         if (error) {
           console.error("Erreur lors du téléchargement:", error);
-          toast.error(`Erreur lors du téléchargement de ${file.name}`);
+          toast.error(`Erreur lors du téléchargement de ${file.name}: ${error.message}`);
           continue;
         }
         

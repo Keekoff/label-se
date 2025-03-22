@@ -52,19 +52,28 @@ export const useFileOperations = ({
 
       if (!submissionId) throw new Error("ID de soumission non trouvé");
       
-      // Simplify path structure to avoid path validation issues
-      const timestamp = Date.now().toString();
-      const sanitizedFilename = file.name.replace(/\s+/g, '_');
-      const uniqueFilename = `${timestamp}_${sanitizedFilename}`;
-      const filePath = `documents/${submissionId}/${justificatifId}_${uniqueFilename}`;
+      // Nettoyer complètement le nom du fichier pour éviter tous caractères problématiques
+      const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
       
-      console.log(`Téléchargement du fichier vers le chemin: ${filePath}`);
+      // Remplacer tous les caractères spéciaux et espaces par des underscores
+      const cleanBaseName = baseName
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '') // Supprimer les accents
+        .replace(/[^a-zA-Z0-9]/g, '_')   // Remplacer caractères spéciaux par _
+        .replace(/_+/g, '_')             // Éviter les underscores multiples
+        .replace(/^_|_$/g, '');          // Supprimer les underscores au début et à la fin
+        
+      const timestamp = Date.now();
+      const uniqueFileName = `justif_${timestamp}_${cleanBaseName}.${fileExt}`;
+      const filePath = `docs/${submissionId}/${justificatifId}_${uniqueFileName}`;
+      
+      console.log(`Téléchargement du fichier "${file.name}" vers le chemin: ${filePath}`);
       
       const { data: uploadData, error: uploadError } = await supabase.storage
         .from('justificatifs')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: true // Changed to true to handle potential conflicts
+          upsert: true
         });
       
       if (uploadError) {
