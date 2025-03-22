@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,7 +8,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Input } from "@/components/ui/input";
 import { getJustificatifs } from "@/components/form/steps/FormPart1";
-import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2";
+import { getJustificatifsForPart2 } from "@/components/form/steps/FormPart2/index";
 
 type JustificatifStatus = 'pending' | 'uploaded' | 'validated';
 type Justificatif = {
@@ -56,7 +55,6 @@ const Justificatifs = () => {
           questionTitle: item.question_identifier,
           items: []
         };
-        // Par défaut, tous les groupes sont ouverts
         setExpandedGroups(prev => ({...prev, [item.question_identifier]: true}));
       }
       
@@ -126,8 +124,12 @@ const Justificatifs = () => {
           
           // Essai de récupération via la fonction edge
           try {
+            // Récupérer l'URL de l'API Supabase depuis l'environnement
+            const baseUrl = import.meta.env.VITE_SUPABASE_URL || "https://xrruijuepuglkguryzlp.supabase.co";
+            const apiUrl = `${baseUrl}/functions/v1/get-admission-documents?submissionId=${latestSubmission.id}`;
+            
             const response = await fetch(
-              `${supabase.supabaseUrl}/functions/v1/get-admission-documents?submissionId=${latestSubmission.id}`,
+              apiUrl,
               {
                 headers: {
                   Authorization: `Bearer ${session.access_token}`,

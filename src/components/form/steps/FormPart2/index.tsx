@@ -18,4 +18,3 @@ export const getJustificatifsForPart2 = (questionId: string, response: string): 
 };
 
 export { default } from "../FormPart2";
-

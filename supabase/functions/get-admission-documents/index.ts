@@ -52,7 +52,13 @@ serve(async (req) => {
       );
     }
 
+    // Journaliser le résultat pour le débogage
     console.log(`Nombre de justificatifs trouvés: ${data ? data.length : 0}`);
+    if (data && data.length > 0) {
+      console.log(`Premier justificatif: ${JSON.stringify(data[0])}`);
+    } else {
+      console.log('Aucun justificatif trouvé pour cette soumission');
+    }
     
     return new Response(
       JSON.stringify(data || []),
