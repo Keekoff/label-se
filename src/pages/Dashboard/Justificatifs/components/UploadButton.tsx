@@ -26,7 +26,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ isUploading, onUpload, subm
         // Récupérer les données du formulaire
         const { data, error } = await supabase
           .from('label_submissions')
-          .select('nom_entreprise, user:user_id(email)')
+          .select('nom_entreprise, user_id')
           .eq('id', submissionId)
           .single();
         
@@ -36,9 +36,10 @@ const UploadButton: React.FC<UploadButtonProps> = ({ isUploading, onUpload, subm
         }
         
         if (data) {
+          // On utilise l'utilisateur connecté pour l'email si disponible
           setCompanyData({
             companyName: data.nom_entreprise || '',
-            userEmail: data.user?.email || '',
+            userEmail: session.user?.email || '',
           });
         }
       } catch (error) {
