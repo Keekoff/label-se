@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import { FormData } from "@/types/eligibility";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Step3FormProps {
   initialData: FormData;
@@ -66,6 +67,7 @@ const certificationStatuses = [
 const WEBHOOK_URL = "https://hook.eu1.make.com/1qdieciiwpnag26wl2ewme593sud371o";
 
 const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
+  const [userEmail, setUserEmail] = useState<string>("");
   const [formData, setFormData] = useState({
     roles: initialData.roles,
     responsibilities: initialData.responsibilities,
@@ -77,6 +79,27 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Récupérer l'email de l'utilisateur connecté
+  useEffect(() => {
+    const fetchUserEmail = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session?.user?.email) {
+          setUserEmail(session.user.email);
+          // Mettre à jour l'état du formulaire avec l'email de l'utilisateur
+          setFormData(prev => ({
+            ...prev,
+            email: session.user.email
+          }));
+        }
+      } catch (error) {
+        console.error("Erreur lors de la récupération de l'email utilisateur:", error);
+      }
+    };
+
+    fetchUserEmail();
+  }, []);
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
@@ -300,9 +323,10 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
             <Input
               id="email"
               type="email"
-              value={formData.email}
-              onChange={(e) => setFormData(prev => ({ ...prev, email: e.target.value }))}
-              className="mt-1"
+              value={userEmail || formData.email}
+              readOnly
+              className="mt-1 bg-gray-100 cursor-not-allowed"
+              aria-label="Votre email (non modifiable)"
             />
             {errors.email && (
               <span className="text-sm text-red-500">{errors.email}</span>
@@ -340,7 +364,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
         </Button>
         <Button 
           type="submit" 
-          className="bg-primary hover:bg-primary/90"
+          className="bg-[#35DA56] hover:bg-[#35DA56]/90 text-white"
           disabled={isSubmitting}
         >
           {isSubmitting ? 'Envoi en cours...' : 'Envoyer'}

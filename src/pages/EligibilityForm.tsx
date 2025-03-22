@@ -29,6 +29,7 @@ const EligibilityForm = () => {
   const [isIneligible, setIsIneligible] = useState(false);
   const [loading, setLoading] = useState(true);
   const [existingSubmission, setExistingSubmission] = useState<null | any>(null);
+  const [userEmail, setUserEmail] = useState<string>("");
   const [formData, setFormData] = useState<FormData>({
     // Step 1
     firstName: "",
@@ -63,6 +64,14 @@ const EligibilityForm = () => {
           navigate('/login');
           return;
         }
+
+        // Récupérer l'email de l'utilisateur
+        setUserEmail(session.user.email || "");
+        // Mettre à jour le formData avec l'email de l'utilisateur
+        setFormData(prev => ({
+          ...prev,
+          email: session.user.email || ""
+        }));
 
         const { data: submission, error } = await supabase
           .from('eligibility_submissions')
@@ -130,7 +139,7 @@ const EligibilityForm = () => {
           motivations: updatedFormData.motivations,
           implemented_actions: updatedFormData.implementedActions,
           certification_status: updatedFormData.certificationStatus,
-          email: updatedFormData.email,
+          email: session.user.email || updatedFormData.email, // Utiliser l'email de session en priorité
           phone: updatedFormData.phone
         };
 
