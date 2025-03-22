@@ -69,19 +69,23 @@ const FileUploader: React.FC<FileUploaderProps> = ({ submissionId, onFilesUpload
       }
 
       const uploadedFiles = [];
-      const timestamp = Date.now();
+      const timestamp = Date.now().toString();
       
       for (const file of selectedFiles) {
-        // Créer un chemin organisé pour les fichiers groupés
-        const sanitizedFilename = file.name.replace(/\s+/g, '_');
-        const filePath = `${submissionId}/groupe_${timestamp}/${sanitizedFilename}`;
+        // Sanitize filename to avoid path issues
+        const fileName = file.name.replace(/\s+/g, '_');
+        const uniqueFileName = `${timestamp}_${fileName}`;
+        // Use a simpler path structure
+        const filePath = `documents/${submissionId}/${uniqueFileName}`;
         
-        // Télécharger le fichier vers Supabase Storage
+        console.log(`Tentative de téléchargement du fichier vers: ${filePath}`);
+        
+        // Upload to Supabase Storage
         const { data, error } = await supabase.storage
           .from('justificatifs')
           .upload(filePath, file, {
             cacheControl: '3600',
-            upsert: false
+            upsert: true // Changed to true to avoid conflicts
           });
         
         if (error) {

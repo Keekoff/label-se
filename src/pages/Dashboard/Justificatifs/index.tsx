@@ -23,7 +23,8 @@ const Justificatifs = () => {
     uploading,
     expandedGroups,
     toggleGroup,
-    handleFileDownload
+    handleFileDownload,
+    handleFileUpload
   } = useJustificatifs();
 
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
@@ -36,12 +37,13 @@ const Justificatifs = () => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) return;
 
+        // Changement du chemin pour récupérer tous les fichiers liés à cette soumission
         const { data, error } = await supabase.storage
           .from('justificatifs')
-          .list(`${submissionId}`, {
+          .list(`documents/${submissionId}`, {
             limit: 100,
             offset: 0,
-            sortBy: { column: 'name', order: 'asc' }
+            sortBy: { column: 'name', order: 'desc' } // Les plus récents d'abord
           });
 
         if (error) {
@@ -49,11 +51,16 @@ const Justificatifs = () => {
           return;
         }
 
+        if (!data) {
+          console.log('Aucun fichier trouvé');
+          return;
+        }
+
         const formattedFiles = data
-          .filter(item => !item.id.includes('groupe_'))
+          .filter(item => !item.name.includes('.emptyFolderPlaceholder'))
           .map(item => ({
-            name: item.name,
-            path: `${submissionId}/${item.name}`,
+            name: item.name.includes('_') ? item.name.split('_').slice(1).join('_') : item.name,
+            path: `documents/${submissionId}/${item.name}`,
             uploadDate: new Date(item.created_at).toLocaleDateString('fr-FR', {
               day: '2-digit',
               month: '2-digit',

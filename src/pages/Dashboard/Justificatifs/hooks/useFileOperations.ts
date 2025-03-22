@@ -36,7 +36,9 @@ export const useFileOperations = ({
       
       const acceptedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.jpeg', '.png'];
       const fileExt = file.name.split('.').pop()?.toLowerCase();
-      if (!fileExt || !acceptedTypes.some(type => type.includes(fileExt))) {
+      const fileExtWithDot = fileExt ? `.${fileExt}` : '';
+      
+      if (!fileExt || !acceptedTypes.includes(fileExtWithDot)) {
         toast.error("Type de fichier non accepté. Veuillez utiliser PDF, DOC, DOCX, JPG ou PNG.");
         setUploading(prev => ({ ...prev, [justificatifId]: false }));
         return;
@@ -50,11 +52,11 @@ export const useFileOperations = ({
 
       if (!submissionId) throw new Error("ID de soumission non trouvé");
       
-      const sanitizedQuestionId = justificatif.question_identifier.replace(/\s+/g, '_').toLowerCase();
-      const sanitizedResponse = justificatif.response.substring(0, 20).replace(/\s+/g, '_').toLowerCase();
-      const timestamp = Date.now();
-      const filename = `${timestamp}_${file.name.replace(/\s+/g, '_')}`;
-      const filePath = `${submissionId}/${sanitizedQuestionId}/${sanitizedResponse}_${filename}`;
+      // Simplify path structure to avoid path validation issues
+      const timestamp = Date.now().toString();
+      const sanitizedFilename = file.name.replace(/\s+/g, '_');
+      const uniqueFilename = `${timestamp}_${sanitizedFilename}`;
+      const filePath = `documents/${submissionId}/${justificatifId}_${uniqueFilename}`;
       
       console.log(`Téléchargement du fichier vers le chemin: ${filePath}`);
       
@@ -62,7 +64,7 @@ export const useFileOperations = ({
         .from('justificatifs')
         .upload(filePath, file, {
           cacheControl: '3600',
-          upsert: false
+          upsert: true // Changed to true to handle potential conflicts
         });
       
       if (uploadError) {
