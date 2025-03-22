@@ -82,10 +82,7 @@ const FormThanks = ({
   };
   return <div className="max-w-4xl mx-auto text-center space-y-8">
       <h2 className="text-2xl font-semibold">Nous avons bien reçu votre formulaire, merci !</h2>
-      <p className="text-gray-600">
-        Nous avons bien reçu votre dossier et nous reviendrons vers vous dans les plus brefs délais.
-        Vous trouverez les documents à fournir dans votre Dashboard.
-      </p>
+      <p className="text-gray-600">Vous devez maintenant procéder au paiement pour accéder à la liste des pièces justificatives à nous fournir pour valider votre labélisation.</p>
 
       <Alert className="bg-[#27017F]/5 border border-[#27017F]/20">
         <Calculator className="h-5 w-5 text-[#27017F]" />
