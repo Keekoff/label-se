@@ -35,28 +35,21 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
   });
 
   // Function to toggle answers with improved handling of exclusive options
-  const toggleAnswer = (questionId: string, label: string, forceState?: boolean) => {
+  const toggleAnswer = (questionId: string, label: string, selected: boolean) => {
     const currentAnswers = answers[questionId] || [];
     let newAnswers: string[];
 
     // Handle "Ce critère ne s'applique pas" option specially
     if (label.includes("Ce critère ne s'applique pas")) {
-      if (forceState !== undefined) {
-        newAnswers = forceState ? [label] : [];
-      } else {
-        newAnswers = currentAnswers.includes(label) ? [] : [label];
-      }
+      newAnswers = selected ? [label] : [];
     } else {
       // For other options
-      if (forceState !== undefined) {
-        newAnswers = forceState
-          ? [...currentAnswers.filter(a => !a.includes("Ce critère ne s'applique pas")), label]
-          : currentAnswers.filter(a => a !== label);
+      if (selected) {
+        // Adding a normal option should remove the "Ce critère ne s'applique pas" if present
+        newAnswers = [...currentAnswers.filter(a => !a.includes("Ce critère ne s'applique pas")), label];
       } else {
-        // Toggle behavior
-        newAnswers = currentAnswers.includes(label)
-          ? currentAnswers.filter(a => a !== label)
-          : [...currentAnswers.filter(a => !a.includes("Ce critère ne s'applique pas")), label];
+        // Removing a normal option
+        newAnswers = currentAnswers.filter(a => a !== label);
       }
     }
     
