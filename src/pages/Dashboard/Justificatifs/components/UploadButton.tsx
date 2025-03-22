@@ -53,39 +53,84 @@ const UploadButton: React.FC<UploadButtonProps> = ({ isUploading, onUpload, subm
   }, [submissionId]);
 
   const handleUpload = async () => {
-    // Appel POST à l'API externe
-    if (companyData && submissionId) {
-      try {
-        // Préparation des données pour l'API
-        const webhookData = {
-          companyName: companyData.companyName,
-          formId: submissionId,
-          email: companyData.userEmail
-        };
+    // Vérifier que les données sont disponibles avant l'appel webhook
+    if (!companyData || !submissionId) {
+      console.error('Données manquantes pour l\'appel webhook');
+      toast.error('Erreur: données incomplètes');
+      onUpload(); // Continuer l'upload malgré l'erreur webhook
+      return;
+    }
 
-        console.log('Envoi des données au webhook:', webhookData);
-        
-        // Appel du webhook
+    try {
+      // Préparation des données pour l'API avec validation
+      const webhookData = {
+        companyName: companyData.companyName || 'Non spécifié',
+        formId: submissionId,
+        email: companyData.userEmail || 'Non spécifié'
+      };
+
+      console.log('Envoi des données au webhook:', webhookData);
+      
+      // Appel du webhook avec timeout et retry
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 secondes timeout
+      
+      try {
         const response = await fetch('https://hook.eu1.make.com/yfuhs39w89ryrld6pafrmluupmkjl1sx', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'Cache-Control': 'no-cache'
           },
-          body: JSON.stringify(webhookData)
+          body: JSON.stringify(webhookData),
+          signal: controller.signal,
+          mode: 'cors',
         });
-
+        
+        clearTimeout(timeoutId);
+        
         if (!response.ok) {
-          console.error('Erreur lors de l\'appel au webhook:', response.statusText);
-          toast.error('Erreur lors de la notification du téléchargement');
-        } else {
-          console.log('Notification de téléchargement envoyée avec succès');
+          throw new Error(`Erreur HTTP: ${response.status} ${response.statusText}`);
         }
-      } catch (error) {
-        console.error('Erreur lors de l\'appel au webhook:', error);
+        
+        // Tentative de lecture de la réponse pour vérifier
+        const responseText = await response.text();
+        console.log('Réponse du webhook:', responseText);
+        
+        toast.success('Notification de téléchargement envoyée');
+      } catch (fetchError) {
+        clearTimeout(timeoutId);
+        console.error('Erreur lors de l\'appel au webhook:', fetchError);
+        
+        // Seconde tentative après échec
+        console.log('Tentative #2 d\'envoi au webhook...');
+        
+        try {
+          const retryResponse = await fetch('https://hook.eu1.make.com/yfuhs39w89ryrld6pafrmluupmkjl1sx', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(webhookData)
+          });
+          
+          if (!retryResponse.ok) {
+            throw new Error('Échec de la seconde tentative');
+          }
+          
+          console.log('Seconde tentative réussie');
+        } catch (retryError) {
+          console.error('Échec de la seconde tentative:', retryError);
+          toast.error('Impossible de notifier le téléchargement');
+        }
       }
+    } catch (error) {
+      console.error('Erreur générale lors de l\'appel webhook:', error);
+      toast.error('Erreur de communication avec le serveur');
     }
 
-    // Exécuter la fonction originale d'upload
+    // Exécuter la fonction originale d'upload quoi qu'il arrive
     onUpload();
   };
 
@@ -95,6 +140,7 @@ const UploadButton: React.FC<UploadButtonProps> = ({ isUploading, onUpload, subm
         onClick={handleUpload} 
         disabled={isUploading}
         className="bg-[#35DA56] hover:bg-[#27017F]"
+        aria-label="Envoyer les documents"
       >
         {isUploading ? (
           <>
