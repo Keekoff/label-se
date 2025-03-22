@@ -55,11 +55,28 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
   const isValidLegalForm = (form: string) => LABEL_LEGAL_FORMS.includes(form);
 
   // Determine what to display in the sector dropdown
-  // If there is no sector but there are secteurs_activite, use the first one
-  const displaySector = formState?.sector || 
-    (Array.isArray(formState?.secteurs_activite) && formState?.secteurs_activite.length > 0 
-      ? formState.secteurs_activite[0] 
-      : "");
+  // Try to get sector from various potential sources in the formState
+  const determineSector = () => {
+    // First check if we have a direct sector value
+    if (formState?.sector) {
+      return formState.sector;
+    }
+    
+    // Then check if we have secteurs_activite array with values
+    if (Array.isArray(formState?.secteurs_activite) && formState.secteurs_activite.length > 0) {
+      return formState.secteurs_activite[0];
+    }
+    
+    // Finally check if we have a sectors array (from eligibility form)
+    if (Array.isArray(formState?.sectors) && formState.sectors.length > 0) {
+      return formState.sectors[0];
+    }
+    
+    // Return empty string if no sector found
+    return "";
+  };
+
+  const displaySector = determineSector();
 
   return (
     <div className="space-y-6">
@@ -83,22 +100,27 @@ const CompanyDetails = ({ formState, setFormState, onValidityChange, readOnly = 
           <Label htmlFor="sector">
             Quel est le secteur d'activité de l'entreprise ? <span className="text-red-500">*</span>
           </Label>
-          <Select
-            value={displaySector}
-            onValueChange={(value) => handleChange("sector", value)}
-            disabled={readOnly}
-          >
-            <SelectTrigger className={readOnly ? "bg-gray-100" : ""}>
-              <SelectValue placeholder="Sélectionnez un secteur" />
-            </SelectTrigger>
-            <SelectContent>
-              {SECTORS.map((sector) => (
-                <SelectItem key={sector} value={sector}>
-                  {sector}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {readOnly ? (
+            <div className="p-2 bg-gray-100 border border-gray-300 rounded">
+              {displaySector || "Non spécifié"}
+            </div>
+          ) : (
+            <Select
+              value={displaySector}
+              onValueChange={(value) => handleChange("sector", value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Sélectionnez un secteur" />
+              </SelectTrigger>
+              <SelectContent>
+                {SECTORS.map((sector) => (
+                  <SelectItem key={sector} value={sector}>
+                    {sector}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
           {errors.sector && <p className="text-sm text-red-500">{errors.sector}</p>}
         </div>
 
