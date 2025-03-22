@@ -22,7 +22,9 @@ const QuestionCard = ({ question, selectedAnswers, onAnswerToggle }: QuestionCar
   return (
     <Card className="bg-white mb-6">
       <CardHeader className="pb-3">
-        <CardTitle className="text-lg font-semibold">{question.title}</CardTitle>
+        <CardTitle className="text-lg font-semibold">
+          {question.title} <span className="text-[#ea384c]">*</span>
+        </CardTitle>
         <p className="text-gray-600 text-sm">{question.description}</p>
       </CardHeader>
       <CardContent>
