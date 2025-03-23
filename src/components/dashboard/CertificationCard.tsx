@@ -1,6 +1,8 @@
 
 import { Award } from "lucide-react";
 import { CompanyData } from "@/hooks/useCompanyData";
+import { useEffect, useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface CertificationCardProps {
   companyData: CompanyData | null;
@@ -21,6 +23,29 @@ export const formatDate = (dateString: string | undefined) => {
 
 export const CertificationCard = ({ companyData, isPremium = false }: CertificationCardProps) => {
   console.log('Données de certification:', companyData);
+  const [isValidated, setIsValidated] = useState(false);
+
+  useEffect(() => {
+    const checkValidationStatus = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+
+        const { data, error } = await supabase
+          .from('label_submissions')
+          .select('valide')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        setIsValidated(data?.valide === true);
+      } catch (error) {
+        console.error('Erreur lors de la vérification de la validation:', error);
+      }
+    };
+
+    checkValidationStatus();
+  }, []);
   
   return (
     <div className="bg-white/80 backdrop-blur-md border-2 border-[#35DA56] rounded-lg p-4 shadow-md animate-fadeIn transition-all duration-300 hover:shadow-lg">
@@ -32,8 +57,12 @@ export const CertificationCard = ({ companyData, isPremium = false }: Certificat
           </div>
           <p className="text-gray-600 text-sm sm:text-base">Niveau : {companyData?.echelonTexte || "Non défini"}</p>
           <div className={`${!isPremium ? 'filter blur-[3px] pointer-events-none' : ''}`}>
-            <p className="text-gray-600 text-sm sm:text-base">Début de validité : {formatDate(companyData?.dateValidation)}</p>
-            <p className="text-gray-600 text-sm sm:text-base">Fin de validité : {formatDate(companyData?.dateFinValidite)}</p>
+            <p className="text-gray-600 text-sm sm:text-base">
+              Début de validité : {isValidated ? formatDate(companyData?.dateValidation) : "En attente de validation"}
+            </p>
+            <p className="text-gray-600 text-sm sm:text-base">
+              Fin de validité : {isValidated ? formatDate(companyData?.dateFinValidite) : "En attente de validation"}
+            </p>
           </div>
           {!isPremium && (
             <p className="text-xs text-[#27017F] font-medium mt-1">Dates disponibles après paiement et envoi des pièces justificatives</p>
