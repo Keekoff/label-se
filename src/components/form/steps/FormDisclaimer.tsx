@@ -26,7 +26,7 @@ const FormDisclaimer = ({ onValidityChange, formState, setFormState }: FormDiscl
     <div className="max-w-2xl mx-auto space-y-6">
       <h2 className="text-2xl font-semibold mb-6">Mentions légales</h2>
       
-      <Card className="p-6 space-y-4">
+      <Card className="p-6 space-y-4 bg-white/90 backdrop-blur-sm border border-[#27017F]/10 shadow-sm">
         <p className="text-sm leading-relaxed">
           Avant toute chose, voici les informations légales concernant les données que nous collectons pour l'étude de votre candidature en vue de l'obtention du label :
         </p>
@@ -59,13 +59,13 @@ const FormDisclaimer = ({ onValidityChange, formState, setFormState }: FormDiscl
         <Button
           variant="outline"
           onClick={() => handleAccept(false)}
-          className={!accepted ? "border-red-500 text-red-500" : ""}
+          className={!accepted ? "border-red-500 text-red-500" : "hover:bg-[#27017F] hover:text-white"}
         >
           Je n'accepte pas
         </Button>
         <Button
           onClick={() => handleAccept(true)}
-          className={accepted ? "bg-primary" : ""}
+          className={accepted ? "bg-[#35DA56] hover:bg-[#35DA56]/90" : "hover:bg-[#27017F]"}
         >
           J'accepte
         </Button>
