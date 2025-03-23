@@ -1,6 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import FaqItem from '@/components/faq/FaqItem';
+import { Card } from '@/components/ui/card';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
 
 const faqItems = [
   {
@@ -34,24 +37,56 @@ const faqItems = [
 ];
 
 const Faq = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  
+  const filteredItems = searchTerm.trim() === "" 
+    ? faqItems 
+    : faqItems.filter(item => 
+        item.question.toLowerCase().includes(searchTerm.toLowerCase()) || 
+        item.answer.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl animate-fadeIn">
-      <h1 className="text-4xl font-bold mb-8">FAQ</h1>
-      
-      <p className="mb-10 text-gray-700">
-        Nous avons tenté de répondre à un maximum de questions que vous vous posez sur le label Startup Engagée. 
-        Si vous ne trouvez pas votre réponse, n'hésitez pas à remplir notre formulaire de contact !
-      </p>
-      
-      <div className="space-y-1">
-        {faqItems.map((item, index) => (
-          <FaqItem
-            key={index}
-            question={item.question}
-            answer={item.answer}
-          />
-        ))}
+      <div className="text-center mb-10">
+        <h1 className="text-3xl md:text-4xl font-bold mb-4">Foire aux questions</h1>
+        <div className="w-16 h-1 bg-[#35DA56] mx-auto mb-6 rounded-full"></div>
+        <p className="text-gray-600 max-w-2xl mx-auto">
+          Nous avons tenté de répondre à un maximum de questions que vous vous posez sur le label Startup Engagée. 
+          Si vous ne trouvez pas votre réponse, n'hésitez pas à remplir notre formulaire de contact !
+        </p>
       </div>
+      
+      <div className="relative mb-8 max-w-md mx-auto">
+        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+          <Search className="h-5 w-5 text-gray-400" />
+        </div>
+        <Input
+          type="text"
+          placeholder="Rechercher une question..."
+          className="pl-10 pr-4 py-2 border border-gray-200 rounded-lg w-full focus:ring-[#35DA56] focus:border-[#35DA56]"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+        />
+      </div>
+      
+      <Card className="p-6 shadow-md backdrop-blur-sm bg-white/95 border border-gray-100">
+        <div className="space-y-4">
+          {filteredItems.length > 0 ? (
+            filteredItems.map((item, index) => (
+              <FaqItem
+                key={index}
+                question={item.question}
+                answer={item.answer}
+              />
+            ))
+          ) : (
+            <div className="text-center py-8">
+              <p className="text-gray-500">Aucune question ne correspond à votre recherche.</p>
+            </div>
+          )}
+        </div>
+      </Card>
     </div>
   );
 };
