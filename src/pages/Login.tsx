@@ -108,6 +108,7 @@ const Login = () => {
                 <Button 
                   type="button" 
                   variant="link" 
+                  onClick={() => navigate("/forgot-password")}
                   className="text-sm text-[#27017F] hover:text-[#27017F]/80 px-0"
                 >
                   Mot de passe oublié ?
