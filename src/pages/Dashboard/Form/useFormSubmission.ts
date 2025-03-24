@@ -222,7 +222,8 @@ export const useFormSubmission = (
       prenom: data.firstName || "",
       courriel: userEmail || user.email || "",
       nom_entreprise: data.companyName || "",
-      secteurs_activite: Array.isArray(data.sectors) ? data.sectors : [],
+      secteurs_activite: Array.isArray(data.secteurs_activite) ? data.secteurs_activite : 
+                         (Array.isArray(data.sectors) ? data.sectors : []),
       forme_juridique: data.legalForm || "",
       adresse: data.streetAddress || "",
       code_postal: data.postalCode || "",
@@ -274,12 +275,12 @@ export const useFormSubmission = (
     
     // Regrouper toutes les questions et leurs réponses dans des collections
     // Partie 1: Questions humaines et sociales
-    if (data.diversity && data.diversity.length > 0) {
+    if (data.diversite && data.diversite.length > 0) {
       réponses.push({
         question: "Diversité",
         catégorie: "Humain & Social",
         partie: 1,
-        réponses: data.diversity
+        réponses: data.diversite
       });
     }
     
@@ -310,12 +311,12 @@ export const useFormSubmission = (
       });
     }
     
-    if (data.parentality && data.parentality.length > 0) {
+    if (data.parentalite && data.parentalite.length > 0) {
       réponses.push({
         question: "Parentalité",
         catégorie: "Humain & Social",
         partie: 1,
-        réponses: data.parentality
+        réponses: data.parentalite
       });
     }
     
@@ -671,22 +672,21 @@ export const useFormSubmission = (
       const submissionData = await formatSubmissionData(formState, 'submitted');
       console.log('Submitting form with data:', submissionData);
 
-      // Send data to Make.com webhook first
-      const webhookSuccess = await sendToMakeWebhook(submissionData);
-      console.log('Résultat de l\'envoi au webhook Make.com:', webhookSuccess ? 'Succès' : 'Échec');
-
       let finalSubmissionId = submissionId;
 
       if (submissionId) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from('label_submissions')
           .update(submissionData)
-          .eq('id', submissionId);
+          .eq('id', submissionId)
+          .select('id')
+          .single();
 
         if (error) {
           console.error('Supabase update error:', error);
           throw error;
         }
+        finalSubmissionId = data.id;
       } else {
         const { data, error } = await supabase
           .from('label_submissions')
@@ -712,6 +712,21 @@ export const useFormSubmission = (
             description: "Le formulaire a été envoyé mais une erreur est survenue lors de l'enregistrement des justificatifs.",
             variant: "destructive"
           });
+        }
+
+        // Récupérer l'enregistrement complet pour l'envoi au webhook avec l'ID inclus
+        const { data: fullSubmission, error: fetchError } = await supabase
+          .from('label_submissions')
+          .select('*')
+          .eq('id', finalSubmissionId)
+          .single();
+
+        if (fetchError) {
+          console.error('Error fetching full submission:', fetchError);
+        } else {
+          // Send data to Make.com webhook with ID included
+          const webhookSuccess = await sendToMakeWebhook(fullSubmission);
+          console.log('Résultat de l\'envoi au webhook Make.com:', webhookSuccess ? 'Succès' : 'Échec');
         }
       }
 
