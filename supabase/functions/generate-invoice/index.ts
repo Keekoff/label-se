@@ -20,7 +20,7 @@ serve(async (req) => {
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
 
     if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase URL or key missing')
+      throw new Error('Supabase URL ou clé manquante')
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
@@ -29,31 +29,31 @@ serve(async (req) => {
     const { paymentId } = await req.json()
 
     if (!paymentId) {
-      throw new Error('Payment ID is required')
+      throw new Error('L\'ID de paiement est requis')
     }
 
-    console.log('Fetching payment with ID:', paymentId)
+    console.log('Récupération du paiement avec ID:', paymentId)
 
     // Fetch payment information
     const { data: payment, error } = await supabase
       .from('label_submissions')
-      .select('id, created_at, nom_entreprise, payment_id, adresse_facturation')
+      .select('id, created_at, nom_entreprise, payment_id, adresse_facturation, payment_status')
       .eq('payment_id', paymentId)
       .maybeSingle()
 
     if (error) {
-      console.error('Error fetching payment:', error)
+      console.error('Erreur lors de la récupération du paiement:', error)
       throw new Error('Erreur lors de la récupération du paiement')
     }
 
     if (!payment) {
-      console.error('Payment not found for ID:', paymentId)
+      console.error('Paiement non trouvé pour ID:', paymentId)
       
       // Vérification supplémentaire - recherche par ID partiel si la première requête échoue
       // Certains IDs Stripe peuvent être tronqués ou modifiés lors du stockage
       const { data: partialMatches, error: partialError } = await supabase
         .from('label_submissions')
-        .select('id, created_at, nom_entreprise, payment_id, adresse_facturation')
+        .select('id, created_at, nom_entreprise, payment_id, adresse_facturation, payment_status')
         .ilike('payment_id', `%${paymentId.substring(0, 20)}%`)
         .limit(1)
       
@@ -61,15 +61,20 @@ serve(async (req) => {
         throw new Error('Paiement introuvable')
       }
       
-      console.log('Payment found with partial match:', partialMatches[0])
+      console.log('Paiement trouvé avec correspondance partielle:', partialMatches[0])
       payment = partialMatches[0]
     }
 
-    console.log('Payment found:', payment)
+    // Vérifier si le paiement est marqué comme payé
+    if (payment.payment_status !== 'paid') {
+      throw new Error('Ce paiement n\'est pas encore marqué comme payé')
+    }
+
+    console.log('Paiement trouvé:', payment)
 
     // Extract address from payment if available
     const addressLines = payment.adresse_facturation ? 
-      payment.adresse_facturation.split(',').map((line: string) => line.trim()) : 
+      payment.adresse_facturation.split(',').map((line) => line.trim()) : 
       ['Adresse non disponible']
 
     // Generate PDF invoice
@@ -102,7 +107,7 @@ serve(async (req) => {
     // Add address lines if available
     if (addressLines && addressLines.length > 0 && addressLines[0] !== 'Adresse non disponible') {
       let yPos = 64
-      addressLines.slice(0, 3).forEach((line: string) => {
+      addressLines.slice(0, 3).forEach((line) => {
         doc.text(line, 130, yPos)
         yPos += 7
       })
@@ -118,7 +123,7 @@ serve(async (req) => {
     doc.setFont('helvetica', 'normal')
     doc.text(`INV-${payment.id.substring(0, 8)}`, 75, 95)
     doc.text(format(new Date(payment.created_at), 'dd/MM/yyyy'), 75, 102)
-    doc.text(payment.payment_id, 75, 109)
+    doc.text(payment.payment_id || 'N/A', 75, 109)
     
     // Table header
     doc.setFont('helvetica', 'bold')
@@ -169,7 +174,7 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error generating invoice:', error)
+    console.error('Erreur de génération de facture:', error)
     
     return new Response(
       JSON.stringify({ error: error.message }),

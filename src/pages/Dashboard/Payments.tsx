@@ -41,22 +41,28 @@ const Payments = () => {
           return;
         }
 
+        // Modifié pour récupérer les paiements sans filtre sur payment_status
         const { data, error } = await supabase
           .from('label_submissions')
           .select('id, created_at, payment_id, nom_entreprise, payment_status')
           .eq('user_id', session.user.id)
-          .eq('payment_status', 'paid')
+          .not('payment_id', 'is', null)  // Récupérer uniquement les soumissions avec un payment_id
           .order('created_at', { ascending: false });
 
         if (error) {
+          console.error('Erreur de récupération des paiements:', error);
           throw error;
         }
 
         if (data) {
+          console.log('Paiements récupérés:', data);
           setPayments(data as Payment[]);
+        } else {
+          console.log('Aucun paiement trouvé');
+          setPayments([]);
         }
       } catch (error) {
-        console.error('Error fetching payments:', error);
+        console.error('Erreur lors du chargement des paiements:', error);
         toast.error("Une erreur est survenue lors du chargement des paiements");
       } finally {
         setIsLoading(false);
@@ -70,7 +76,7 @@ const Payments = () => {
     try {
       setIsDownloading(paymentId);
       
-      console.log('Downloading invoice for payment ID:', paymentId);
+      console.log('Téléchargement de la facture pour l\'ID de paiement:', paymentId);
       
       // Appeler la fonction Edge pour générer la facture
       const response = await supabase.functions.invoke('generate-invoice', {
@@ -78,7 +84,7 @@ const Payments = () => {
       });
       
       if (response.error) {
-        console.error('Edge function error:', response.error);
+        console.error('Erreur de fonction Edge:', response.error);
         throw new Error(response.error.message || "Erreur lors de la génération de la facture");
       }
       
@@ -108,7 +114,7 @@ const Payments = () => {
         style: { backgroundColor: '#35DA56', color: 'white' }
       });
     } catch (error) {
-      console.error('Error downloading invoice:', error);
+      console.error('Erreur lors du téléchargement de la facture:', error);
       setErrorDetails(error instanceof Error ? error.message : "Erreur inconnue");
       setShowErrorDialog(true);
       toast.error("Une erreur est survenue lors du téléchargement de la facture");
@@ -143,6 +149,7 @@ const Payments = () => {
                   <TableHead>Date</TableHead>
                   <TableHead>Entreprise</TableHead>
                   <TableHead>Référence</TableHead>
+                  <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -156,14 +163,29 @@ const Payments = () => {
                       {payment.nom_entreprise || 'Label Startup Engagée'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {payment.payment_id.substring(0, 20)}...
+                      {payment.payment_id && payment.payment_id.length > 20 
+                        ? `${payment.payment_id.substring(0, 20)}...` 
+                        : payment.payment_id || 'N/A'}
+                    </TableCell>
+                    <TableCell>
+                      <span className={`px-2 py-1 rounded-full text-xs ${
+                        payment.payment_status === 'paid' 
+                          ? 'bg-[#35DA56]/20 text-[#35DA56]' 
+                          : payment.payment_status === 'pending' 
+                            ? 'bg-yellow-100 text-yellow-800' 
+                            : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {payment.payment_status === 'paid' ? 'Payé' : 
+                         payment.payment_status === 'pending' ? 'En attente' : 
+                         payment.payment_status || 'Non payé'}
+                      </span>
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 
                         variant="outline" 
                         size="sm"
                         onClick={() => downloadInvoice(payment.payment_id)}
-                        disabled={isDownloading === payment.payment_id}
+                        disabled={isDownloading === payment.payment_id || payment.payment_status !== 'paid'}
                         aria-label="Télécharger la facture"
                         className="hover:bg-[#27017F] hover:text-white"
                       >
