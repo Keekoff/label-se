@@ -1,8 +1,8 @@
 
 import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
-import jsPDF from 'jspdf'
-import { createClient } from '@supabase/supabase-js'
-import { format } from 'date-fns'
+import jsPDF from 'https://esm.sh/jspdf@2.5.1'
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0'
+import { format } from 'https://esm.sh/date-fns@3.6.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
