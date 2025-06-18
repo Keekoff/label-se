@@ -190,20 +190,16 @@ const Dashboard = () => {
           onPayment={handlePayment}
         />
 
-        {isPremium && (
-          <>
-            <CertificationCard companyData={companyData} isPremium={isPremium} />
-            
-            {error ? (
-              <ErrorDisplay 
-                error={error} 
-                errorDetails={errorDetails}
-                companyName={companyName}
-              />
-            ) : (
-              <DashboardCharts />
-            )}
-          </>
+        <CertificationCard companyData={companyData} isPremium={isPremium} />
+        
+        {error ? (
+          <ErrorDisplay 
+            error={error} 
+            errorDetails={errorDetails}
+            companyName={companyName}
+          />
+        ) : (
+          <DashboardCharts />
         )}
       </div>
     </div>
