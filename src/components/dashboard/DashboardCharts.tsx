@@ -1,8 +1,8 @@
+
 import { Button } from "@/components/ui/button";
 import { Download, Lock } from "lucide-react";
 import { useCompanyData } from "@/hooks/useCompanyData";
 import { usePdfGenerator } from "@/hooks/usePdfGenerator";
-import { CertificationCard } from "./CertificationCard";
 import { BarChartsGrid } from "./BarChartsGrid";
 import { RadarChartCard } from "./RadarChartCard";
 import { ImprovementSuggestions } from "./ImprovementSuggestions";
@@ -12,7 +12,6 @@ export const DashboardCharts = () => {
     isLoading, 
     companyData, 
     companyName, 
-    hasSubmittedForm,
     isPremium
   } = useCompanyData();
   
@@ -46,8 +45,6 @@ export const DashboardCharts = () => {
 
   return (
     <div className="space-y-6">
-      {hasSubmittedForm && <CertificationCard companyData={companyData} isPremium={isPremium} />}
-
       <div className="flex justify-end mb-4">
         <Button 
           variant="outline" 
