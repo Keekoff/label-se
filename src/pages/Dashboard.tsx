@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -16,6 +15,7 @@ const Dashboard = () => {
   const [paymentStatus, setPaymentStatus] = useState<'unpaid' | 'pending' | 'paid' | null>(null);
   const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
+  const [firstName, setFirstName] = useState<string>("");
   
   const {
     isLoading,
@@ -26,6 +26,32 @@ const Dashboard = () => {
     hasSubmittedForm,
     isPremium
   } = useCompanyData();
+
+  // Récupérer le prénom de l'utilisateur
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) return;
+
+        const { data, error } = await supabase
+          .from('label_submissions')
+          .select('prenom')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        
+        if (data?.prenom) {
+          setFirstName(data.prenom);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   // Vérifier le paiement lors du retour depuis Stripe
   useEffect(() => {
@@ -156,7 +182,7 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4">
       <div className="max-w-7xl mx-auto space-y-8">
-        <WelcomeHeader companyName={companyName} />
+        <WelcomeHeader firstName={firstName} companyName={companyName} />
         
         <SubmissionCard 
           paymentStatus={paymentStatus}
@@ -166,7 +192,7 @@ const Dashboard = () => {
 
         {isPremium && (
           <>
-            <CertificationCard />
+            <CertificationCard companyData={companyData} isPremium={isPremium} />
             
             {error ? (
               <ErrorDisplay 
@@ -175,10 +201,7 @@ const Dashboard = () => {
                 companyName={companyName}
               />
             ) : (
-              <DashboardCharts 
-                isLoading={isLoading}
-                companyData={companyData}
-              />
+              <DashboardCharts />
             )}
           </>
         )}
