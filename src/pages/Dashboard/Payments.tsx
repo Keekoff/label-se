@@ -20,9 +20,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 interface Payment {
   id: string;
   created_at: string;
+  payment_date: string | null;
   payment_id: string;
   nom_entreprise: string;
   payment_status: string;
+  user_id: string;
 }
 
 const Payments = () => {
@@ -31,6 +33,7 @@ const Payments = () => {
   const [isDownloading, setIsDownloading] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [showErrorDialog, setShowErrorDialog] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -41,28 +44,44 @@ const Payments = () => {
           return;
         }
 
-        // Modifié pour récupérer les paiements sans filtre sur payment_status
+        console.log("User ID utilisé pour la requête:", session.user.id);
+        setDebugInfo(`User ID: ${session.user.id}`);
+
+        // Récupérer tous les paiements de l'utilisateur avec plus de détails
         const { data, error } = await supabase
           .from('label_submissions')
-          .select('id, created_at, payment_id, nom_entreprise, payment_status')
+          .select('id, created_at, payment_date, payment_id, nom_entreprise, payment_status, user_id')
           .eq('user_id', session.user.id)
-          .not('payment_id', 'is', null)  // Récupérer uniquement les soumissions avec un payment_id
           .order('created_at', { ascending: false });
 
         if (error) {
           console.error('Erreur de récupération des paiements:', error);
+          setDebugInfo(prev => prev + `\nErreur SQL: ${error.message}`);
           throw error;
         }
 
+        console.log('Toutes les soumissions de cet utilisateur:', data);
+        setDebugInfo(prev => prev + `\nNombre total de soumissions: ${data?.length || 0}`);
+
         if (data) {
-          console.log('Paiements récupérés:', data);
-          setPayments(data as Payment[]);
+          // Filtrer pour n'afficher que celles avec un payment_id ou un statut de paiement
+          const paymentsData = data.filter(item => 
+            item.payment_id || 
+            item.payment_status === 'paid' || 
+            item.payment_status === 'pending'
+          );
+          
+          console.log('Paiements filtrés:', paymentsData);
+          setDebugInfo(prev => prev + `\nNombre de paiements: ${paymentsData.length}`);
+          
+          setPayments(paymentsData as Payment[]);
         } else {
-          console.log('Aucun paiement trouvé');
+          console.log('Aucune donnée retournée');
           setPayments([]);
         }
       } catch (error) {
         console.error('Erreur lors du chargement des paiements:', error);
+        setDebugInfo(prev => prev + `\nErreur: ${error instanceof Error ? error.message : 'Erreur inconnue'}`);
         toast.error("Une erreur est survenue lors du chargement des paiements");
       } finally {
         setIsLoading(false);
@@ -78,7 +97,6 @@ const Payments = () => {
       
       console.log('Téléchargement de la facture pour l\'ID de paiement:', paymentId);
       
-      // Appeler la fonction Edge pour générer la facture
       const response = await supabase.functions.invoke('generate-invoice', {
         body: { paymentId }
       });
@@ -88,25 +106,17 @@ const Payments = () => {
         throw new Error(response.error.message || "Erreur lors de la génération de la facture");
       }
       
-      // Vérifier que la réponse contient des données
       if (!response.data) {
         throw new Error("Aucune donnée reçue du serveur");
       }
       
-      // Créer un blob à partir des données de la réponse
       const blob = new Blob([response.data], { type: 'application/pdf' });
-      
-      // Créer une URL pour le blob
       const url = window.URL.createObjectURL(blob);
-      
-      // Créer un élément a temporaire pour déclencher le téléchargement
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `facture_${paymentId.substring(0, 8)}.pdf`);
       document.body.appendChild(link);
       link.click();
-      
-      // Nettoyer
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
       
@@ -123,10 +133,40 @@ const Payments = () => {
     }
   };
 
+  const getPaymentDate = (payment: Payment) => {
+    // Utiliser payment_date si disponible, sinon created_at
+    const dateToUse = payment.payment_date || payment.created_at;
+    return format(new Date(dateToUse), "dd/MM/yyyy à HH:mm", { locale: fr });
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'paid':
+        return 'bg-[#35DA56]/20 text-[#35DA56]';
+      case 'pending':
+        return 'bg-yellow-100 text-yellow-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  };
+
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'paid':
+        return 'Payé';
+      case 'pending':
+        return 'En attente';
+      case 'unpaid':
+        return 'Non payé';
+      default:
+        return status || 'Inconnu';
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
-        <p>Chargement...</p>
+        <p>Chargement des paiements...</p>
       </div>
     );
   }
@@ -140,6 +180,16 @@ const Payments = () => {
         </p>
       </div>
 
+      {/* Debug info pour le développement */}
+      {process.env.NODE_ENV === 'development' && (
+        <Card className="bg-blue-50 border-blue-200">
+          <CardContent className="p-4">
+            <p className="text-sm font-medium text-blue-800">Informations de débogage :</p>
+            <pre className="text-xs text-blue-600 mt-2 whitespace-pre-wrap">{debugInfo}</pre>
+          </CardContent>
+        </Card>
+      )}
+
       {payments.length > 0 ? (
         <Card>
           <CardContent className="p-0">
@@ -150,35 +200,35 @@ const Payments = () => {
                   <TableHead>Entreprise</TableHead>
                   <TableHead>Référence</TableHead>
                   <TableHead>Statut</TableHead>
+                  <TableHead>Montant</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {payments.map((payment) => (
                   <TableRow key={payment.id}>
-                    <TableCell>
-                      {format(new Date(payment.created_at), "dd/MM/yyyy", { locale: fr })}
-                    </TableCell>
                     <TableCell className="font-medium">
-                      {payment.nom_entreprise || 'Label Startup Engagée'}
+                      {getPaymentDate(payment)}
+                    </TableCell>
+                    <TableCell>
+                      {payment.nom_entreprise || 'Entreprise non spécifiée'}
                     </TableCell>
                     <TableCell className="text-sm text-muted-foreground">
-                      {payment.payment_id && payment.payment_id.length > 20 
-                        ? `${payment.payment_id.substring(0, 20)}...` 
-                        : payment.payment_id || 'N/A'}
+                      {payment.payment_id ? (
+                        payment.payment_id.length > 20 
+                          ? `${payment.payment_id.substring(0, 20)}...` 
+                          : payment.payment_id
+                      ) : (
+                        'N/A'
+                      )}
                     </TableCell>
                     <TableCell>
-                      <span className={`px-2 py-1 rounded-full text-xs ${
-                        payment.payment_status === 'paid' 
-                          ? 'bg-[#35DA56]/20 text-[#35DA56]' 
-                          : payment.payment_status === 'pending' 
-                            ? 'bg-yellow-100 text-yellow-800' 
-                            : 'bg-gray-100 text-gray-800'
-                      }`}>
-                        {payment.payment_status === 'paid' ? 'Payé' : 
-                         payment.payment_status === 'pending' ? 'En attente' : 
-                         payment.payment_status || 'Non payé'}
+                      <span className={`px-2 py-1 rounded-full text-xs ${getStatusColor(payment.payment_status)}`}>
+                        {getStatusText(payment.payment_status)}
                       </span>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      800,00 €
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 
@@ -209,7 +259,10 @@ const Payments = () => {
         <Card>
           <CardContent className="p-6 text-center text-gray-500">
             <FileText className="w-12 h-12 mx-auto mb-4 text-gray-400" />
-            <p>Aucun paiement trouvé</p>
+            <p className="text-lg font-medium mb-2">Aucun paiement trouvé</p>
+            <p className="text-sm">
+              Vous n'avez encore effectué aucun paiement ou vos paiements ne sont pas encore traités.
+            </p>
           </CardContent>
         </Card>
       )}
