@@ -2,111 +2,110 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useCompanyData } from "@/hooks/useCompanyData";
 import { toast } from "sonner";
 import { WelcomeHeader } from "@/components/dashboard/WelcomeHeader";
 import { SubmissionCard } from "@/components/dashboard/SubmissionCard";
+import { CertificationCard } from "@/components/dashboard/CertificationCard";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
-import { WelcomeCard } from "@/components/dashboard/WelcomeCard";
-
-type PaymentStatus = 'unpaid' | 'pending' | 'paid' | null;
+import { ErrorDisplay } from "@/components/dashboard/ErrorDisplay";
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const [firstName, setFirstName] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [hasSubmittedForm, setHasSubmittedForm] = useState(false);
-  const [paymentStatus, setPaymentStatus] = useState<PaymentStatus>(null);
+  const [paymentStatus, setPaymentStatus] = useState<'unpaid' | 'pending' | 'paid' | null>(null);
+  const [isPaymentLoading, setIsPaymentLoading] = useState(false);
   const [submissionId, setSubmissionId] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
+  
+  const {
+    isLoading,
+    companyData,
+    companyName,
+    error,
+    errorDetails,
+    hasSubmittedForm,
+    isPremium
+  } = useCompanyData();
 
-  const getSubmissionDetails = async () => {
+  // Vérifier le paiement lors du retour depuis Stripe
+  useEffect(() => {
+    const verifyPaymentFromStripe = async () => {
+      const success = searchParams.get('success');
+      const sessionId = searchParams.get('session_id');
+      const submissionIdFromUrl = searchParams.get('submission_id');
+      
+      if (success === 'true' && sessionId && submissionIdFromUrl) {
+        try {
+          console.log('Verifying payment for session:', sessionId);
+          
+          const { data, error } = await supabase.functions.invoke('verify-payment', {
+            body: { 
+              sessionId,
+              submissionId: submissionIdFromUrl
+            }
+          });
+
+          if (error) throw error;
+          
+          if (data?.success) {
+            toast.success("Paiement confirmé avec succès !");
+            setPaymentStatus('paid');
+            // Nettoyer l'URL
+            navigate('/dashboard', { replace: true });
+          } else {
+            toast.error("Le paiement n'a pas pu être confirmé");
+          }
+        } catch (error) {
+          console.error('Error verifying payment:', error);
+          toast.error("Erreur lors de la vérification du paiement");
+        }
+      }
+    };
+
+    verifyPaymentFromStripe();
+  }, [searchParams, navigate]);
+
+  useEffect(() => {
+    const fetchSubmissionData = async () => {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          navigate('/login');
+          return;
+        }
+
+        const { data, error } = await supabase
+          .from('label_submissions')
+          .select('id, payment_status')
+          .eq('user_id', session.user.id)
+          .maybeSingle();
+        
+        if (error) throw error;
+        
+        if (data) {
+          setSubmissionId(data.id);
+          setPaymentStatus(data.payment_status as 'unpaid' | 'pending' | 'paid');
+        }
+      } catch (error) {
+        console.error('Error fetching submission data:', error);
+      }
+    };
+
+    fetchSubmissionData();
+  }, [navigate]);
+
+  const handlePayment = async () => {
+    setIsPaymentLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.user) {
+      if (!session) {
+        toast.error("Veuillez vous connecter pour continuer");
         navigate("/login");
         return;
       }
 
-      const { data, error } = await supabase
-        .from('label_submissions')
-        .select('id, prenom, nom_entreprise, status, payment_status')
-        .eq('user_id', session.user.id)
-        .maybeSingle();
-      
-      if (error) throw error;
-
-      if (data) {
-        setFirstName(data.prenom || '');
-        setCompanyName(data.nom_entreprise || '');
-        setSubmissionId(data.id);
-        setHasSubmittedForm(data.status !== 'draft');
-        setPaymentStatus(data.payment_status as PaymentStatus);
-      } else {
-        // If no label submission exists yet, try to get data from eligibility submission
-        const { data: eligibilityData, error: eligibilityError } = await supabase
-          .from('eligibility_submissions')
-          .select('first_name, company_name')
-          .eq('user_id', session.user.id)
-          .maybeSingle();
-        
-        if (!eligibilityError && eligibilityData) {
-          setFirstName(eligibilityData.first_name || '');
-          setCompanyName(eligibilityData.company_name || '');
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching submission details:', error);
-      toast.error("Erreur lors du chargement de vos informations");
-    }
-  };
-
-  useEffect(() => {
-    getSubmissionDetails();
-  }, []);
-
-  useEffect(() => {
-    const checkPaymentStatus = async () => {
-      const success = searchParams.get('success');
-      const sessionId = searchParams.get('session_id');
-      const submissionIdFromUrl = searchParams.get('submission_id');
-
-      if (success === 'true' && sessionId && submissionIdFromUrl) {
-        try {
-          const { error } = await supabase
-            .from('label_submissions')
-            .update({ 
-              payment_status: 'paid',
-              payment_id: sessionId,
-            })
-            .eq('id', submissionIdFromUrl);
-
-          if (error) throw error;
-          
-          toast.success("Paiement effectué avec succès !");
-          setPaymentStatus('paid');
-          
-          navigate('/dashboard', { replace: true });
-          getSubmissionDetails();
-        } catch (error) {
-          console.error('Error updating payment status:', error);
-          toast.error("Erreur lors de la mise à jour du statut de paiement");
-        }
-      } else if (success === 'false') {
-        toast.error("Le paiement a été annulé.");
-        navigate('/dashboard', { replace: true });
-      }
-    };
-
-    checkPaymentStatus();
-  }, [searchParams]);
-
-  const handlePayment = async () => {
-    try {
-      setIsLoading(true);
-      
       if (!submissionId) {
-        toast.error("Une erreur est survenue: ID de soumission manquant");
+        toast.error("Une erreur est survenue");
         return;
       }
 
@@ -114,38 +113,76 @@ const Dashboard = () => {
         body: { submissionId }
       });
 
-      if (error) throw error;
-      if (!data?.url) throw new Error('URL de paiement non reçue');
+      if (error) {
+        throw error;
+      }
 
-      setPaymentStatus('pending');
+      if (!data?.url) {
+        throw new Error('URL de paiement non reçue');
+      }
+
       window.location.href = data.url;
     } catch (error) {
-      console.error('Payment error:', error);
+      console.error("Payment error:", error);
       toast.error("Une erreur est survenue lors de la redirection vers le paiement");
-      setPaymentStatus('unpaid');
     } finally {
-      setIsLoading(false);
+      setIsPaymentLoading(false);
     }
   };
 
-  if (hasSubmittedForm) {
+  if (!hasSubmittedForm) {
     return (
-      <div className="space-y-8 animate-fadeIn">
-        <WelcomeHeader firstName={firstName} companyName={companyName} />
-        <SubmissionCard 
-          paymentStatus={paymentStatus}
-          isLoading={isLoading}
-          onPayment={handlePayment}
-        />
-        <DashboardCharts />
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-semibold text-[#27017F] mb-4">
+              Bienvenue sur votre tableau de bord
+            </h1>
+            <p className="text-gray-600 mb-8">
+              Pour accéder à votre tableau de bord, vous devez d'abord remplir le formulaire d'éligibilité.
+            </p>
+            <button
+              onClick={() => navigate('/eligibility')}
+              className="bg-[#35DA56] text-white px-6 py-3 rounded-lg hover:bg-[#35DA56]/90 transition-colors"
+            >
+              Commencer le formulaire
+            </button>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-8 animate-fadeIn">
-      <WelcomeHeader firstName={firstName} companyName={companyName} />
-      <WelcomeCard />
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4">
+      <div className="max-w-7xl mx-auto space-y-8">
+        <WelcomeHeader companyName={companyName} />
+        
+        <SubmissionCard 
+          paymentStatus={paymentStatus}
+          isLoading={isPaymentLoading}
+          onPayment={handlePayment}
+        />
+
+        {isPremium && (
+          <>
+            <CertificationCard />
+            
+            {error ? (
+              <ErrorDisplay 
+                error={error} 
+                errorDetails={errorDetails}
+                companyName={companyName}
+              />
+            ) : (
+              <DashboardCharts 
+                isLoading={isLoading}
+                companyData={companyData}
+              />
+            )}
+          </>
+        )}
+      </div>
     </div>
   );
 };

@@ -8,6 +8,21 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
+// Mapping des produits Stripe selon le nombre d'employés
+const getStripeProductId = (employeeCount: string): string => {
+  const count = parseInt(employeeCount) || 0;
+  
+  if (count <= 10) {
+    return 'prod_SVd1sExPwVYNzT'; // moins de 10 collaborateurs
+  } else if (count <= 50) {
+    return 'prod_SVdJmvwjJgTpX0'; // 11 à 50 collaborateurs
+  } else if (count <= 100) {
+    return 'prod_SVdKfWfUg6gNyq'; // 51 à 100 collaborateurs
+  } else {
+    return 'prod_SVdM7hUC29aJxi'; // plus de 100 collaborateurs
+  }
+};
+
 serve(async (req: Request) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders })
@@ -32,7 +47,7 @@ serve(async (req: Request) => {
 
     const { data: submission, error: submissionError } = await supabaseClient
       .from('label_submissions')
-      .select('*')
+      .select('*, nombre_employes')
       .eq('id', submissionId)
       .maybeSingle()
 
@@ -45,6 +60,24 @@ serve(async (req: Request) => {
       throw new Error('Le paiement a déjà été effectué pour cette soumission')
     }
 
+    // Récupérer le bon produit selon le nombre d'employés
+    const productId = getStripeProductId(submission.nombre_employes || '0');
+    console.log('Using Stripe product:', productId, 'for employee count:', submission.nombre_employes);
+
+    // Récupérer le prix du produit depuis Stripe
+    const prices = await stripe.prices.list({
+      product: productId,
+      active: true,
+      limit: 1
+    });
+
+    if (prices.data.length === 0) {
+      throw new Error('Aucun prix trouvé pour ce produit');
+    }
+
+    const priceId = prices.data[0].id;
+    console.log('Using price ID:', priceId);
+
     console.log('Creating Stripe checkout session')
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -52,16 +85,12 @@ serve(async (req: Request) => {
       success_url: `${req.headers.get('origin')}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}&submission_id=${submissionId}`,
       cancel_url: `${req.headers.get('origin')}/dashboard?success=false`,
       line_items: [{
-        price_data: {
-          currency: 'eur',
-          product_data: {
-            name: 'Label Startup Engagée',
-            description: 'Processus de labellisation Startup Engagée'
-          },
-          unit_amount: 49900
-        },
+        price: priceId,
         quantity: 1
-      }]
+      }],
+      metadata: {
+        submission_id: submissionId
+      }
     })
 
     console.log('Updating submission status to pending')

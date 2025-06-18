@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useNavigate } from "react-router-dom";
@@ -6,32 +7,36 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+
 interface FormThanksProps {
   onValidityChange: (isValid: boolean) => void;
   formState: Record<string, any>;
   setFormState: (state: Record<string, any>) => void;
   submissionId?: string | null;
 }
+
 const pricingTiers = [{
   range: "0 à 10 salariés",
   price: "99€ HT"
 }, {
-  range: "11 à 49 salariés",
+  range: "11 à 50 salariés",
   price: "199€ HT"
 }, {
-  range: "50 à 99 salariés",
+  range: "51 à 100 salariés",
   price: "249€ HT"
 }, {
   range: "Plus de 100 salariés",
   price: "349€ HT"
 }];
+
 const getPricingTier = (employeeCount: string) => {
   const count = parseInt(employeeCount);
   if (count <= 10) return "0 à 10 salariés";
-  if (count <= 49) return "11 à 49 salariés";
-  if (count <= 99) return "50 à 99 salariés";
+  if (count <= 50) return "11 à 50 salariés";
+  if (count <= 100) return "51 à 100 salariés";
   return "Plus de 100 salariés";
 };
+
 const FormThanks = ({
   onValidityChange,
   formState,
@@ -39,9 +44,11 @@ const FormThanks = ({
 }: FormThanksProps) => {
   const navigate = useNavigate();
   const currentTier = getPricingTier(formState.employeeCount || "0");
+
   useEffect(() => {
     onValidityChange(true);
   }, [onValidityChange]);
+
   const handlePayment = async () => {
     try {
       const {
@@ -80,6 +87,7 @@ const FormThanks = ({
       toast.error("Une erreur est survenue lors de la redirection vers le paiement");
     }
   };
+
   return <div className="max-w-4xl mx-auto text-center space-y-8">
       <h2 className="text-2xl font-semibold">Nous avons bien reçu votre formulaire, merci !</h2>
       <p className="text-gray-600">Vous devez maintenant procéder au paiement pour accéder à la liste des pièces justificatives à nous fournir pour valider votre labélisation.</p>
@@ -123,4 +131,5 @@ const FormThanks = ({
       </div>
     </div>;
 };
+
 export default FormThanks;
