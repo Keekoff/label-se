@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -110,11 +109,12 @@ const Payments = () => {
         throw new Error("Aucune donnée reçue du serveur");
       }
       
+      // Créer le blob et télécharger le fichier
       const blob = new Blob([response.data], { type: 'application/pdf' });
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.setAttribute('download', `facture_${paymentId.substring(0, 8)}.pdf`);
+      link.setAttribute('download', `facture_${paymentId ? paymentId.substring(0, 8) : 'unknown'}.pdf`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -228,18 +228,18 @@ const Payments = () => {
                       </span>
                     </TableCell>
                     <TableCell className="font-medium">
-                      800,00 €
+                      666,67 € HT
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 
                         variant="outline" 
                         size="sm"
-                        onClick={() => downloadInvoice(payment.payment_id)}
-                        disabled={isDownloading === payment.payment_id || payment.payment_status !== 'paid'}
+                        onClick={() => downloadInvoice(payment.payment_id || payment.id)}
+                        disabled={isDownloading === (payment.payment_id || payment.id) || payment.payment_status !== 'paid'}
                         aria-label="Télécharger la facture"
                         className="hover:bg-[#27017F] hover:text-white"
                       >
-                        {isDownloading === payment.payment_id ? (
+                        {isDownloading === (payment.payment_id || payment.id) ? (
                           <span className="animate-pulse">Téléchargement...</span>
                         ) : (
                           <>

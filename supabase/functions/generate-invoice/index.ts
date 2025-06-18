@@ -34,12 +34,33 @@ serve(async (req) => {
 
     console.log('Récupération du paiement avec ID:', paymentId)
 
-    // Fetch payment information avec plus de détails
-    const { data: payment, error } = await supabase
-      .from('label_submissions')
-      .select('id, created_at, payment_date, nom_entreprise, payment_id, adresse, ville, code_postal, payment_status, prenom')
-      .eq('payment_id', paymentId)
-      .maybeSingle()
+    // Fetch payment information - try by payment_id first, then by id
+    let payment = null
+    let error = null
+
+    // First try to find by payment_id
+    if (paymentId !== 'N/A' && paymentId) {
+      const { data, error: paymentError } = await supabase
+        .from('label_submissions')
+        .select('id, created_at, payment_date, nom_entreprise, payment_id, adresse, ville, code_postal, payment_status, prenom')
+        .eq('payment_id', paymentId)
+        .maybeSingle()
+
+      payment = data
+      error = paymentError
+    }
+
+    // If not found by payment_id, try by id
+    if (!payment && !error) {
+      const { data, error: idError } = await supabase
+        .from('label_submissions')
+        .select('id, created_at, payment_date, nom_entreprise, payment_id, adresse, ville, code_postal, payment_status, prenom')
+        .eq('id', paymentId)
+        .maybeSingle()
+
+      payment = data
+      error = idError
+    }
 
     if (error) {
       console.error('Erreur lors de la récupération du paiement:', error)
@@ -48,20 +69,7 @@ serve(async (req) => {
 
     if (!payment) {
       console.error('Paiement non trouvé pour ID:', paymentId)
-      
-      // Vérification supplémentaire - recherche par ID partiel
-      const { data: partialMatches, error: partialError } = await supabase
-        .from('label_submissions')
-        .select('id, created_at, payment_date, nom_entreprise, payment_id, adresse, ville, code_postal, payment_status, prenom')
-        .ilike('payment_id', `%${paymentId.substring(0, 20)}%`)
-        .limit(1)
-      
-      if (partialError || !partialMatches || partialMatches.length === 0) {
-        throw new Error('Paiement introuvable avec l\'ID: ' + paymentId)
-      }
-      
-      console.log('Paiement trouvé avec correspondance partielle:', partialMatches[0])
-      Object.assign(payment, partialMatches[0])
+      throw new Error('Paiement introuvable avec l\'ID: ' + paymentId)
     }
 
     // Vérifier si le paiement est marqué comme payé
@@ -130,7 +138,7 @@ serve(async (req) => {
     const paymentDateToUse = payment.payment_date || payment.created_at
     doc.text(format(new Date(paymentDateToUse), 'dd/MM/yyyy'), 75, 109)
     
-    doc.text(payment.payment_id || 'N/A', 75, 116)
+    doc.text(payment.payment_id || payment.id.substring(0, 8), 75, 116)
     
     // Table header
     doc.setFont('helvetica', 'bold')
