@@ -13,19 +13,61 @@ const ResetPassword = () => {
   const [passwordConfirm, setPasswordConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [resetComplete, setResetComplete] = useState(false);
+  const [sessionLoading, setSessionLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Vérifier si l'utilisateur arrive avec un token de réinitialisation
-    const checkSession = async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session) {
-        toast.error("Lien de réinitialisation invalide ou expiré. Veuillez recommencer.");
+    const handlePasswordReset = async () => {
+      try {
+        // Extraire les paramètres de fragment de l'URL
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        const tokenType = hashParams.get('token_type');
+        const type = hashParams.get('type');
+
+        console.log('URL params:', { accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+
+        // Si nous avons des tokens de récupération dans l'URL
+        if (accessToken && refreshToken && type === 'recovery') {
+          console.log('Setting session with recovery tokens');
+          
+          const { data, error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+
+          if (error) {
+            console.error('Erreur lors de l\'établissement de la session:', error);
+            toast.error("Lien de réinitialisation invalide ou expiré. Veuillez recommencer.");
+            navigate("/forgot-password");
+            return;
+          }
+
+          if (data.session) {
+            console.log('Session établie avec succès');
+            toast.success("Session de récupération établie. Vous pouvez maintenant réinitialiser votre mot de passe.");
+          }
+        } else {
+          // Vérifier si l'utilisateur a déjà une session active
+          const { data } = await supabase.auth.getSession();
+          if (!data.session) {
+            console.log('Aucune session trouvée et aucun token de récupération');
+            toast.error("Lien de réinitialisation invalide ou expiré. Veuillez recommencer.");
+            navigate("/forgot-password");
+            return;
+          }
+        }
+      } catch (error) {
+        console.error('Erreur lors de la gestion de la récupération:', error);
+        toast.error("Une erreur est survenue. Veuillez recommencer.");
         navigate("/forgot-password");
+      } finally {
+        setSessionLoading(false);
       }
     };
 
-    checkSession();
+    handlePasswordReset();
   }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,20 +85,39 @@ const ResetPassword = () => {
     
     setLoading(true);
     try {
+      console.log('Tentative de mise à jour du mot de passe');
       const { error } = await supabase.auth.updateUser({ password });
       
       if (error) {
+        console.error('Erreur lors de la mise à jour du mot de passe:', error);
         toast.error(error.message);
       } else {
+        console.log('Mot de passe mis à jour avec succès');
         setResetComplete(true);
         toast.success("Votre mot de passe a été réinitialisé avec succès.");
+        
+        // Nettoyer l'URL pour supprimer les paramètres de récupération
+        window.history.replaceState({}, document.title, "/reset-password");
       }
     } catch (error) {
+      console.error('Erreur lors de la réinitialisation:', error);
       toast.error("Une erreur est survenue lors de la réinitialisation du mot de passe.");
     } finally {
       setLoading(false);
     }
   };
+
+  // Afficher un état de chargement pendant la vérification de la session
+  if (sessionLoading) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50/80 px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#35DA56] mx-auto mb-4"></div>
+          <p className="text-gray-600">Vérification du lien de récupération...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50/80 px-4">
