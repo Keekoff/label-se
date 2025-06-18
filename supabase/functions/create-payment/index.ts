@@ -88,6 +88,7 @@ serve(async (req: Request) => {
         price: priceId,
         quantity: 1
       }],
+      allow_promotion_codes: true, // Active les codes promo Stripe natifs
       metadata: {
         submission_id: submissionId
       }
