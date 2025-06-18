@@ -70,7 +70,7 @@ export const DashboardCharts = () => {
             <ImprovementSuggestions />
           </>
         ) : (
-          <div className="space-y-6">
+          <>
             <div className="relative">
               <div className="filter blur-[6px] pointer-events-none opacity-70">
                 <BarChartsGrid companyData={null} />
@@ -103,7 +103,7 @@ export const DashboardCharts = () => {
                 <div className="text-xl font-semibold text-[#27017F]">Fonctionnalité Premium</div>
               </div>
             </div>
-          </div>
+          </>
         )}
       </div>
     </div>
