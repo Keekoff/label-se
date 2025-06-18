@@ -4,8 +4,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { fr } from "date-fns/locale";
-import { FileText, Download } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import { FileText } from "lucide-react";
 import { toast } from "sonner";
 import {
   Table,
@@ -15,7 +14,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 interface Payment {
   id: string;
@@ -33,9 +31,6 @@ interface Payment {
 const Payments = () => {
   const [payments, setPayments] = useState<Payment[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isDownloading, setIsDownloading] = useState<string | null>(null);
-  const [errorDetails, setErrorDetails] = useState<string | null>(null);
-  const [showErrorDialog, setShowErrorDialog] = useState(false);
   const [debugInfo, setDebugInfo] = useState<string>("");
 
   useEffect(() => {
@@ -93,49 +88,6 @@ const Payments = () => {
 
     fetchPayments();
   }, []);
-
-  const downloadInvoice = async (paymentId: string) => {
-    try {
-      setIsDownloading(paymentId);
-      
-      console.log('Téléchargement de la facture pour l\'ID de paiement:', paymentId);
-      
-      const response = await supabase.functions.invoke('generate-invoice', {
-        body: { paymentId }
-      });
-      
-      if (response.error) {
-        console.error('Erreur de fonction Edge:', response.error);
-        throw new Error(response.error.message || "Erreur lors de la génération de la facture");
-      }
-      
-      if (!response.data) {
-        throw new Error("Aucune donnée reçue du serveur");
-      }
-      
-      // Créer le blob et télécharger le fichier
-      const blob = new Blob([response.data], { type: 'application/pdf' });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `facture_${paymentId ? paymentId.substring(0, 8) : 'unknown'}.pdf`);
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
-      
-      toast.success("Facture téléchargée avec succès", {
-        style: { backgroundColor: '#35DA56', color: 'white' }
-      });
-    } catch (error) {
-      console.error('Erreur lors du téléchargement de la facture:', error);
-      setErrorDetails(error instanceof Error ? error.message : "Erreur inconnue");
-      setShowErrorDialog(true);
-      toast.error("Une erreur est survenue lors du téléchargement de la facture");
-    } finally {
-      setIsDownloading(null);
-    }
-  };
 
   const getPaymentDate = (payment: Payment) => {
     // Utiliser payment_date si disponible, sinon created_at
@@ -211,7 +163,7 @@ const Payments = () => {
       <div>
         <h1 className="text-3xl font-bold">Mes paiements</h1>
         <p className="text-gray-500 mt-2">
-          Historique de vos paiements et factures
+          Historique de vos paiements
         </p>
       </div>
 
@@ -236,7 +188,6 @@ const Payments = () => {
                   <TableHead>Référence</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Montant</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -265,25 +216,6 @@ const Payments = () => {
                     <TableCell>
                       {formatAmount(payment)}
                     </TableCell>
-                    <TableCell className="text-right">
-                      <Button 
-                        variant="outline" 
-                        size="sm"
-                        onClick={() => downloadInvoice(payment.payment_id || payment.id)}
-                        disabled={isDownloading === (payment.payment_id || payment.id) || payment.payment_status !== 'paid'}
-                        aria-label="Télécharger la facture"
-                        className="hover:bg-[#27017F] hover:text-white"
-                      >
-                        {isDownloading === (payment.payment_id || payment.id) ? (
-                          <span className="animate-pulse">Téléchargement...</span>
-                        ) : (
-                          <>
-                            <Download className="w-4 h-4 mr-2" />
-                            Facture
-                          </>
-                        )}
-                      </Button>
-                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
@@ -301,23 +233,6 @@ const Payments = () => {
           </CardContent>
         </Card>
       )}
-
-      <Dialog open={showErrorDialog} onOpenChange={setShowErrorDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Erreur de téléchargement</DialogTitle>
-            <DialogDescription>
-              Une erreur est survenue lors du téléchargement de la facture. Détails techniques:
-            </DialogDescription>
-          </DialogHeader>
-          <div className="bg-gray-100 p-4 rounded-md text-sm">
-            <code>{errorDetails}</code>
-          </div>
-          <p className="text-sm text-gray-500">
-            Veuillez contacter le support si ce problème persiste.
-          </p>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 };
