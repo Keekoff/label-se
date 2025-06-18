@@ -82,25 +82,43 @@ serve(async (req) => {
 
     console.log('Paiement trouvé:', payment)
 
-    // Si on a une facture Stripe, essayer de la récupérer directement
-    if (payment.stripe_invoice_id && stripeKey) {
+    // Essayer de récupérer la facture Stripe officielle
+    if (stripeKey && (payment.stripe_invoice_id || payment.stripe_session_id)) {
       try {
-        console.log('Tentative de récupération de la facture Stripe:', payment.stripe_invoice_id)
-        const invoice = await stripe.invoices.retrieve(payment.stripe_invoice_id)
-        console.log('Facture Stripe trouvée:', invoice.id)
+        let invoiceUrl = null
+
+        // Option 1: Récupérer directement par invoice_id
+        if (payment.stripe_invoice_id) {
+          console.log('Récupération de la facture Stripe par ID:', payment.stripe_invoice_id)
+          const invoice = await stripe.invoices.retrieve(payment.stripe_invoice_id)
+          
+          if (invoice.invoice_pdf) {
+            invoiceUrl = invoice.invoice_pdf
+            console.log('Facture PDF Stripe trouvée:', invoiceUrl)
+          }
+        }
         
-        // Récupérer le PDF de la facture Stripe
-        const invoicePdf = await stripe.invoices.retrieveUpcoming({
-          customer: invoice.customer as string,
-        })
-        
-        if (invoice.invoice_pdf) {
-          // Rediriger vers le PDF Stripe officiel
+        // Option 2: Récupérer via la session de checkout
+        if (!invoiceUrl && payment.stripe_session_id) {
+          console.log('Récupération via session Stripe:', payment.stripe_session_id)
+          const session = await stripe.checkout.sessions.retrieve(payment.stripe_session_id, {
+            expand: ['invoice']
+          })
+          
+          if (session.invoice && typeof session.invoice === 'object' && session.invoice.invoice_pdf) {
+            invoiceUrl = session.invoice.invoice_pdf
+            console.log('Facture PDF trouvée via session:', invoiceUrl)
+          }
+        }
+
+        // Si on a trouvé une facture Stripe, rediriger vers elle
+        if (invoiceUrl) {
+          console.log('Redirection vers la facture Stripe officielle')
           return new Response(null, {
             status: 302,
             headers: {
               ...corsHeaders,
-              'Location': invoice.invoice_pdf
+              'Location': invoiceUrl
             }
           })
         }
@@ -110,6 +128,7 @@ serve(async (req) => {
     }
 
     // Générer une facture PDF personnalisée si pas de facture Stripe disponible
+    console.log('Génération d\'une facture personnalisée')
     const doc = new jsPDF()
     
     // Calculer les montants

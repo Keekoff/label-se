@@ -30,9 +30,9 @@ serve(async (req: Request) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') || ''
     )
 
-    // Vérifier le statut de la session Stripe
+    // Vérifier le statut de la session Stripe avec expansion de la facture
     const session = await stripe.checkout.sessions.retrieve(sessionId, {
-      expand: ['line_items', 'total_details']
+      expand: ['line_items', 'total_details', 'invoice']
     })
     console.log('Stripe session status:', session.payment_status)
 
@@ -48,20 +48,27 @@ serve(async (req: Request) => {
       let stripeInvoiceId = null
       if (session.invoice) {
         stripeInvoiceId = typeof session.invoice === 'string' ? session.invoice : session.invoice.id
+        console.log('Invoice ID found:', stripeInvoiceId)
       }
 
-      // Mettre à jour le statut de paiement dans la base de données avec les nouvelles informations
+      // Mettre à jour le statut de paiement dans la base de données avec toutes les informations
+      const updateData = { 
+        payment_status: 'paid',
+        payment_date: new Date().toISOString(),
+        amount_paid: amountPaid,
+        currency: currency,
+        discount_applied: discountApplied,
+        stripe_session_id: sessionId,
+      }
+
+      // Ajouter l'invoice_id seulement s'il existe
+      if (stripeInvoiceId) {
+        updateData.stripe_invoice_id = stripeInvoiceId
+      }
+
       const { error: updateError } = await supabaseClient
         .from('label_submissions')
-        .update({ 
-          payment_status: 'paid',
-          payment_date: new Date().toISOString(),
-          amount_paid: amountPaid,
-          currency: currency,
-          discount_applied: discountApplied,
-          stripe_session_id: sessionId,
-          stripe_invoice_id: stripeInvoiceId
-        })
+        .update(updateData)
         .eq('id', submissionId)
 
       if (updateError) {
@@ -78,7 +85,9 @@ serve(async (req: Request) => {
           paymentStatus: 'paid',
           amountPaid: amountPaid,
           currency: currency,
-          discountApplied: discountApplied
+          discountApplied: discountApplied,
+          stripeSessionId: sessionId,
+          stripeInvoiceId: stripeInvoiceId
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
