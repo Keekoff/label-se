@@ -157,6 +157,7 @@ export type Database = {
           nombre_employes: string | null
           numerique_responsable: string[] | null
           parentalite: string[] | null
+          payment_date: string | null
           payment_id: string | null
           payment_status: string | null
           politique_rse: string[] | null
@@ -203,6 +204,7 @@ export type Database = {
           nombre_employes?: string | null
           numerique_responsable?: string[] | null
           parentalite?: string[] | null
+          payment_date?: string | null
           payment_id?: string | null
           payment_status?: string | null
           politique_rse?: string[] | null
@@ -249,6 +251,7 @@ export type Database = {
           nombre_employes?: string | null
           numerique_responsable?: string[] | null
           parentalite?: string[] | null
+          payment_date?: string | null
           payment_id?: string | null
           payment_status?: string | null
           politique_rse?: string[] | null

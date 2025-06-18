@@ -71,7 +71,10 @@ const Dashboard = () => {
             }
           });
 
-          if (error) throw error;
+          if (error) {
+            console.error('Payment verification error:', error);
+            throw error;
+          }
           
           if (data?.success) {
             toast.success("Paiement confirmé avec succès !");
@@ -79,12 +82,15 @@ const Dashboard = () => {
             // Nettoyer l'URL
             navigate('/dashboard', { replace: true });
           } else {
-            toast.error("Le paiement n'a pas pu être confirmé");
+            console.error('Payment verification failed:', data);
+            toast.error("Le paiement n'a pas pu être confirmé. Contactez le support si le problème persiste.");
           }
         } catch (error) {
           console.error('Error verifying payment:', error);
-          toast.error("Erreur lors de la vérification du paiement");
+          toast.error("Erreur lors de la vérification du paiement. Contactez le support si le problème persiste.");
         }
+      } else if (success === 'false') {
+        toast.error("Paiement annulé");
       }
     };
 
@@ -114,6 +120,7 @@ const Dashboard = () => {
         }
       } catch (error) {
         console.error('Error fetching submission data:', error);
+        toast.error("Erreur lors du chargement des données");
       }
     };
 
@@ -140,6 +147,7 @@ const Dashboard = () => {
       });
 
       if (error) {
+        console.error("Payment creation error:", error);
         throw error;
       }
 
