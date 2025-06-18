@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,6 +25,9 @@ interface Payment {
   nom_entreprise: string;
   payment_status: string;
   user_id: string;
+  amount_paid: number | null;
+  currency: string | null;
+  discount_applied: number | null;
 }
 
 const Payments = () => {
@@ -46,10 +50,10 @@ const Payments = () => {
         console.log("User ID utilisé pour la requête:", session.user.id);
         setDebugInfo(`User ID: ${session.user.id}`);
 
-        // Récupérer tous les paiements de l'utilisateur avec plus de détails
+        // Récupérer tous les paiements de l'utilisateur avec les nouvelles informations
         const { data, error } = await supabase
           .from('label_submissions')
-          .select('id, created_at, payment_date, payment_id, nom_entreprise, payment_status, user_id')
+          .select('id, created_at, payment_date, payment_id, nom_entreprise, payment_status, user_id, amount_paid, currency, discount_applied')
           .eq('user_id', session.user.id)
           .order('created_at', { ascending: false });
 
@@ -163,6 +167,37 @@ const Payments = () => {
     }
   };
 
+  const formatAmount = (payment: Payment) => {
+    // Si on a le montant réel, l'utiliser
+    if (payment.amount_paid !== null && payment.amount_paid !== undefined) {
+      const amountInEur = (payment.amount_paid / 100).toFixed(2);
+      const currency = payment.currency === 'eur' ? '€' : payment.currency?.toUpperCase() || '€';
+      
+      // Calculer le montant HT (en retirant la TVA de 20%)
+      const amountHT = (payment.amount_paid / 1.20 / 100).toFixed(2);
+      
+      return (
+        <div className="text-right">
+          <div className="font-medium">{amountInEur} {currency}</div>
+          <div className="text-xs text-muted-foreground">{amountHT} {currency} HT</div>
+          {payment.discount_applied && payment.discount_applied > 0 && (
+            <div className="text-xs text-red-600">
+              Remise: -{(payment.discount_applied / 100).toFixed(2)} {currency}
+            </div>
+          )}
+        </div>
+      );
+    }
+    
+    // Fallback vers l'ancien montant fixe
+    return (
+      <div className="text-right">
+        <div className="font-medium">800,00 €</div>
+        <div className="text-xs text-muted-foreground">666,67 € HT</div>
+      </div>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[200px]">
@@ -200,7 +235,7 @@ const Payments = () => {
                   <TableHead>Entreprise</TableHead>
                   <TableHead>Référence</TableHead>
                   <TableHead>Statut</TableHead>
-                  <TableHead>Montant</TableHead>
+                  <TableHead className="text-right">Montant</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
@@ -227,8 +262,8 @@ const Payments = () => {
                         {getStatusText(payment.payment_status)}
                       </span>
                     </TableCell>
-                    <TableCell className="font-medium">
-                      666,67 € HT
+                    <TableCell>
+                      {formatAmount(payment)}
                     </TableCell>
                     <TableCell className="text-right">
                       <Button 

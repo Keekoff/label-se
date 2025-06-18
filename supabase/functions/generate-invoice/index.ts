@@ -3,6 +3,7 @@ import { serve } from 'https://deno.land/std@0.177.0/http/server.ts'
 import jsPDF from 'https://esm.sh/jspdf@2.5.1'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.0'
 import { format } from 'https://esm.sh/date-fns@3.6.0'
+import Stripe from 'https://esm.sh/stripe@12.18.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -18,12 +19,14 @@ serve(async (req) => {
   try {
     const supabaseUrl = Deno.env.get('SUPABASE_URL') || ''
     const supabaseKey = Deno.env.get('SUPABASE_ANON_KEY') || ''
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY') || ''
 
     if (!supabaseUrl || !supabaseKey) {
       throw new Error('Supabase URL ou clé manquante')
     }
 
     const supabase = createClient(supabaseUrl, supabaseKey)
+    const stripe = new Stripe(stripeKey, { apiVersion: '2023-10-16' })
 
     // Get request body
     const { paymentId } = await req.json()
@@ -42,7 +45,7 @@ serve(async (req) => {
     if (paymentId !== 'N/A' && paymentId) {
       const { data, error: paymentError } = await supabase
         .from('label_submissions')
-        .select('id, created_at, payment_date, nom_entreprise, payment_id, adresse, ville, code_postal, payment_status, prenom')
+        .select('id, created_at, payment_date, nom_entreprise, payment_id, adresse, ville, code_postal, payment_status, prenom, amount_paid, currency, discount_applied, stripe_invoice_id, stripe_session_id')
         .eq('payment_id', paymentId)
         .maybeSingle()
 
@@ -54,7 +57,7 @@ serve(async (req) => {
     if (!payment && !error) {
       const { data, error: idError } = await supabase
         .from('label_submissions')
-        .select('id, created_at, payment_date, nom_entreprise, payment_id, adresse, ville, code_postal, payment_status, prenom')
+        .select('id, created_at, payment_date, nom_entreprise, payment_id, adresse, ville, code_postal, payment_status, prenom, amount_paid, currency, discount_applied, stripe_invoice_id, stripe_session_id')
         .eq('id', paymentId)
         .maybeSingle()
 
@@ -79,6 +82,47 @@ serve(async (req) => {
 
     console.log('Paiement trouvé:', payment)
 
+    // Si on a une facture Stripe, essayer de la récupérer directement
+    if (payment.stripe_invoice_id && stripeKey) {
+      try {
+        console.log('Tentative de récupération de la facture Stripe:', payment.stripe_invoice_id)
+        const invoice = await stripe.invoices.retrieve(payment.stripe_invoice_id)
+        console.log('Facture Stripe trouvée:', invoice.id)
+        
+        // Récupérer le PDF de la facture Stripe
+        const invoicePdf = await stripe.invoices.retrieveUpcoming({
+          customer: invoice.customer as string,
+        })
+        
+        if (invoice.invoice_pdf) {
+          // Rediriger vers le PDF Stripe officiel
+          return new Response(null, {
+            status: 302,
+            headers: {
+              ...corsHeaders,
+              'Location': invoice.invoice_pdf
+            }
+          })
+        }
+      } catch (stripeError) {
+        console.log('Impossible de récupérer la facture Stripe, génération d\'une facture personnalisée:', stripeError)
+      }
+    }
+
+    // Générer une facture PDF personnalisée si pas de facture Stripe disponible
+    const doc = new jsPDF()
+    
+    // Calculer les montants
+    const amountPaid = payment.amount_paid || 80000 // fallback vers l'ancien montant
+    const discountApplied = payment.discount_applied || 0
+    const originalAmount = amountPaid + discountApplied
+    const currency = payment.currency || 'eur'
+    
+    // Convertir de centimes vers euros
+    const amountPaidEur = (amountPaid / 100).toFixed(2)
+    const discountAppliedEur = (discountApplied / 100).toFixed(2)
+    const originalAmountEur = (originalAmount / 100).toFixed(2)
+    
     // Construire l'adresse de facturation
     const addressComponents = [
       payment.adresse,
@@ -86,9 +130,6 @@ serve(async (req) => {
     ].filter(Boolean)
     
     const addressLines = addressComponents.length > 0 ? addressComponents : ['Adresse non disponible']
-
-    // Generate PDF invoice
-    const doc = new jsPDF()
     
     // Header
     doc.setFontSize(20)
@@ -134,7 +175,6 @@ serve(async (req) => {
     doc.text(`INV-${payment.id.substring(0, 8)}`, 75, 95)
     doc.text(format(new Date(payment.created_at), 'dd/MM/yyyy'), 75, 102)
     
-    // Utiliser payment_date si disponible, sinon created_at
     const paymentDateToUse = payment.payment_date || payment.created_at
     doc.text(format(new Date(paymentDateToUse), 'dd/MM/yyyy'), 75, 109)
     
@@ -154,21 +194,42 @@ serve(async (req) => {
     doc.setFont('helvetica', 'normal')
     doc.text('Label Startup Engagée - Certification annuelle', 20, 150)
     doc.text('1', 100, 150)
-    doc.text('666,67 €', 130, 150)
-    doc.text('666,67 €', 170, 150)
+    
+    // Calculer le prix unitaire HT (en retirant la TVA de 20%)
+    const unitPriceHT = (amountPaid / 1.20).toFixed(2)
+    doc.text(`${unitPriceHT} €`, 130, 150)
+    doc.text(`${unitPriceHT} €`, 170, 150)
+    
+    let currentY = 160
+    
+    // Afficher la remise si elle existe
+    if (discountApplied > 0) {
+      doc.setTextColor(255, 0, 0) // Rouge pour la remise
+      doc.text('Remise appliquée (code promo)', 20, currentY)
+      doc.text('1', 100, currentY)
+      doc.text(`-${(discountApplied / 1.20).toFixed(2)} €`, 130, currentY)
+      doc.text(`-${(discountApplied / 1.20).toFixed(2)} €`, 170, currentY)
+      currentY += 10
+      doc.setTextColor(0, 0, 0) // Retour au noir
+    }
     
     // Total section
-    doc.line(15, 160, 195, 160)
+    doc.line(15, currentY, 195, currentY)
+    currentY += 10
+    
     doc.setFont('helvetica', 'bold')
-    doc.text('Total HT:', 130, 170)
-    doc.text('TVA (20%):', 130, 177)
-    doc.text('Total TTC:', 130, 184)
+    doc.text('Total HT:', 130, currentY)
+    doc.text('TVA (20%):', 130, currentY + 7)
+    doc.text('Total TTC:', 130, currentY + 14)
+    
+    const totalHT = (amountPaid / 1.20).toFixed(2)
+    const tva = (amountPaid - (amountPaid / 1.20)).toFixed(2)
     
     doc.setFont('helvetica', 'normal')
-    doc.text('666,67 €', 170, 170)
-    doc.text('133,33 €', 170, 177)
+    doc.text(`${totalHT} €`, 170, currentY)
+    doc.text(`${tva} €`, 170, currentY + 7)
     doc.setFont('helvetica', 'bold')
-    doc.text('800,00 €', 170, 184)
+    doc.text(`${amountPaidEur} €`, 170, currentY + 14)
     
     // Footer
     doc.setFontSize(10)

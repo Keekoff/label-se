@@ -130,6 +130,7 @@ export type Database = {
           a_financements: string | null
           achats_responsables: string[] | null
           adresse: string | null
+          amount_paid: number | null
           annee_creation: string | null
           code_postal: string | null
           communication_transparente: string[] | null
@@ -137,9 +138,11 @@ export type Database = {
           contribution_associative: string[] | null
           courriel: string | null
           created_at: string | null
+          currency: string | null
           current_step: number | null
           details_financement: string | null
           disclaimer_accepted: boolean | null
+          discount_applied: number | null
           diversite: string[] | null
           eco_conception: string[] | null
           economie_circulaire: string[] | null
@@ -168,6 +171,8 @@ export type Database = {
           secteurs_activite: string[] | null
           situation_handicap: string[] | null
           status: string | null
+          stripe_invoice_id: string | null
+          stripe_session_id: string | null
           updated_at: string | null
           user_id: string | null
           valide: boolean | null
@@ -177,6 +182,7 @@ export type Database = {
           a_financements?: string | null
           achats_responsables?: string[] | null
           adresse?: string | null
+          amount_paid?: number | null
           annee_creation?: string | null
           code_postal?: string | null
           communication_transparente?: string[] | null
@@ -184,9 +190,11 @@ export type Database = {
           contribution_associative?: string[] | null
           courriel?: string | null
           created_at?: string | null
+          currency?: string | null
           current_step?: number | null
           details_financement?: string | null
           disclaimer_accepted?: boolean | null
+          discount_applied?: number | null
           diversite?: string[] | null
           eco_conception?: string[] | null
           economie_circulaire?: string[] | null
@@ -215,6 +223,8 @@ export type Database = {
           secteurs_activite?: string[] | null
           situation_handicap?: string[] | null
           status?: string | null
+          stripe_invoice_id?: string | null
+          stripe_session_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           valide?: boolean | null
@@ -224,6 +234,7 @@ export type Database = {
           a_financements?: string | null
           achats_responsables?: string[] | null
           adresse?: string | null
+          amount_paid?: number | null
           annee_creation?: string | null
           code_postal?: string | null
           communication_transparente?: string[] | null
@@ -231,9 +242,11 @@ export type Database = {
           contribution_associative?: string[] | null
           courriel?: string | null
           created_at?: string | null
+          currency?: string | null
           current_step?: number | null
           details_financement?: string | null
           disclaimer_accepted?: boolean | null
+          discount_applied?: number | null
           diversite?: string[] | null
           eco_conception?: string[] | null
           economie_circulaire?: string[] | null
@@ -262,6 +275,8 @@ export type Database = {
           secteurs_activite?: string[] | null
           situation_handicap?: string[] | null
           status?: string | null
+          stripe_invoice_id?: string | null
+          stripe_session_id?: string | null
           updated_at?: string | null
           user_id?: string | null
           valide?: boolean | null

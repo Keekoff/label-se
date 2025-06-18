@@ -31,16 +31,36 @@ serve(async (req: Request) => {
     )
 
     // Vérifier le statut de la session Stripe
-    const session = await stripe.checkout.sessions.retrieve(sessionId)
+    const session = await stripe.checkout.sessions.retrieve(sessionId, {
+      expand: ['line_items', 'total_details']
+    })
     console.log('Stripe session status:', session.payment_status)
 
     if (session.payment_status === 'paid') {
-      // Mettre à jour le statut de paiement dans la base de données
+      // Calculer les informations de paiement
+      const amountPaid = session.amount_total || 0 // déjà en centimes
+      const currency = session.currency || 'eur'
+      const discountApplied = (session.total_details?.amount_discount || 0)
+      
+      console.log('Payment details:', { amountPaid, currency, discountApplied })
+
+      // Récupérer l'ID de facture Stripe si disponible
+      let stripeInvoiceId = null
+      if (session.invoice) {
+        stripeInvoiceId = typeof session.invoice === 'string' ? session.invoice : session.invoice.id
+      }
+
+      // Mettre à jour le statut de paiement dans la base de données avec les nouvelles informations
       const { error: updateError } = await supabaseClient
         .from('label_submissions')
         .update({ 
           payment_status: 'paid',
-          payment_date: new Date().toISOString()
+          payment_date: new Date().toISOString(),
+          amount_paid: amountPaid,
+          currency: currency,
+          discount_applied: discountApplied,
+          stripe_session_id: sessionId,
+          stripe_invoice_id: stripeInvoiceId
         })
         .eq('id', submissionId)
 
@@ -55,7 +75,10 @@ serve(async (req: Request) => {
         JSON.stringify({ 
           success: true, 
           message: 'Paiement vérifié et statut mis à jour',
-          paymentStatus: 'paid'
+          paymentStatus: 'paid',
+          amountPaid: amountPaid,
+          currency: currency,
+          discountApplied: discountApplied
         }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
