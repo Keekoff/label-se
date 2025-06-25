@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -176,7 +177,7 @@ const Dashboard = () => {
               Pour accéder à votre tableau de bord, vous devez d'abord remplir le formulaire d'éligibilité.
             </p>
             <button
-              onClick={() => navigate('/eligibility')}
+              onClick={() => navigate('/dashboard/eligibility')}
               className="bg-[#35DA56] text-white px-6 py-3 rounded-lg hover:bg-[#35DA56]/90 transition-colors"
             >
               Commencer le formulaire

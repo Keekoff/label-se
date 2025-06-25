@@ -30,7 +30,6 @@ type MenuItem = InternalMenuItem | ExternalMenuItem;
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
-  const [authChecked, setAuthChecked] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
   const [isValidated, setIsValidated] = useState(false);
   const navigate = useNavigate();
@@ -60,6 +59,8 @@ const DashboardLayout = () => {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        console.log('Checking auth for path:', location.pathname);
+        
         const {
           data: {
             session
@@ -67,12 +68,12 @@ const DashboardLayout = () => {
         } = await supabase.auth.getSession();
         
         if (!session) {
+          console.log('No session found, redirecting to login');
           navigate('/login');
           return;
         }
 
-        // Marquer l'authentification comme vérifiée
-        setAuthChecked(true);
+        console.log('Session found, checking eligibility and payment status');
 
         // Check payment status and validation status
         const {
@@ -82,40 +83,42 @@ const DashboardLayout = () => {
         setHasPaid(submission?.payment_status === 'paid');
         setIsValidated(submission?.valide === true);
 
-        // Check for eligibility submission seulement si on n'est pas déjà sur la page d'éligibilité
+        // Check for eligibility submission - simplifié
         if (location.pathname !== '/dashboard/eligibility') {
           const {
             data: eligibilitySubmission,
             error
-          } = await supabase.from('eligibility_submissions').select('legal_form').eq('user_id', session.user.id).single();
+          } = await supabase.from('eligibility_submissions').select('legal_form').eq('user_id', session.user.id).maybeSingle();
           
           if (error && error.code !== 'PGRST116') {
+            console.error('Error checking eligibility:', error);
             throw error;
           }
           
-          // Rediriger vers l'éligibilité seulement si nécessaire
+          // Rediriger vers l'éligibilité si pas de soumission ou si forme juridique non éligible
           if (!eligibilitySubmission) {
+            console.log('No eligibility submission found, redirecting to eligibility');
             navigate('/dashboard/eligibility');
             return;
           }
           
           if (eligibilitySubmission && ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"].includes(eligibilitySubmission.legal_form)) {
+            console.log('Ineligible legal form, redirecting to eligibility');
             navigate('/dashboard/eligibility');
             return;
           }
         }
+
+        console.log('Auth check completed successfully');
       } catch (error) {
-        console.error('Error checking eligibility:', error);
+        console.error('Error in auth check:', error);
         toast.error("Une erreur est survenue lors de la vérification de votre éligibilité.");
       } finally {
         setLoading(false);
       }
     };
 
-    // Ne pas refaire la vérification si elle a déjà été faite
-    if (!authChecked) {
-      checkAuth();
-    }
+    checkAuth();
 
     // Subscribe to auth changes
     const {
@@ -123,12 +126,13 @@ const DashboardLayout = () => {
         subscription
       }
     } = supabase.auth.onAuthStateChange((event, session) => {
+      console.log('Auth state changed:', event);
       if (event === 'SIGNED_OUT' || !session) {
         navigate('/login');
       }
     });
     return () => subscription.unsubscribe();
-  }, [navigate, location.pathname, authChecked]);
+  }, [navigate, location.pathname]);
 
   // Déterminer l'URL du kit media en fonction de l'échelon
   const getKitMediaUrl = () => {
@@ -214,7 +218,7 @@ const DashboardLayout = () => {
     : menuItemsWithKitMedia;
 
   // Afficher un état de chargement amélioré
-  if (loading || !authChecked) {
+  if (loading) {
     return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
       <div className="text-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#35DA56] mx-auto mb-4"></div>
