@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt, Upload, HelpCircle, FileText } from "lucide-react";
@@ -6,7 +7,6 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompanyData } from "@/hooks/useCompanyData";
-import { useAuth } from "@/contexts/AuthContext";
 
 // Définir des types distincts pour les éléments de menu
 type BaseMenuItem = {
@@ -30,12 +30,12 @@ type MenuItem = InternalMenuItem | ExternalMenuItem;
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [hasPaid, setHasPaid] = useState(false);
   const [isValidated, setIsValidated] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { companyData } = useCompanyData();
-  const { user, signOut } = useAuth();
 
   useEffect(() => {
     // Handle responsiveness - close sidebar on small screens by default
@@ -58,27 +58,63 @@ const DashboardLayout = () => {
   }, []);
 
   useEffect(() => {
-    const fetchPaymentAndValidationStatus = async () => {
-      if (!user) return;
-
+    const checkAuth = async () => {
       try {
-        console.log('DashboardLayout: Fetching payment and validation status');
-        
-        const { data: submission } = await supabase
-          .from('label_submissions')
-          .select('payment_status, valide')
-          .eq('user_id', user.id)
-          .maybeSingle();
+        const {
+          data: {
+            session
+          }
+        } = await supabase.auth.getSession();
+        if (!session) {
+          navigate('/login');
+          return;
+        }
+
+        // Check payment status and validation status
+        const {
+          data: submission
+        } = await supabase.from('label_submissions').select('payment_status, valide').eq('user_id', session.user.id).maybeSingle();
         
         setHasPaid(submission?.payment_status === 'paid');
         setIsValidated(submission?.valide === true);
+
+        // Check for eligibility submission
+        const {
+          data: eligibilitySubmission,
+          error
+        } = await supabase.from('eligibility_submissions').select('legal_form').eq('user_id', session.user.id).single();
+        if (error && error.code !== 'PGRST116') {
+          throw error;
+        }
+        if (!eligibilitySubmission && location.pathname !== '/dashboard/eligibility') {
+          navigate('/dashboard/eligibility');
+          return;
+        }
+        if (eligibilitySubmission && ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"].includes(eligibilitySubmission.legal_form)) {
+          navigate('/dashboard/eligibility');
+          return;
+        }
       } catch (error) {
-        console.error('DashboardLayout: Error fetching submission data:', error);
+        console.error('Error checking eligibility:', error);
+        toast.error("Une erreur est survenue lors de la vérification de votre éligibilité.");
+      } finally {
+        setLoading(false);
       }
     };
+    checkAuth();
 
-    fetchPaymentAndValidationStatus();
-  }, [user]);
+    // Subscribe to auth changes
+    const {
+      data: {
+        subscription
+      }
+    } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        navigate('/login');
+      }
+    });
+    return () => subscription.unsubscribe();
+  }, [navigate, location.pathname]);
 
   // Déterminer l'URL du kit media en fonction de l'échelon
   const getKitMediaUrl = () => {
@@ -163,8 +199,13 @@ const DashboardLayout = () => {
       ] 
     : menuItemsWithKitMedia;
 
-  return (
-    <div className="min-h-screen bg-background">
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">
+      Chargement...
+    </div>;
+  }
+
+  return <div className="min-h-screen bg-background">
       {/* Fixed positioned sidebar with higher z-index to ensure it's above content on small screens */}
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-40 shadow-lg`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10 backdrop-blur-sm bg-primary/95">
@@ -220,9 +261,9 @@ const DashboardLayout = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-600 hover:bg-red-50/70" onClick={async () => {
-                  await signOut();
-                  navigate("/login");
-                }}>
+                await supabase.auth.signOut();
+                navigate("/login");
+              }}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Se déconnecter</span>
                 </DropdownMenuItem>
@@ -236,8 +277,7 @@ const DashboardLayout = () => {
           </div>
         </main>
       </div>
-    </div>
-  );
+    </div>;
 };
 
 export default DashboardLayout;

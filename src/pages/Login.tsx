@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -6,42 +7,30 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { ArrowLeft, Mail, Lock } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user } = useAuth();
-
-  // Rediriger si déjà connecté
-  useEffect(() => {
-    if (user) {
-      console.log('Login: User already logged in, redirecting to dashboard');
-      navigate("/dashboard");
-    }
-  }, [user, navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      console.log('Login: Attempting to sign in');
-      const { error } = await supabase.auth.signInWithPassword({
+      const {
+        error
+      } = await supabase.auth.signInWithPassword({
         email,
         password
       });
       if (error) {
-        console.error('Login: Sign in error:', error);
         toast.error(error.message);
       } else {
-        console.log('Login: Sign in successful');
         toast.success("Connexion réussie !");
         navigate("/dashboard");
       }
     } catch (error) {
-      console.error('Login: Unexpected error:', error);
       toast.error("Une erreur est survenue lors de la connexion.");
     } finally {
       setLoading(false);
