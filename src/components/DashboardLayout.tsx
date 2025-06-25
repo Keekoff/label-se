@@ -6,6 +6,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel,
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useCompanyData } from "@/hooks/useCompanyData";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Définir des types distincts pour les éléments de menu
 type BaseMenuItem = {
@@ -29,12 +30,12 @@ type MenuItem = InternalMenuItem | ExternalMenuItem;
 
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [loading, setLoading] = useState(true);
   const [hasPaid, setHasPaid] = useState(false);
   const [isValidated, setIsValidated] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
   const { companyData } = useCompanyData();
+  const { user, signOut } = useAuth();
 
   useEffect(() => {
     // Handle responsiveness - close sidebar on small screens by default
@@ -57,82 +58,27 @@ const DashboardLayout = () => {
   }, []);
 
   useEffect(() => {
-    const checkAuth = async () => {
+    const fetchPaymentAndValidationStatus = async () => {
+      if (!user) return;
+
       try {
-        console.log('Checking auth for path:', location.pathname);
+        console.log('DashboardLayout: Fetching payment and validation status');
         
-        const {
-          data: {
-            session
-          }
-        } = await supabase.auth.getSession();
-        
-        if (!session) {
-          console.log('No session found, redirecting to login');
-          navigate('/login');
-          return;
-        }
-
-        console.log('Session found, checking eligibility and payment status');
-
-        // Check payment status and validation status
-        const {
-          data: submission
-        } = await supabase.from('label_submissions').select('payment_status, valide').eq('user_id', session.user.id).maybeSingle();
+        const { data: submission } = await supabase
+          .from('label_submissions')
+          .select('payment_status, valide')
+          .eq('user_id', user.id)
+          .maybeSingle();
         
         setHasPaid(submission?.payment_status === 'paid');
         setIsValidated(submission?.valide === true);
-
-        // Check for eligibility submission - simplifié
-        if (location.pathname !== '/dashboard/eligibility') {
-          const {
-            data: eligibilitySubmission,
-            error
-          } = await supabase.from('eligibility_submissions').select('legal_form').eq('user_id', session.user.id).maybeSingle();
-          
-          if (error && error.code !== 'PGRST116') {
-            console.error('Error checking eligibility:', error);
-            throw error;
-          }
-          
-          // Rediriger vers l'éligibilité si pas de soumission ou si forme juridique non éligible
-          if (!eligibilitySubmission) {
-            console.log('No eligibility submission found, redirecting to eligibility');
-            navigate('/dashboard/eligibility');
-            return;
-          }
-          
-          if (eligibilitySubmission && ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"].includes(eligibilitySubmission.legal_form)) {
-            console.log('Ineligible legal form, redirecting to eligibility');
-            navigate('/dashboard/eligibility');
-            return;
-          }
-        }
-
-        console.log('Auth check completed successfully');
       } catch (error) {
-        console.error('Error in auth check:', error);
-        toast.error("Une erreur est survenue lors de la vérification de votre éligibilité.");
-      } finally {
-        setLoading(false);
+        console.error('DashboardLayout: Error fetching submission data:', error);
       }
     };
 
-    checkAuth();
-
-    // Subscribe to auth changes
-    const {
-      data: {
-        subscription
-      }
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      console.log('Auth state changed:', event);
-      if (event === 'SIGNED_OUT' || !session) {
-        navigate('/login');
-      }
-    });
-    return () => subscription.unsubscribe();
-  }, [navigate, location.pathname]);
+    fetchPaymentAndValidationStatus();
+  }, [user]);
 
   // Déterminer l'URL du kit media en fonction de l'échelon
   const getKitMediaUrl = () => {
@@ -217,17 +163,8 @@ const DashboardLayout = () => {
       ] 
     : menuItemsWithKitMedia;
 
-  // Afficher un état de chargement amélioré
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#35DA56] mx-auto mb-4"></div>
-        <p className="text-gray-600">Vérification des accès...</p>
-      </div>
-    </div>;
-  }
-
-  return <div className="min-h-screen bg-background">
+  return (
+    <div className="min-h-screen bg-background">
       {/* Fixed positioned sidebar with higher z-index to ensure it's above content on small screens */}
       <div className={`fixed top-0 left-0 h-full bg-primary transition-all duration-300 ease-in-out ${sidebarOpen ? "w-64" : "w-20"} z-40 shadow-lg`}>
         <div className="flex items-center justify-between p-4 h-16 border-b border-white/10 backdrop-blur-sm bg-primary/95">
@@ -283,9 +220,9 @@ const DashboardLayout = () => {
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-600 hover:bg-red-50/70" onClick={async () => {
-                await supabase.auth.signOut();
-                navigate("/login");
-              }}>
+                  await signOut();
+                  navigate("/login");
+                }}>
                   <LogOut className="mr-2 h-4 w-4" />
                   <span>Se déconnecter</span>
                 </DropdownMenuItem>
@@ -299,7 +236,8 @@ const DashboardLayout = () => {
           </div>
         </main>
       </div>
-    </div>;
+    </div>
+  );
 };
 
 export default DashboardLayout;
