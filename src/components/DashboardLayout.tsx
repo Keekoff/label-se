@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, Settings, User, ArrowLeft, ArrowRight, LogOut, Receipt, Upload, HelpCircle, FileText } from "lucide-react";
@@ -31,6 +30,7 @@ type MenuItem = InternalMenuItem | ExternalMenuItem;
 const DashboardLayout = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [authChecked, setAuthChecked] = useState(false);
   const [hasPaid, setHasPaid] = useState(false);
   const [isValidated, setIsValidated] = useState(false);
   const navigate = useNavigate();
@@ -65,10 +65,14 @@ const DashboardLayout = () => {
             session
           }
         } = await supabase.auth.getSession();
+        
         if (!session) {
           navigate('/login');
           return;
         }
+
+        // Marquer l'authentification comme vérifiée
+        setAuthChecked(true);
 
         // Check payment status and validation status
         const {
@@ -78,21 +82,27 @@ const DashboardLayout = () => {
         setHasPaid(submission?.payment_status === 'paid');
         setIsValidated(submission?.valide === true);
 
-        // Check for eligibility submission
-        const {
-          data: eligibilitySubmission,
-          error
-        } = await supabase.from('eligibility_submissions').select('legal_form').eq('user_id', session.user.id).single();
-        if (error && error.code !== 'PGRST116') {
-          throw error;
-        }
-        if (!eligibilitySubmission && location.pathname !== '/dashboard/eligibility') {
-          navigate('/dashboard/eligibility');
-          return;
-        }
-        if (eligibilitySubmission && ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"].includes(eligibilitySubmission.legal_form)) {
-          navigate('/dashboard/eligibility');
-          return;
+        // Check for eligibility submission seulement si on n'est pas déjà sur la page d'éligibilité
+        if (location.pathname !== '/dashboard/eligibility') {
+          const {
+            data: eligibilitySubmission,
+            error
+          } = await supabase.from('eligibility_submissions').select('legal_form').eq('user_id', session.user.id).single();
+          
+          if (error && error.code !== 'PGRST116') {
+            throw error;
+          }
+          
+          // Rediriger vers l'éligibilité seulement si nécessaire
+          if (!eligibilitySubmission) {
+            navigate('/dashboard/eligibility');
+            return;
+          }
+          
+          if (eligibilitySubmission && ["Association Loi 1901", "EI (auto-entrepreneur, micro-entreprise)"].includes(eligibilitySubmission.legal_form)) {
+            navigate('/dashboard/eligibility');
+            return;
+          }
         }
       } catch (error) {
         console.error('Error checking eligibility:', error);
@@ -101,7 +111,11 @@ const DashboardLayout = () => {
         setLoading(false);
       }
     };
-    checkAuth();
+
+    // Ne pas refaire la vérification si elle a déjà été faite
+    if (!authChecked) {
+      checkAuth();
+    }
 
     // Subscribe to auth changes
     const {
@@ -114,7 +128,7 @@ const DashboardLayout = () => {
       }
     });
     return () => subscription.unsubscribe();
-  }, [navigate, location.pathname]);
+  }, [navigate, location.pathname, authChecked]);
 
   // Déterminer l'URL du kit media en fonction de l'échelon
   const getKitMediaUrl = () => {
@@ -199,9 +213,13 @@ const DashboardLayout = () => {
       ] 
     : menuItemsWithKitMedia;
 
-  if (loading) {
-    return <div className="min-h-screen flex items-center justify-center">
-      Chargement...
+  // Afficher un état de chargement amélioré
+  if (loading || !authChecked) {
+    return <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-white">
+      <div className="text-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#35DA56] mx-auto mb-4"></div>
+        <p className="text-gray-600">Vérification des accès...</p>
+      </div>
     </div>;
   }
 
