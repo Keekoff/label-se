@@ -52,17 +52,20 @@ const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50/80 px-4">
-      <Button 
-        variant="ghost" 
-        onClick={() => navigate("/")} 
-        className="absolute top-4 left-4 flex items-center gap-1 text-[#27017F] hover:text-[#27017F]/80"
-      >
-        <ArrowLeft size={16} />
-        Retour à l'accueil
-      </Button>
+    <div className="min-h-screen flex flex-col bg-gradient-to-b from-white to-gray-50/80 px-4">
+      <div className="w-full pt-4 pb-2">
+        <Button 
+          variant="ghost" 
+          onClick={() => navigate("/")} 
+          className="flex items-center gap-1 text-[#27017F] hover:text-[#27017F]/80"
+        >
+          <ArrowLeft size={16} />
+          Retour à l'accueil
+        </Button>
+      </div>
       
-      <div className="w-full max-w-md space-y-6 animate-fadeIn">
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="w-full max-w-md space-y-6 animate-fadeIn">
         <div className="text-center mb-6">
           <h1 className="text-3xl font-bold text-[#27017F] mb-2">Startup Engagée</h1>
           <p className="text-gray-600">Rejoignez la communauté des startups responsables</p>
@@ -171,6 +174,7 @@ const Signup = () => {
             </form>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   );
