@@ -165,11 +165,6 @@ const DashboardLayout = () => {
       icon: HelpCircle,
       label: "FAQ",
       path: "/dashboard/faq"
-    }, 
-    {
-      icon: Settings,
-      label: "Paramètres",
-      path: "/dashboard/settings"
     }
   ];
 
@@ -279,10 +274,6 @@ const DashboardLayout = () => {
                 <DropdownMenuItem onClick={() => navigate("/dashboard/profil")} className="hover:bg-gray-100/70">
                   <User className="mr-2 h-4 w-4" />
                   <span>Mon profil</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => navigate("/dashboard/settings")} className="hover:bg-gray-100/70">
-                  <Settings className="mr-2 h-4 w-4" />
-                  <span>Paramètres</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="text-red-600 hover:bg-red-50/70" onClick={async () => {
