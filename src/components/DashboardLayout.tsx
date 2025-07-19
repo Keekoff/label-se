@@ -86,7 +86,12 @@ const DashboardLayout = () => {
         if (error && error.code !== 'PGRST116') {
           throw error;
         }
-        if (!eligibilitySubmission && location.pathname !== '/dashboard/eligibility') {
+        
+        // Allow access to FAQ and settings even without eligibility submission
+        const allowedPagesWithoutEligibility = ['/dashboard/faq', '/dashboard/settings'];
+        const isOnAllowedPage = allowedPagesWithoutEligibility.includes(location.pathname);
+        
+        if (!eligibilitySubmission && location.pathname !== '/dashboard/eligibility' && !isOnAllowedPage) {
           navigate('/dashboard/eligibility');
           return;
         }
@@ -224,10 +229,30 @@ const DashboardLayout = () => {
               className={`w-full justify-start text-white hover:bg-[#8985FF] ${!sidebarOpen && "justify-center"} ${
                 'path' in item && location.pathname === item.path ? "bg-[#35DA56]" : ""
               } transition-all duration-300`} 
-              onClick={() => {
+              onClick={async () => {
                 if ('isExternalLink' in item && item.isExternalLink) {
                   item.onClick();
                 } else if ('path' in item) {
+                  // Si l'utilisateur clique sur "Tableau de bord" et n'a pas rempli le formulaire d'éligibilité
+                  if (item.path === "/dashboard" && item.label === "Tableau de bord") {
+                    try {
+                      const { data: { session } } = await supabase.auth.getSession();
+                      if (session) {
+                        const { data: eligibilitySubmission } = await supabase
+                          .from('eligibility_submissions')
+                          .select('legal_form')
+                          .eq('user_id', session.user.id)
+                          .single();
+                        
+                        if (!eligibilitySubmission) {
+                          navigate('/dashboard/eligibility');
+                          return;
+                        }
+                      }
+                    } catch (error) {
+                      console.error('Error checking eligibility:', error);
+                    }
+                  }
                   navigate(item.path);
                 }
               }}
