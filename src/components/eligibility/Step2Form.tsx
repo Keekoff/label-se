@@ -165,7 +165,7 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
 
         <div>
           <Label>
-            Quel est le nombre de collaborateurs de votre structure ? <span className="text-red-500">*</span>
+            Quel est le nombre de collaborateurs dans votre structure ? <span className="text-red-500">*</span>
           </Label>
           <RadioGroup
             value={formData.employeeCount}
