@@ -44,7 +44,11 @@ const Step1Form = ({ initialData, onSubmit }: Step1FormProps) => {
     if (!formData.firstName) newErrors.firstName = "Ce champ est requis";
     if (!formData.lastName) newErrors.lastName = "Ce champ est requis";
     if (!formData.companyName) newErrors.companyName = "Ce champ est requis";
-    if (!formData.siret) newErrors.siret = "Ce champ est requis";
+    if (!formData.siret) {
+      newErrors.siret = "Ce champ est requis";
+    } else if (!/^\d{14}$/.test(formData.siret)) {
+      newErrors.siret = "Le SIRET doit contenir exactement 14 chiffres";
+    }
     if (!formData.legalForm) newErrors.legalForm = "Ce champ est requis";
     if (!formData.isMissionDriven) newErrors.isMissionDriven = "Ce champ est requis";
 
@@ -118,8 +122,13 @@ const Step1Form = ({ initialData, onSubmit }: Step1FormProps) => {
           <Input
             id="siret"
             value={formData.siret}
-            onChange={(e) => setFormData(prev => ({ ...prev, siret: e.target.value }))}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, '').slice(0, 14);
+              setFormData(prev => ({ ...prev, siret: value }));
+            }}
             className="mt-1"
+            placeholder="12345678901234"
+            maxLength={14}
           />
           <p className="text-sm text-gray-500 mt-1">
             Nous en avons besoin pour vérifier votre éligibilité via le code NAF. Si vous avez un doute, vous pouvez retrouver cette information sur Société.com.
