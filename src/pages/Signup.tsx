@@ -142,11 +142,11 @@ const Signup = () => {
                   className="text-sm text-gray-700 leading-tight"
                 >
                   J'accepte les{" "}
-                  <a href="#" className="text-[#27017F] hover:underline">
+                  <a href="/terms" target="_blank" className="text-[#27017F] hover:underline">
                     conditions d'utilisation
                   </a>{" "}
                   et la{" "}
-                  <a href="#" className="text-[#27017F] hover:underline">
+                  <a href="/privacy" target="_blank" className="text-[#27017F] hover:underline">
                     politique de confidentialité
                   </a>
                 </label>

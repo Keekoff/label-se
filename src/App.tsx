@@ -14,6 +14,8 @@ import Justificatifs from "./pages/Dashboard/Justificatifs";
 import Payments from "./pages/Dashboard/Payments";
 import Profil from "./pages/Dashboard/Profil";
 import Faq from "./pages/Faq";
+import TermsOfService from "./pages/TermsOfService";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as SonnerToaster } from "sonner";
 
@@ -36,6 +38,8 @@ function App() {
           <Route path="settings" element={<div>Settings Page</div>} />
           <Route path="faq" element={<Faq />} />
         </Route>
+        <Route path="/terms" element={<TermsOfService />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/404" element={<NotFound />} />
         <Route path="*" element={<Navigate to="/404" replace />} />
       </Routes>
