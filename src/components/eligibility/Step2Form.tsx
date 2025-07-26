@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { FormData } from "@/types/eligibility";
 import { ArrowLeft } from "lucide-react";
@@ -53,6 +54,7 @@ const employeeCounts = [
 const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
   const [formData, setFormData] = useState({
     sectors: initialData.sectors,
+    customSector: initialData.customSector,
     growthStage: initialData.growthStage,
     employeeCount: initialData.employeeCount,
   });
@@ -62,6 +64,9 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
     const newErrors: Record<string, string> = {};
     
     if (formData.sectors.length === 0) newErrors.sectors = "Veuillez sélectionner au moins un secteur";
+    if (formData.sectors.includes("Autre") && !formData.customSector.trim()) {
+      newErrors.customSector = "Veuillez préciser votre secteur d'activité";
+    }
     if (!formData.growthStage) newErrors.growthStage = "Ce champ est requis";
     if (!formData.employeeCount) newErrors.employeeCount = "Ce champ est requis";
 
@@ -113,6 +118,25 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
               </div>
             ))}
           </div>
+          
+          {formData.sectors.includes("Autre") && (
+            <div className="mt-4">
+              <Label htmlFor="customSector">
+                Précisez votre secteur d'activité <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="customSector"
+                value={formData.customSector}
+                onChange={(e) => setFormData(prev => ({ ...prev, customSector: e.target.value }))}
+                className="mt-1"
+                placeholder="Entrez votre secteur d'activité"
+              />
+              {errors.customSector && (
+                <span className="text-sm text-red-500">{errors.customSector}</span>
+              )}
+            </div>
+          )}
+          
           {errors.sectors && (
             <span className="text-sm text-red-500">{errors.sectors}</span>
           )}

@@ -41,6 +41,7 @@ const EligibilityForm = () => {
     
     // Step 2
     sectors: [],
+    customSector: "",
     growthStage: "",
     employeeCount: "",
     

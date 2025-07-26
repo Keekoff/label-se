@@ -10,6 +10,7 @@ export interface FormData {
   
   // Step 2
   sectors: string[];
+  customSector: string;
   growthStage: string;
   employeeCount: string;
   
