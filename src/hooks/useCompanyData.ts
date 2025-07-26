@@ -45,26 +45,40 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.user) return;
 
-        const { data, error } = await supabase
+        // Vérifier d'abord s'il y a une soumission dans label_submissions
+        const { data: labelData, error: labelError } = await supabase
           .from('label_submissions')
           .select('nom_entreprise, status, payment_status')
           .eq('user_id', session.user.id)
           .maybeSingle();
         
-        if (error) throw error;
+        if (labelError) throw labelError;
         
-        if (data) {
-          setCompanyName(data.nom_entreprise);
-          setHasSubmittedForm(data.status !== 'draft');
-          setIsPremium(data.payment_status === 'paid');
-          console.log(`Nom d'entreprise récupéré: ${data.nom_entreprise}`);
-          console.log(`Statut du formulaire: ${data.status}`);
-          console.log(`Statut premium: ${data.payment_status === 'paid'}`);
+        if (labelData) {
+          setCompanyName(labelData.nom_entreprise);
+          setHasSubmittedForm(labelData.status !== 'draft');
+          setIsPremium(labelData.payment_status === 'paid');
+          console.log(`Nom d'entreprise récupéré: ${labelData.nom_entreprise}`);
+          console.log(`Statut du formulaire: ${labelData.status}`);
+          console.log(`Statut premium: ${labelData.payment_status === 'paid'}`);
         } else {
-          console.log('Aucun nom d\'entreprise trouvé');
+          // Si pas de soumission dans label_submissions, vérifier eligibility_submissions
+          const { data: eligibilityData, error: eligibilityError } = await supabase
+            .from('eligibility_submissions')
+            .select('legal_form')
+            .eq('user_id', session.user.id)
+            .single();
+          
+          if (eligibilityError) {
+            console.log('Aucune soumission d\'éligibilité trouvée');
+          } else if (eligibilityData) {
+            // L'utilisateur a soumis le formulaire d'éligibilité mais pas encore commencé le formulaire de labélisation
+            setHasSubmittedForm(true);
+            console.log('Formulaire d\'éligibilité soumis, redirection vers le formulaire de labélisation');
+          }
         }
       } catch (error) {
-        console.error('Error fetching company name:', error);
+        console.error('Error fetching company data:', error);
       }
     };
 

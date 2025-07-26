@@ -176,10 +176,35 @@ const Dashboard = () => {
               Pour accéder à votre tableau de bord, vous devez d'abord remplir le formulaire d'éligibilité.
             </p>
             <button
-              onClick={() => navigate('/eligibility')}
+              onClick={() => navigate('/dashboard/eligibility')}
               className="bg-[#35DA56] text-white px-6 py-3 rounded-lg hover:bg-[#35DA56]/90 transition-colors"
             >
               Commencer le formulaire
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Si l'utilisateur a soumis le formulaire d'éligibilité mais n'a pas encore de soumission dans label_submissions
+  // Rediriger vers le formulaire de labélisation
+  if (hasSubmittedForm && !companyName) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <h1 className="text-2xl font-semibold text-[#27017F] mb-4">
+              Félicitations ! Vous êtes éligible
+            </h1>
+            <p className="text-gray-600 mb-8">
+              Vous pouvez maintenant remplir le formulaire de labélisation pour obtenir votre certification.
+            </p>
+            <button
+              onClick={() => navigate('/dashboard/form')}
+              className="bg-[#35DA56] text-white px-6 py-3 rounded-lg hover:bg-[#35DA56]/90 transition-colors"
+            >
+              Commencer le formulaire de labélisation
             </button>
           </div>
         </div>
