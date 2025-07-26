@@ -131,11 +131,11 @@ const Login = () => {
         
         <p className="text-center text-sm text-gray-500 mt-6">
           En vous connectant, vous acceptez nos{" "}
-          <a href="#" className="text-[#27017F] hover:text-[#27017F]/80">
+          <a href="/terms" target="_blank" className="text-[#27017F] hover:text-[#27017F]/80">
             Conditions d'utilisation
           </a>{" "}
           et notre{" "}
-          <a href="#" className="text-[#27017F] hover:text-[#27017F]/80">
+          <a href="/privacy" target="_blank" className="text-[#27017F] hover:text-[#27017F]/80">
             Politique de confidentialité
           </a>
         </p>
