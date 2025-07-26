@@ -55,6 +55,7 @@ const implementedActions = [
   "Des actions perfectibles",
   "Une feuille de route d'actions concrètes",
   "Nous avons déjà mesuré les résultats de nos actions",
+  "Nous n'avons rien mis en oeuvre",
 ];
 
 const certificationStatuses = [
