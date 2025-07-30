@@ -89,8 +89,11 @@ const FormThanks = ({
   };
 
   return <div className="max-w-4xl mx-auto text-center space-y-8">
-      <h2 className="text-2xl font-semibold">Nous avons bien reçu votre formulaire, merci !</h2>
-      <p className="text-gray-600">Vous devez maintenant procéder au paiement pour accéder à la liste des pièces justificatives à nous fournir pour valider votre labélisation.</p>
+      <h2 className="text-2xl font-semibold">Nous avons bien reçu votre candidature, merci !</h2>
+      <div className="text-gray-600 space-y-2">
+        <p>Vous devez maintenant procéder au paiement pour lancer l'audit de vos réponses et obtenir le label Startup Engagée.</p>
+        <p>Vous recevrez ensuite la liste des pièces justificatives à nous transmettre pour valider les éléments déclarés dans votre questionnaire.</p>
+      </div>
 
       <Alert className="bg-[#27017F]/5 border border-[#27017F]/20">
         <Calculator className="h-5 w-5 text-[#27017F]" />
