@@ -122,10 +122,7 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h2 className="text-2xl font-semibold mb-2">Partie 3 : Maîtrise d'impact environnemental & développement durable</h2>
-        <p className="text-gray-600 mb-4">
-          Les questions suivantes sont relatives aux actions déployées pour limiter l'empreinte écologique.
-        </p>
+        <h2 className="text-2xl font-semibold mb-4">Partie 3 : Maîtrise d'impact environnemental & développement durable</h2>
         <div className="bg-gray-50 p-4 rounded-lg space-y-3">
           <p className="text-gray-700">
             Cette partie porte sur les actions mises en place pour mesurer, limiter et réduire l'empreinte
