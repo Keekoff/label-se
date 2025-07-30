@@ -82,8 +82,17 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h2 className="text-2xl font-semibold mb-2">Partie 1 : Gouvernance interne juste et inclusive</h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 mb-4">
           Les questions suivantes concernent la gestion interne et la culture de l'entreprise, particulièrement la lutte contre les discriminations et les conditions de travail.
+        </p>
+        <p className="text-gray-600">
+          Dans cette première partie, nous nous intéressons à la manière dont votre entreprise est
+          organisée en interne, et à la façon dont elle prend soin de ses équipes.
+          L'objectif : évaluer si votre culture managériale est saine, équitable et inclusive - et comment
+          vous luttez concrètement contre les discriminations, tout en garantissant de bonnes
+          conditions de travail.
+          Toutes vos réponses devront être justifiées par des documents ou éléments concrets : le
+          label repose sur des engagements réels, et non déclaratifs.
         </p>
       </div>
 
