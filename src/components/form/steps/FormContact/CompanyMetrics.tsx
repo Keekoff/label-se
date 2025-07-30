@@ -17,7 +17,13 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = 
 
   const validate = () => {
     const newErrors: Record<string, string> = {};
-    if (!formState?.foundingYear?.trim()) newErrors.foundingYear = "L'année de création est requise";
+    if (!formState?.foundingYear?.trim()) {
+      newErrors.foundingYear = "L'année de création est requise";
+    } else if (formState.foundingYear.length !== 4) {
+      newErrors.foundingYear = "L'année doit contenir exactement 4 chiffres";
+    } else if (!/^\d{4}$/.test(formState.foundingYear)) {
+      newErrors.foundingYear = "L'année ne peut contenir que des chiffres";
+    }
     if (!formState?.employeeCount) newErrors.employeeCount = "Le nombre de collaborateurs est requis";
     if (!formState?.hasFunding) newErrors.hasFunding = "La réponse est requise";
     if (formState?.hasFunding === "Oui" && !formState?.fundingDetails?.trim()) {
@@ -36,6 +42,11 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = 
   const handleChange = (field: string, value: string) => {
     if (readOnly && field !== "foundingYear") return;
     
+    // Pour l'année de création, n'accepter que les chiffres et limiter à 4 caractères
+    if (field === "foundingYear") {
+      if (!/^\d*$/.test(value) || value.length > 4) return;
+    }
+    
     setFormState((prev: Record<string, any>) => ({
       ...prev,
       [field]: value
@@ -53,9 +64,17 @@ const CompanyMetrics = ({ formState, setFormState, onValidityChange, readOnly = 
           </Label>
           <Input
             id="foundingYear"
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            maxLength={4}
             value={formState?.foundingYear || ""}
             onChange={(e) => handleChange("foundingYear", e.target.value)}
+            className={errors.foundingYear ? "border-red-500" : ""}
           />
+          {errors.foundingYear && (
+            <p className="text-sm text-red-500">{errors.foundingYear}</p>
+          )}
         </div>
 
         <div className="space-y-3">
