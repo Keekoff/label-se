@@ -85,15 +85,21 @@ const FormPart1 = ({ onValidityChange, formState, setFormState }: FormPart1Props
         <p className="text-gray-600 mb-4">
           Les questions suivantes concernent la gestion interne et la culture de l'entreprise, particulièrement la lutte contre les discriminations et les conditions de travail.
         </p>
-        <p className="text-gray-600">
-          Dans cette première partie, nous nous intéressons à la manière dont votre entreprise est
-          organisée en interne, et à la façon dont elle prend soin de ses équipes.
-          L'objectif : évaluer si votre culture managériale est saine, équitable et inclusive - et comment
-          vous luttez concrètement contre les discriminations, tout en garantissant de bonnes
-          conditions de travail.
-          Toutes vos réponses devront être justifiées par des documents ou éléments concrets : le
-          label repose sur des engagements réels, et non déclaratifs.
-        </p>
+        <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+          <p className="text-gray-700">
+            Dans cette première partie, nous nous intéressons à la manière dont votre entreprise est
+            organisée en interne, et à la façon dont elle prend soin de ses équipes.
+          </p>
+          <p className="text-gray-700">
+            <strong>L'objectif :</strong> évaluer si votre culture managériale est saine, équitable et inclusive - et comment
+            vous luttez concrètement contre les discriminations, tout en garantissant de bonnes
+            conditions de travail.
+          </p>
+          <p className="text-gray-700">
+            <strong>Important :</strong> Toutes vos réponses devront être justifiées par des documents ou éléments concrets : le
+            label repose sur des engagements réels, et non déclaratifs.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-8">
