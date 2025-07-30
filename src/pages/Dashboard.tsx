@@ -194,12 +194,26 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center py-12">
-            <h1 className="text-2xl font-semibold text-[#27017F] mb-4">
-              Félicitations ! Vous êtes éligible
-            </h1>
-            <p className="text-gray-600 mb-8">
-              Vous pouvez maintenant remplir le formulaire de labélisation pour obtenir votre certification.
-            </p>
+            <div className="space-y-4">
+              <h1 className="text-2xl font-semibold text-[#27017F] mb-2">
+                Label Startup Engagée
+              </h1>
+              <h2 className="text-xl font-semibold text-[#27017F] mb-4">
+                Félicitations 🎉
+              </h2>
+              <p className="text-gray-600 mb-4">
+                Votre entreprise est éligible pour poursuivre le processus de labellisation
+              </p>
+              <p className="text-gray-600 mb-4">
+                Ce questionnaire est l'étape clé pour évaluer votre maturité sur les sujets ESG, et vous attribuer l'échelon 1, 2 ou 3 du label Startup Engagée.
+              </p>
+              <p className="text-gray-600 mb-4">
+                Vous disposez de 30 jours pour compléter le questionnaire.
+              </p>
+              <p className="text-gray-600 mb-8">
+                Nous restons disponibles si besoin ! Vous pouvez nous écrire à aurelie@keekoff.fr
+              </p>
+            </div>
             <button
               onClick={() => navigate('/dashboard/form')}
               className="bg-[#35DA56] text-white px-6 py-3 rounded-lg hover:bg-[#35DA56]/90 transition-colors"
