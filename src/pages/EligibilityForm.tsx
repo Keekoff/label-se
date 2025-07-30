@@ -15,12 +15,33 @@ const INELIGIBLE_LEGAL_FORMS = ["Association Loi 1901", "EI (auto-entrepreneur, 
 
 const IneligibleMessage = () => (
   <div className="text-center space-y-4">
-    <h2 className="text-xl font-semibold">Vous n'êtes pas encore éligible.</h2>
-    <p className="text-gray-600">
-      Le label Startup Engagée n'est pas adapté aux Associations Loi 1901 et aux EI (auto-entrepreneur, micro-entreprise). 
-      Nous reviendrons vers vous dès que ce sera le cas. Merci de votre confiance.
-    </p>
-    <p className="font-medium">L'équipe KeekOff</p>
+    <h2 className="text-xl font-semibold">Vous n'êtes pas encore éligible</h2>
+    <div className="text-gray-600 space-y-4">
+      <p>
+        Le label Startup Engagée est actuellement réservé aux entreprises françaises constituées en société.
+      </p>
+      <p>
+        Il n'est donc pas encore accessible aux associations Loi 1901 ni aux entreprises individuelles (auto-entrepreneurs et micro-entreprises).
+      </p>
+      <p>
+        Nous vous remercions pour votre intérêt et vous tiendrons informés dès que le label sera ouvert à de nouveaux statuts.
+      </p>
+    </div>
+    <div className="space-y-2">
+      <p className="font-medium">À très bientôt,</p>
+      <p className="font-medium">L'équipe Startup Engagée</p>
+    </div>
+    <div className="mt-6">
+      <p className="text-gray-600 mb-2">En attendant, n'hésitez pas à suivre notre actualité sur LinkedIn</p>
+      <a 
+        href="https://www.linkedin.com/company/startup-engagee/" 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="inline-flex items-center text-[#35DA56] hover:text-[#27017F] transition-colors"
+      >
+        Suivre sur LinkedIn →
+      </a>
+    </div>
   </div>
 );
 
