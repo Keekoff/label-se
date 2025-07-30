@@ -98,9 +98,24 @@ const FormPart2 = ({ onValidityChange, formState, setFormState }: FormPart2Props
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h2 className="text-2xl font-semibold mb-2">Partie 2 : Économique & Sociétal</h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 mb-4">
           Cette section concernera les aspects économiques et sociétaux de votre entreprise.
         </p>
+        <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+          <p className="text-gray-700">
+            Dans cette section, nous nous penchons sur la manière dont votre entreprise crée de la
+            valeur au-delà de son chiffre d'affaires : pour son territoire, ses parties prenantes, et la
+            société dans son ensemble.
+          </p>
+          <p className="text-gray-700">
+            Nous évaluons notamment votre modèle économique, vos engagements en matière
+            d'inclusion, ainsi que vos relations avec vos fournisseurs et partenaires.
+          </p>
+          <p className="text-gray-700">
+            <strong>Important :</strong> Comme pour chaque partie du questionnaire, toutes vos réponses devront être
+            accompagnées d'éléments concrets ou de documents justificatifs.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-8">
