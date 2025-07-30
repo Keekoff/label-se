@@ -123,9 +123,24 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
         <h2 className="text-2xl font-semibold mb-2">Partie 3 : Maîtrise d'impact environnemental & développement durable</h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 mb-4">
           Les questions suivantes sont relatives aux actions déployées pour limiter l'empreinte écologique.
         </p>
+        <div className="bg-gray-50 p-4 rounded-lg space-y-3">
+          <p className="text-gray-700">
+            Cette partie porte sur les actions mises en place pour mesurer, limiter et réduire l'empreinte
+            environnementale de votre activité.
+          </p>
+          <p className="text-gray-700">
+            Qu'il s'agisse de vos bureaux, de vos produits, de vos usages numériques ou de vos
+            déplacements, chaque geste compte pour inscrire votre startup dans une trajectoire plus
+            durable.
+          </p>
+          <p className="text-gray-700">
+            <strong>Important :</strong> Vos réponses doivent s'appuyer sur des éléments tangibles : actions mises en œuvre
+            documents ou outils utilisés au quotidien.
+          </p>
+        </div>
       </div>
 
       <div className="space-y-8">
