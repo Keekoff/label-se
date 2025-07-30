@@ -210,7 +210,7 @@ const Dashboard = () => {
               <p className="text-gray-600 mb-4">
                 Vous disposez de 30 jours pour compléter le questionnaire.
               </p>
-              <p className="text-gray-600 mb-12">
+              <p className="text-gray-600 mb-20">
                 Nous restons disponibles si besoin ! Vous pouvez nous écrire à aurelie@keekoff.fr
               </p>
             </div>
