@@ -194,7 +194,7 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4">
         <div className="max-w-4xl mx-auto">
           <div className="text-center py-12">
-            <div className="space-y-4">
+            <div className="space-y-4 mb-12">
               <h1 className="text-2xl font-semibold text-[#27017F] mb-2">
                 Label Startup Engagée
               </h1>
@@ -210,7 +210,7 @@ const Dashboard = () => {
               <p className="text-gray-600 mb-4">
                 Vous disposez de 30 jours pour compléter le questionnaire.
               </p>
-              <p className="text-gray-600 mb-20">
+              <p className="text-gray-600">
                 Nous restons disponibles si besoin ! Vous pouvez nous écrire à aurelie@keekoff.fr
               </p>
             </div>
