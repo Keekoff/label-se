@@ -104,7 +104,7 @@ const FormThanks = ({
       </Alert>
 
       <Card className="p-6 mt-8 shadow-md bg-white/95 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
-        <h3 className="text-xl font-semibold mb-6">Grille tarifaire</h3>
+        <h3 className="text-xl font-semibold mb-6">Grille tarifaire (prix annuels)</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="font-semibold text-gray-600">Nombre de collaborateurs</div>
           <div className="font-semibold text-gray-600">Prix</div>
@@ -118,7 +118,7 @@ const FormThanks = ({
             </React.Fragment>)}
         </div>
         <div className="mt-6 text-sm text-gray-500">
-          * Prix basé sur votre effectif déclaré
+          Le tarif est calculé en fonction de l'effectif que vous avez déclaré dans votre questionnaire de labellisation
         </div>
       </Card>
 
