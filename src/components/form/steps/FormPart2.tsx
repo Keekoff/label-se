@@ -77,10 +77,7 @@ const FormPart2: React.FC<FormPart2Props> = ({ onValidityChange, formState, setF
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>
-        <h2 className="text-2xl font-semibold mb-2">Partie 2 : Économique & Sociétal</h2>
-        <p className="text-gray-600 mb-4">
-          Cette section concernera les aspects économiques et sociétaux de votre entreprise.
-        </p>
+        <h2 className="text-2xl font-semibold mb-4">Partie 2 : Économique & Sociétal</h2>
         <div className="bg-gray-50 p-4 rounded-lg space-y-3">
           <p className="text-gray-700">
             Dans cette section, nous nous penchons sur la manière dont votre entreprise crée de la
