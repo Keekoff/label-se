@@ -203,7 +203,7 @@ const Dashboard = () => {
 Vous pouvez nous écrire à contact@startupengagee.com</p>
             </div>
             <button onClick={() => navigate('/dashboard/form')} className="bg-[#35DA56] text-white px-6 py-3 rounded-lg hover:bg-[#35DA56]/90 transition-colors">
-              Commencer le formulaire de labélisation
+              Commencer le formulaire de labellisation
             </button>
           </div>
         </div>
