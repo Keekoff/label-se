@@ -41,10 +41,7 @@ const Faq = () => {
       <div className="text-center mb-10">
         <h1 className="text-3xl md:text-4xl font-bold mb-4">FAQ</h1>
         <div className="w-16 h-1 bg-[#35DA56] mx-auto mb-6 rounded-full"></div>
-        <p className="text-gray-600 max-w-2xl mx-auto">
-          Nous avons tenté de répondre à un maximum de questions que vous vous posez sur le label Startup Engagée. 
-          Si vous ne trouvez pas votre réponse, n'hésitez pas à remplir notre formulaire de contact !
-        </p>
+        <p className="text-gray-600 max-w-2xl mx-auto">Nous avons tenté de répondre à un maximum de questions que vous vous posez sur le label Startup Engagée. Si vous ne trouvez pas votre réponse, n'hésitez pas à contact@startupengagee.fr !</p>
       </div>
       
       <div className="relative mb-8 max-w-md mx-auto">
