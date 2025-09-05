@@ -58,7 +58,7 @@ export const SubmissionCard = ({
               <p className="text-[#27017F] font-medium text-sm sm:text-base leading-relaxed">
                 {paymentStatus === 'unpaid' ? (
                   <>
-                    Félicitations, vous avez complété votre demande de labellisation !
+                    <strong>Félicitations, vous avez complété votre demande de labellisation !</strong>
                     <br />
                     Encore une étape pour finaliser votre démarche 🚀
                     <br /><br />
