@@ -53,10 +53,14 @@ const motivations = [
 ];
 
 const implementedActions = [
-  "Des actions perfectibles",
-  "Une feuille de route d'actions concrètes",
-  "Nous avons déjà mesuré les résultats de nos actions",
-  "Nous n'avons rien mis en oeuvre",
+  "Nous n'avons encore rien formalisé, mais nous commençons à y réfléchir",
+  "Nous avons identifié des enjeux importants, mais rien n'est structuré",
+  "Nous avons mis en place des premières actions concrètes",
+  "Nous avons commencé à formaliser nos engagements (charte, objectifs, documentation)",
+  "Nous avons défini une stratégie ou une feuille de route",
+  "Nous mesurons nos actions et suivons des indicateurs régulièrement",
+  "Nous communiquons nos engagements de manière transparente (rapport, site, labels…)",
+  "Nous intégrons notre démarche dans notre modèle économique et nos prises de décision",
 ];
 
 const certificationStatuses = [
@@ -329,7 +333,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
 
         <div>
           <Label>
-            Qu'avez-vous déjà mis en œuvre ? <span className="text-red-500">*</span>
+            Où en êtes-vous dans votre démarche RSE ? <span className="text-red-500">*</span>
           </Label>
           <div className="space-y-2 mt-2">
             {implementedActions.map((action) => (
