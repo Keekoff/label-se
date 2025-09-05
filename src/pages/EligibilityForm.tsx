@@ -74,6 +74,7 @@ const EligibilityForm = () => {
     motivations: [],
     implementedActions: [],
     certificationStatus: "",
+    certificationDetails: "",
     email: "",
     phone: "",
   });

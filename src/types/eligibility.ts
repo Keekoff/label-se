@@ -22,6 +22,7 @@ export interface FormData {
   motivations: string[];
   implementedActions: string[];
   certificationStatus: string;
+  certificationDetails: string;
   email: string;
   phone: string;
 }

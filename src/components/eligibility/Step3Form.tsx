@@ -82,6 +82,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
     motivations: initialData.motivations,
     implementedActions: initialData.implementedActions,
     certificationStatus: initialData.certificationStatus,
+    certificationDetails: initialData.certificationDetails,
     email: initialData.email,
     phone: initialData.phone,
   });
@@ -123,6 +124,9 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
     if (formData.motivations.length === 0) newErrors.motivations = "Veuillez sélectionner au moins une motivation";
     if (formData.implementedActions.length === 0) newErrors.implementedActions = "Ce champ est requis";
     if (!formData.certificationStatus) newErrors.certificationStatus = "Ce champ est requis";
+    if ((formData.certificationStatus === "Oui" || formData.certificationStatus === "C'est en cours") && !formData.certificationDetails.trim()) {
+      newErrors.certificationDetails = "Veuillez préciser quelle(s) procédure(s)";
+    }
     if (!formData.email) newErrors.email = "Ce champ est requis";
     if (!validateEmail(formData.email)) newErrors.email = "Email invalide";
     if (!formData.phone) newErrors.phone = "Ce champ est requis";
@@ -378,6 +382,25 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
               </div>
             ))}
           </RadioGroup>
+          
+          {(formData.certificationStatus === "Oui" || formData.certificationStatus === "C'est en cours") && (
+            <div className="mt-4">
+              <Label htmlFor="certificationDetails">
+                Précisez quelle(s) procédure(s) <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="certificationDetails"
+                value={formData.certificationDetails}
+                onChange={(e) => setFormData(prev => ({ ...prev, certificationDetails: e.target.value }))}
+                className="mt-1"
+                placeholder="Ex: B Corp, EcoVadis, Lucie 26 000..."
+              />
+              {errors.certificationDetails && (
+                <span className="text-sm text-red-500">{errors.certificationDetails}</span>
+              )}
+            </div>
+          )}
+          
           {errors.certificationStatus && (
             <span className="text-sm text-red-500">{errors.certificationStatus}</span>
           )}
