@@ -17,14 +17,13 @@ interface Step3FormProps {
 }
 
 const roles = [
-  "CEO",
-  "Co-fondateur",
-  "Directeur Général",
-  "C-level/Direction",
-  "Manager",
-  "Junior / Alternant / Stagiaire",
-  "Investisseur/Membre du board",
-  "Autre",
+  "Fondateur·rice / Cofondateur·rice",
+  "CEO / Direction générale",
+  "Directeur·rice / Responsable de département",
+  "Chargé·e de mission / Chef·fe de projet",
+  "Collaborateur·rice opérationnel·le",
+  "Alternant·e / Stagiaire",
+  "Autre (merci de préciser)",
 ];
 
 const responsibilities = [
