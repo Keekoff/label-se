@@ -8,6 +8,7 @@ import { SubmissionCard } from "@/components/dashboard/SubmissionCard";
 import { CertificationCard } from "@/components/dashboard/CertificationCard";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { ErrorDisplay } from "@/components/dashboard/ErrorDisplay";
+import NotEligibleNotice from "@/components/dashboard/NotEligibleNotice";
 const Dashboard = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -213,11 +214,17 @@ Vous pouvez nous écrire à contact@startupengagee.com</p>
       <div className="max-w-7xl mx-auto space-y-8">
         <WelcomeHeader firstName={firstName} companyName={companyName} />
         
-        <SubmissionCard paymentStatus={paymentStatus} isLoading={isPaymentLoading} onPayment={handlePayment} />
+        {companyData?.insufficientScore ? (
+          <NotEligibleNotice />
+        ) : (
+          <>
+            <SubmissionCard paymentStatus={paymentStatus} isLoading={isPaymentLoading} onPayment={handlePayment} />
 
-        <CertificationCard companyData={companyData} isPremium={isPremium} />
-        
-        {error ? <ErrorDisplay error={error} errorDetails={errorDetails} companyName={companyName} /> : <DashboardCharts />}
+            <CertificationCard companyData={companyData} isPremium={isPremium} />
+            
+            {error ? <ErrorDisplay error={error} errorDetails={errorDetails} companyName={companyName} /> : <DashboardCharts />}
+          </>
+        )}
       </div>
     </div>;
 };

@@ -14,6 +14,7 @@ export type CompanyData = {
   dateValidation?: string;
   dateFinValidite?: string;
   developpementImpactSocialPositifPercentage?: number;
+  insufficientScore?: boolean;
   criteriaScores?: {
     [key: string]: number;
   };
@@ -144,6 +145,9 @@ export const useCompanyData = (): FetchCompanyDataResult => {
             
           // On conserve les scores des critères tels quels
           criteriaScores: data.criteriaScores || {},
+          
+          // On conserve le champ insufficientScore tel quel
+          insufficientScore: data.insufficientScore || false,
           
           // S'assurer que echelonTexte est bien passé
           echelonTexte: data.echelonTexte || ''

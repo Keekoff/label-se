@@ -22,6 +22,8 @@ type CompanyData = {
   dateFinValidite?: string;
   // Champ spécifique pour le développement d'impact social positif
   developpementImpactSocialPositifPercentage?: number;
+  // Champ pour le score insuffisant
+  insufficientScore?: boolean;
   // Scores des critères pour le radar chart
   criteriaScores?: {
     [key: string]: number;
@@ -114,6 +116,25 @@ Deno.serve(async (req) => {
     // Déboguer spécifiquement la valeur Echelon_texte
     console.log("Valeur de Echelon_texte:", record.fields['Echelon_texte']);
     
+    // Récupération du champ "Score insuffisant"
+    const scoreInsuffisantRaw = record.fields['Score insuffisant'];
+    console.log(`Valeur brute du champ Score insuffisant: ${scoreInsuffisantRaw}`);
+    
+    // Parse robuste du champ "Score insuffisant"
+    let insufficientScore = false;
+    if (scoreInsuffisantRaw !== undefined && scoreInsuffisantRaw !== null) {
+      if (typeof scoreInsuffisantRaw === 'string') {
+        insufficientScore = scoreInsuffisantRaw.toLowerCase().trim() === 'oui';
+      } else if (typeof scoreInsuffisantRaw === 'boolean') {
+        insufficientScore = scoreInsuffisantRaw;
+      } else if (Array.isArray(scoreInsuffisantRaw)) {
+        insufficientScore = scoreInsuffisantRaw.some(val => 
+          typeof val === 'string' && val.toLowerCase().trim() === 'oui'
+        );
+      }
+    }
+    console.log(`Score insuffisant traité: ${insufficientScore}`);
+    
     // Liste des critères pour le radar chart
     const criteriaFields = [
       { name: "Diversité", field: "Score Diversité" },
@@ -167,6 +188,8 @@ Deno.serve(async (req) => {
       logoUrl: record.fields['Logo (from Millésime)']?.[0]?.url || '',
       dateValidation: record.fields['Date validation label'] || '',
       dateFinValidite: record.fields['Date fin validité label'] || '',
+      // Champ pour le score insuffisant
+      insufficientScore: insufficientScore,
       // Scores des critères pour le radar chart
       criteriaScores
     };
