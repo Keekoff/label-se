@@ -141,9 +141,30 @@ const Justificatifs = () => {
     <div className="space-y-6 animate-fadeIn">
       <div>
         <h1 className="text-3xl font-bold">Pièces justificatives</h1>
-        <p className="text-gray-500 mt-2">
-          Veuillez télécharger les documents demandés ci-dessous pour compléter votre dossier
-        </p>
+        <div className="mt-6 space-y-4 text-gray-700 leading-relaxed">
+          <p>
+            Veuillez télécharger les documents demandés ci-dessous pour finaliser votre dossier de labellisation.
+          </p>
+          <p>
+            Afin de garantir la crédibilité du label Startup Engagée, chaque candidature fait l'objet d'un audit basé sur les réponses que vous avez fournies dans le questionnaire.
+          </p>
+          <p>
+            Ces pièces nous permettent simplement de vérifier certains éléments clés de votre démarche, en toute bienveillance.
+          </p>
+          <p>
+            <strong>Pas d'inquiétude :</strong> Nous vous proposons des exemples de justificatifs acceptés, mais la liste n'est pas exhaustive. L'idée est surtout de mieux comprendre votre démarche concrète, quels que soient vos moyens ou votre stade d'avancement.
+          </p>
+          <p>
+            Si vous ne trouvez pas le bon document ou si vous avez un doute, écrivez-nous simplement à{" "}
+            <a href="mailto:bonjour@startupengagee.com" className="text-[#35DA56] hover:text-[#27017F] transition-colors">
+              bonjour@startupengagee.com
+            </a>
+            {" "}- nous sommes là pour vous aider 🙂
+          </p>
+          <p>
+            <strong>L'objectif :</strong> Faire de cette étape est de faire la lumière sur ce que vous avez déjà mis en place et de vous permettre d'obtenir un label aligné avec vos engagements.
+          </p>
+        </div>
       </div>
 
       <FileUploader 
