@@ -15,25 +15,23 @@ interface Step2FormProps {
 }
 
 const sectors = [
-  "Food",
-  "Agro-alimentaire",
-  "Mode/Beauté",
-  "Luxe",
-  "Industrie",
-  "Santé/Pharma",
-  "Banque/Assurance",
-  "Environnement",
-  "Social",
-  "ESS",
-  "Data & IT",
-  "E-commerce",
-  "Legal",
-  "Finance",
-  "Marketing",
-  "Ressources Humaines",
-  "Agence",
-  "Cabinet de conseil",
-  "Autre",
+  "Tech, digital & logiciels",
+  "Conseil, audit & services aux entreprises",
+  "Agroalimentaire & grande consommation",
+  "Banque, assurance & fintech",
+  "Développement durable, énergie & environnement",
+  "Événementiel, culture & médias",
+  "Immobilier, construction & aménagement",
+  "Industrie & fabrication",
+  "Logistique, supply chain & transport",
+  "Mode, luxe & beauté",
+  "Retail, e-commerce & distribution",
+  "Santé, pharmaceutique & bien-être",
+  "Automobile, mobilité & aéronautique",
+  "Service public, éducation & collectivités",
+  "Télécom & infrastructures",
+  "Tourisme, hôtellerie & loisirs",
+  "Autre (merci de préciser)",
 ];
 
 const growthStages = [
@@ -64,7 +62,7 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
     const newErrors: Record<string, string> = {};
     
     if (formData.sectors.length === 0) newErrors.sectors = "Veuillez sélectionner au moins un secteur";
-    if (formData.sectors.includes("Autre") && !formData.customSector.trim()) {
+    if (formData.sectors.includes("Autre (merci de préciser)") && !formData.customSector.trim()) {
       newErrors.customSector = "Veuillez préciser votre secteur d'activité";
     }
     if (!formData.growthStage) newErrors.growthStage = "Ce champ est requis";
@@ -119,7 +117,7 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
             ))}
           </div>
           
-          {formData.sectors.includes("Autre") && (
+          {formData.sectors.includes("Autre (merci de préciser)") && (
             <div className="mt-4">
               <Label htmlFor="customSector">
                 Précisez votre secteur d'activité <span className="text-red-500">*</span>
