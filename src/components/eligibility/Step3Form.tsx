@@ -42,12 +42,14 @@ const responsibilities = [
 ];
 
 const motivations = [
-  "Améliorer l'image de marque de l'entreprise",
-  "Gagner des parts de marché",
-  "Répondre à des appels d'offre",
-  "S'aligner à la concurrence",
-  "Recruter et fidéliser les collaborateurs",
-  "Aligner business et convictions personnelles",
+  "Valoriser notre engagement auprès de nos clients, partenaires ou investisseurs",
+  "Renforcer notre crédibilité et notre image de marque",
+  "Structurer et déployer notre démarche RSE",
+  "Attirer et fidéliser des talents sensibles à ces sujets",
+  "Répondre à des exigences dans des appels d'offres ou dossiers de financement",
+  "Se comparer ou se positionner vis à vis de nos concurrents",
+  "Bénéficier d'un accompagnement et de ressources concrètes pour progresser",
+  "Rejoindre une communauté d'entreprises qui partagent nos valeurs",
 ];
 
 const implementedActions = [
@@ -297,7 +299,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
 
         <div>
           <Label>
-            Motivations à intégrer une démarche de maîtrise d'impact <span className="text-red-500">*</span>
+            Quelles sont vos principales motivations pour obtenir un label RSE ? <span className="text-red-500">*</span>
           </Label>
           <div className="space-y-2 mt-2">
             {motivations.map((motivation) => (
