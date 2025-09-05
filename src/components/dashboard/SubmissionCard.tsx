@@ -64,9 +64,9 @@ export const SubmissionCard = ({
                     <br /><br />
                     Il vous suffit maintenant de procéder au paiement pour :
                     <br />
-                    Accéder à vos résultats détaillés et vos pistes d'amélioration
-                    <br /><br />
-                    Déposer vos justificatifs pour finaliser l'attribution du label
+                    1 - Accéder à vos résultats détaillés et vos pistes d'amélioration
+                    <br />
+                    2 - Déposer vos justificatifs pour finaliser l'attribution du label
                   </>
                 ) : (
                   <>
