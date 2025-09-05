@@ -70,6 +70,7 @@ const EligibilityForm = () => {
     roles: [],
     customRole: "",
     responsibilities: [],
+    customResponsibility: "",
     motivations: [],
     implementedActions: [],
     certificationStatus: "",

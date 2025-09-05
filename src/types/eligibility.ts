@@ -18,6 +18,7 @@ export interface FormData {
   roles: string[];
   customRole: string;
   responsibilities: string[];
+  customResponsibility: string;
   motivations: string[];
   implementedActions: string[];
   certificationStatus: string;

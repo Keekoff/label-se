@@ -27,18 +27,18 @@ const roles = [
 ];
 
 const responsibilities = [
-  "RSE",
-  "Marketing",
-  "Communication",
-  "Sales",
-  "Opérations",
-  "Tech",
-  "Ressources Humaines",
-  "Finance / Comptabilité",
-  "Achats / Moyens Généraux",
-  "Office Manager",
-  "Legal",
-  "Autre",
+  "Stratégie & développement",
+  "Finances, comptabilité & gestion",
+  "RH, QVT & culture d'entreprise",
+  "Communication & marketing",
+  "Produit, tech & innovation",
+  "RSE, impact & développement durable",
+  "Ventes, relation client & développement commercial",
+  "Opérations & gestion des flux",
+  "Achats & services généraux",
+  "Juridique & conformité",
+  "Office management & support interne",
+  "Autre (merci de préciser)",
 ];
 
 const motivations = [
@@ -72,6 +72,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
     roles: initialData.roles,
     customRole: initialData.customRole,
     responsibilities: initialData.responsibilities,
+    customResponsibility: initialData.customResponsibility,
     motivations: initialData.motivations,
     implementedActions: initialData.implementedActions,
     certificationStatus: initialData.certificationStatus,
@@ -110,6 +111,9 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
       newErrors.customRole = "Veuillez préciser votre rôle";
     }
     if (formData.responsibilities.length === 0) newErrors.responsibilities = "Veuillez sélectionner au moins une responsabilité";
+    if (formData.responsibilities.includes("Autre (merci de préciser)") && !formData.customResponsibility.trim()) {
+      newErrors.customResponsibility = "Veuillez préciser votre responsabilité";
+    }
     if (formData.motivations.length === 0) newErrors.motivations = "Veuillez sélectionner au moins une motivation";
     if (formData.implementedActions.length === 0) newErrors.implementedActions = "Ce champ est requis";
     if (!formData.certificationStatus) newErrors.certificationStatus = "Ce champ est requis";
@@ -267,6 +271,25 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
               </div>
             ))}
           </div>
+          
+          {formData.responsibilities.includes("Autre (merci de préciser)") && (
+            <div className="mt-4">
+              <Label htmlFor="customResponsibility">
+                Précisez votre responsabilité <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="customResponsibility"
+                value={formData.customResponsibility}
+                onChange={(e) => setFormData(prev => ({ ...prev, customResponsibility: e.target.value }))}
+                className="mt-1"
+                placeholder="Entrez votre responsabilité"
+              />
+              {errors.customResponsibility && (
+                <span className="text-sm text-red-500">{errors.customResponsibility}</span>
+              )}
+            </div>
+          )}
+          
           {errors.responsibilities && (
             <span className="text-sm text-red-500">{errors.responsibilities}</span>
           )}
