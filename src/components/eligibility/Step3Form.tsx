@@ -193,9 +193,9 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
           <Label>
             Quel est votre rôle dans la structure ? <span className="text-red-500">*</span>
           </Label>
-          <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
             {roles.map((role) => (
-              <div key={role} className="flex items-start space-x-2">
+              <div key={role} className="flex items-start space-x-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
                 <Checkbox
                   id={`role-${role}`}
                   checked={formData.roles.includes(role)}
@@ -203,8 +203,12 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
                     ...prev,
                     roles: toggleArrayItem(prev.roles, role)
                   }))}
+                  className="mt-0.5 flex-shrink-0"
                 />
-                <Label htmlFor={`role-${role}`} className="text-sm">
+                <Label 
+                  htmlFor={`role-${role}`} 
+                  className="text-sm leading-relaxed cursor-pointer flex-1 break-words"
+                >
                   {role}
                 </Label>
               </div>
@@ -219,9 +223,9 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
           <Label>
             De quel(s) sujet(s) êtes-vous en charge ? <span className="text-red-500">*</span>
           </Label>
-          <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
             {responsibilities.map((resp) => (
-              <div key={resp} className="flex items-start space-x-2">
+              <div key={resp} className="flex items-start space-x-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
                 <Checkbox
                   id={`resp-${resp}`}
                   checked={formData.responsibilities.includes(resp)}
@@ -229,8 +233,12 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
                     ...prev,
                     responsibilities: toggleArrayItem(prev.responsibilities, resp)
                   }))}
+                  className="mt-0.5 flex-shrink-0"
                 />
-                <Label htmlFor={`resp-${resp}`} className="text-sm">
+                <Label 
+                  htmlFor={`resp-${resp}`} 
+                  className="text-sm leading-relaxed cursor-pointer flex-1 break-words"
+                >
                   {resp}
                 </Label>
               </div>
@@ -247,7 +255,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
           </Label>
           <div className="space-y-2 mt-2">
             {motivations.map((motivation) => (
-              <div key={motivation} className="flex items-start space-x-2">
+              <div key={motivation} className="flex items-start space-x-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
                 <Checkbox
                   id={`motivation-${motivation}`}
                   checked={formData.motivations.includes(motivation)}
@@ -255,8 +263,12 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
                     ...prev,
                     motivations: toggleArrayItem(prev.motivations, motivation)
                   }))}
+                  className="mt-0.5 flex-shrink-0"
                 />
-                <Label htmlFor={`motivation-${motivation}`} className="text-sm">
+                <Label 
+                  htmlFor={`motivation-${motivation}`} 
+                  className="text-sm leading-relaxed cursor-pointer flex-1 break-words"
+                >
                   {motivation}
                 </Label>
               </div>
@@ -273,7 +285,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
           </Label>
           <div className="space-y-2 mt-2">
             {implementedActions.map((action) => (
-              <div key={action} className="flex items-start space-x-2">
+              <div key={action} className="flex items-start space-x-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
                 <Checkbox
                   id={`action-${action}`}
                   checked={formData.implementedActions.includes(action)}
@@ -281,8 +293,12 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
                     ...prev,
                     implementedActions: toggleArrayItem(prev.implementedActions, action)
                   }))}
+                  className="mt-0.5 flex-shrink-0"
                 />
-                <Label htmlFor={`action-${action}`} className="text-sm">
+                <Label 
+                  htmlFor={`action-${action}`} 
+                  className="text-sm leading-relaxed cursor-pointer flex-1 break-words"
+                >
                   {action}
                 </Label>
               </div>
@@ -315,7 +331,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
             <Label htmlFor="email">
               Votre email <span className="text-red-500">*</span>
