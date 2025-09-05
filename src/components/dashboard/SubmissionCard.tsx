@@ -58,13 +58,15 @@ export const SubmissionCard = ({
               <p className="text-[#27017F] font-medium text-sm sm:text-base leading-relaxed">
                 {paymentStatus === 'unpaid' ? (
                   <>
-                    Vous avez rempli votre formulaire de demande de label, bravo ! 🥳
+                    Félicitations, vous avez complété votre demande de labellisation !
+                    <br />
+                    Encore une étape pour finaliser votre démarche 🚀
                     <br /><br />
-                    Maintenant, veuillez procéder au paiement pour :
+                    Il vous suffit maintenant de procéder au paiement pour :
                     <br />
-                    1 / Accéder à vos performances et pistes d'améliorations
-                    <br />
-                    2 / Partager vos documents pour valider votre demande de label
+                    Accéder à vos résultats détaillés et vos pistes d'amélioration
+                    <br /><br />
+                    Déposer vos justificatifs pour finaliser l'attribution du label
                   </>
                 ) : (
                   <>
