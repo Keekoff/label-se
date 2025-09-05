@@ -68,6 +68,7 @@ const EligibilityForm = () => {
     
     // Step 3
     roles: [],
+    customRole: "",
     responsibilities: [],
     motivations: [],
     implementedActions: [],

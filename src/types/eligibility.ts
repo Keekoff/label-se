@@ -16,6 +16,7 @@ export interface FormData {
   
   // Step 3
   roles: string[];
+  customRole: string;
   responsibilities: string[];
   motivations: string[];
   implementedActions: string[];

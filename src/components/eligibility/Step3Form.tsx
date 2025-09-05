@@ -70,6 +70,7 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
   const [userEmail, setUserEmail] = useState<string>("");
   const [formData, setFormData] = useState({
     roles: initialData.roles,
+    customRole: initialData.customRole,
     responsibilities: initialData.responsibilities,
     motivations: initialData.motivations,
     implementedActions: initialData.implementedActions,
@@ -105,6 +106,9 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
     const newErrors: Record<string, string> = {};
     
     if (formData.roles.length === 0) newErrors.roles = "Veuillez sélectionner au moins un rôle";
+    if (formData.roles.includes("Autre (merci de préciser)") && !formData.customRole.trim()) {
+      newErrors.customRole = "Veuillez préciser votre rôle";
+    }
     if (formData.responsibilities.length === 0) newErrors.responsibilities = "Veuillez sélectionner au moins une responsabilité";
     if (formData.motivations.length === 0) newErrors.motivations = "Veuillez sélectionner au moins une motivation";
     if (formData.implementedActions.length === 0) newErrors.implementedActions = "Ce champ est requis";
@@ -214,6 +218,25 @@ const Step3Form = ({ initialData, onSubmit, onBack }: Step3FormProps) => {
               </div>
             ))}
           </div>
+          
+          {formData.roles.includes("Autre (merci de préciser)") && (
+            <div className="mt-4">
+              <Label htmlFor="customRole">
+                Précisez votre rôle <span className="text-red-500">*</span>
+              </Label>
+              <Input
+                id="customRole"
+                value={formData.customRole}
+                onChange={(e) => setFormData(prev => ({ ...prev, customRole: e.target.value }))}
+                className="mt-1"
+                placeholder="Entrez votre rôle"
+              />
+              {errors.customRole && (
+                <span className="text-sm text-red-500">{errors.customRole}</span>
+              )}
+            </div>
+          )}
+          
           {errors.roles && (
             <span className="text-sm text-red-500">{errors.roles}</span>
           )}
