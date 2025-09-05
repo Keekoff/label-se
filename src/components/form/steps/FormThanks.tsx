@@ -17,16 +17,16 @@ interface FormThanksProps {
 
 const pricingTiers = [{
   range: "0 à 10 salariés",
-  price: "99€ HT"
+  price: "129€"
 }, {
   range: "11 à 50 salariés",
-  price: "199€ HT"
+  price: "299€"
 }, {
   range: "51 à 100 salariés",
-  price: "249€ HT"
+  price: "499€"
 }, {
   range: "Plus de 100 salariés",
-  price: "349€ HT"
+  price: "699€"
 }];
 
 const getPricingTier = (employeeCount: string) => {
@@ -104,7 +104,7 @@ const FormThanks = ({
       </Alert>
 
       <Card className="p-6 mt-8 shadow-md bg-white/95 backdrop-blur-sm hover:shadow-lg transition-all duration-300">
-        <h3 className="text-xl font-semibold mb-6">Grille tarifaire (prix annuels)</h3>
+        <h3 className="text-xl font-semibold mb-6">Grille tarifaire (Montants annuels HT)</h3>
         <div className="grid grid-cols-2 gap-4">
           <div className="font-semibold text-gray-600">Nombre de collaborateurs</div>
           <div className="font-semibold text-gray-600">Prix</div>
