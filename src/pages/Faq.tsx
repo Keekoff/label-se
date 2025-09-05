@@ -40,7 +40,7 @@ const faqItems = [
   },
   {
     question: "Combien ça coûte de se faire labelliser ?",
-    answer: "Nous avons fait le choix d'indexer le prix de l'audit de labellisation sur le nombre de collaborateurs. Cela nous paraît juste et cohérent avec le niveau de maturité attendu sur les sujets RSE selon la taille de l'entreprise.\nTarifs 2025 (hors taxe) :\n- Pour une entreprise de 0 à 10 collaborateurs : 99 €\n- Pour une entreprise de 10 à 49 collaborateurs : 199 €\n- Pour une entreprise de 50 à 99 collaborateurs : 249 €\n- Pour une entreprise de plus de 100 collaborateurs : 399 €\nCe tarif volontairement raisonnable vise à rendre le label accessible au plus grand nombre.\n\nIl est payant car nos équipes consacrent un temps réel à l'audit des pièces justificatives, ainsi qu'au suivi individualisé des demandes d'accompagnement des entreprises candidates."
+    answer: "Nous avons fait le choix d'indexer le prix de l'audit de labellisation sur le nombre de collaborateurs. Cela nous paraît juste et cohérent avec le niveau de maturité attendu sur les sujets RSE selon la taille de l'entreprise.\nTarifs 2025 (hors taxe) :\n- Pour une entreprise de 0 à 10 collaborateurs : 129 €\n- Pour une entreprise de 11 à 49 collaborateurs : 299 €\n- Pour une entreprise de 50 à 99 collaborateurs : 499 €\n- Pour une entreprise de plus de 100 collaborateurs : 699 €\nCe tarif volontairement raisonnable vise à rendre le label accessible au plus grand nombre.\n\nIl est payant car nos équipes consacrent un temps réel à l'audit des pièces justificatives, ainsi qu'au suivi individualisé des demandes d'accompagnement des entreprises candidates."
   },
   {
     question: "Quelle est la durée de validité du label ?",
