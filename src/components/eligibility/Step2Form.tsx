@@ -44,7 +44,7 @@ const growthStages = [
 
 const employeeCounts = [
   "0-10",
-  "10-49",
+  "11-49",
   "50-99",
   "100 et plus",
 ];
