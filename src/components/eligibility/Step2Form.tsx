@@ -35,11 +35,12 @@ const sectors = [
 ];
 
 const growthStages = [
-  "Amorçage",
-  "Early stage",
-  "Pre-seed",
-  "Seed",
-  "Late stage",
+  "Idée en cours de validation (pas encore de création officielle)",
+  "Entreprise récemment créée (moins de 12 mois)",
+  "En phase de démarrage (CA < 100 000 €)",
+  "En croissance (CA entre 100 000 € et 1M €)",
+  "En structuration (CA > 1M €)",
+  "Pré-série A ou post-levée de fonds",
 ];
 
 const employeeCounts = [
@@ -143,7 +144,7 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
 
         <div>
           <Label>
-            Quel est le niveau de croissance de votre startup ? <span className="text-red-500">*</span>
+            À quel stade de développement économique se situe votre entreprise ? <span className="text-red-500">*</span>
           </Label>
           <RadioGroup
             value={formData.growthStage}
