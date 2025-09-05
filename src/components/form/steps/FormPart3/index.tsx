@@ -34,6 +34,14 @@ const FormPart3 = ({ onValidityChange, formState, setFormState }: FormPart3Props
     setFormState({ ...formState, ...updatedAnswers });
   };
 
+  // Check form validity whenever answers change
+  useEffect(() => {
+    const isValid = QUESTIONS.every(question => 
+      answers[question.id] && answers[question.id].length > 0
+    );
+    onValidityChange(isValid);
+  }, [answers, onValidityChange]);
+
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div>

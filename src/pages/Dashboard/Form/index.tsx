@@ -44,6 +44,13 @@ const Form = () => {
   const onSubmit = async () => {
     if (isSubmitting) return;
     
+    // Check if all required steps are valid before submission
+    const allStepsValid = stepsValidity.slice(0, 5).every(step => step.isValid); // Steps 1-5 (excluding thanks step)
+    if (!allStepsValid) {
+      console.warn("Cannot submit: not all steps are valid");
+      return;
+    }
+    
     try {
       await handleSubmit();
       // Instead of showing the modal, we now directly move to step 6 (already handled in handleSubmit)
@@ -113,7 +120,11 @@ const Form = () => {
             onNext={handleNext}
             onSave={handleSave}
             onSubmit={onSubmit}
-            isDisabled={currentStep === 1 && !formState.disclaimerAccepted || isSubmitting}
+            isDisabled={
+              (currentStep === 1 && !formState.disclaimerAccepted) || 
+              isSubmitting ||
+              (currentStep === 5 && !stepsValidity.slice(0, 5).every(step => step.isValid)) // Disable submit on step 5 if not all steps valid
+            }
           />
         </div>
       </div>
