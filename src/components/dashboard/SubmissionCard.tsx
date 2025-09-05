@@ -95,7 +95,7 @@ export const SubmissionCard = ({
                   className="bg-white/90 backdrop-blur-sm text-[#27017F] hover:bg-[#27017F] hover:text-white transition-colors duration-300 shadow-md border border-white/60 px-4 sm:px-6 py-3 sm:py-5 h-auto w-full sm:w-auto"
                 >
                   <FileCheck className="mr-2 h-4 w-4 flex-shrink-0" />
-                  <span className="whitespace-normal text-center">Ajouter mes justificatifs</span>
+                  <span className="whitespace-normal text-center">Justificatifs à fournir</span>
                 </Button>
               )}
             </div>
