@@ -99,17 +99,18 @@ const Step2Form = ({ initialData, onSubmit, onBack }: Step2FormProps) => {
           <Label>
             Quel est le secteur d'activité de l'entreprise ? <span className="text-red-500">*</span>
           </Label>
-          <div className="grid grid-cols-2 gap-4 mt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2">
             {sectors.map((sector) => (
-              <div key={sector} className="flex items-start space-x-2">
+              <div key={sector} className="flex items-start space-x-3 p-2 rounded-md hover:bg-muted/50 transition-colors">
                 <Checkbox
                   id={`sector-${sector}`}
                   checked={formData.sectors.includes(sector)}
                   onCheckedChange={() => toggleSector(sector)}
+                  className="mt-0.5 flex-shrink-0"
                 />
                 <Label 
                   htmlFor={`sector-${sector}`} 
-                  className="text-sm leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  className="text-sm leading-relaxed cursor-pointer flex-1 break-words"
                 >
                   {sector}
                 </Label>
