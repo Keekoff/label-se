@@ -4,7 +4,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "diversity",
     title: "Diversité",
-    description: "Votre entreprise est-elle engagée en faveur de la diversité?",
+    description: "Votre entreprise est-elle engagée en faveur de la diversité ?",
     options: [
       {
         value: "option1",
@@ -41,7 +41,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "equality",
     title: "Égalité",
-    description: "Votre entreprise est-elle engagée en faveur de l'égalité?",
+    description: "Votre entreprise est-elle engagée en faveur de l'égalité ?",
     options: [
       {
         value: "option1",
@@ -82,7 +82,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "handicap",
     title: "Handicap",
-    description: "Votre entreprise est-elle engagée en faveur de l'intégration des personnes en situation de handicap?",
+    description: "Votre entreprise est-elle engagée en faveur de l'intégration des personnes en situation de handicap ?",
     options: [
       {
         value: "option1",
@@ -115,7 +115,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "health",
     title: "Santé des salariés/bien-être au travail",
-    description: "Votre entreprise est-elle engagée en faveur de la santé et du bien-être au travail?",
+    description: "Votre entreprise est-elle engagée en faveur de la santé et du bien-être au travail ?",
     options: [
       {
         value: "option1",
@@ -153,7 +153,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "parentality",
     title: "Parentalité",
-    description: "Votre entreprise est-elle engagée en faveur de la parentalité?",
+    description: "Votre entreprise est-elle engagée en faveur de la parentalité ?",
     options: [
       {
         value: "option1",
@@ -193,7 +193,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "training",
     title: "Formation",
-    description: "Votre entreprise est-elle engagée en faveur de la formation?",
+    description: "Votre entreprise est-elle engagée en faveur de la formation ?",
     options: [
       {
         value: "option1",
@@ -234,7 +234,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "csr",
     title: "Politique RSE",
-    description: "Votre entreprise a-t-elle mis en place une politique RSE?",
+    description: "Votre entreprise a-t-elle mis en place une politique RSE ?",
     options: [
       {
         value: "option1",
@@ -270,7 +270,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "privacy",
     title: "Privacy/Data",
-    description: "Votre entreprise est-elle engagée en faveur de la protection des données?",
+    description: "Votre entreprise est-elle engagée en faveur de la protection des données ?",
     options: [
       {
         value: "option1",
@@ -307,7 +307,7 @@ export const QUESTIONS: Question[] = [
   {
     id: "transport",
     title: "Transports",
-    description: "Votre entreprise est-elle engagée en faveur des mobilités durables?",
+    description: "Votre entreprise est-elle engagée en faveur des mobilités durables ?",
     options: [
       {
         value: "option1",
