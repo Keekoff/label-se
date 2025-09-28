@@ -57,7 +57,7 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         
         if (labelData) {
           setCompanyName(labelData.nom_entreprise);
-          setHasSubmittedForm(true); // Si une entrée existe dans label_submissions, le formulaire d'éligibilité a été soumis
+          setHasSubmittedForm(labelData.status !== 'draft');
           setIsPremium(labelData.payment_status === 'paid');
           console.log(`Nom d'entreprise récupéré: ${labelData.nom_entreprise}`);
           console.log(`Statut du formulaire: ${labelData.status}`);

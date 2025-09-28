@@ -114,20 +114,7 @@ const EligibilityForm = () => {
           if (INELIGIBLE_LEGAL_FORMS.includes(submission.legal_form)) {
             setIsIneligible(true);
           } else {
-            // Vérifier s'il y a déjà une soumission dans label_submissions
-            const { data: labelSubmission } = await supabase
-              .from('label_submissions')
-              .select('id')
-              .eq('user_id', session.user.id)
-              .maybeSingle();
-            
-            if (labelSubmission) {
-              // L'utilisateur a déjà commencé le formulaire de labellisation
-              navigate('/dashboard/form');
-            } else {
-              // L'utilisateur doit aller au dashboard pour commencer le formulaire de labellisation
-              navigate('/dashboard');
-            }
+            navigate('/dashboard');
           }
         }
       } catch (error) {
