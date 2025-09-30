@@ -751,6 +751,7 @@ export const useFormSubmission = (
 
   return {
     submissionId,
+    setSubmissionId,
     handleSave,
     handleSubmit,
     isAuthenticated,

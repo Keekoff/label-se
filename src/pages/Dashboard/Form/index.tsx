@@ -19,7 +19,7 @@ const Form = () => {
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(FORM_STEPS);
   const [isLoadingDraft, setIsLoadingDraft] = useState(true);
 
-  const { submissionId, handleSave, handleSubmit, isSubmitting } = useFormSubmission(formState, setCurrentStep);
+  const { submissionId, setSubmissionId, handleSave, handleSubmit, isSubmitting } = useFormSubmission(formState, setCurrentStep);
 
   // Charger les données du draft au démarrage
   useEffect(() => {
@@ -37,6 +37,11 @@ const Form = () => {
         if (error) throw error;
 
         if (data) {
+          // Sauvegarder l'ID de la soumission pour éviter les duplications
+          if (data.id) {
+            setSubmissionId(data.id);
+          }
+          
           // Restaurer l'état du formulaire en mappant les champs de la DB vers le FormState
           const loadedState: FormState = {
             disclaimerAccepted: data.disclaimer_accepted || false,
