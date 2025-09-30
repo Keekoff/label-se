@@ -133,13 +133,6 @@ const Form = () => {
         description: "Veuillez répondre à toutes les questions obligatoires avant de soumettre votre demande.",
         variant: "destructive"
       });
-      
-      // Trouver la première étape invalide et y naviguer
-      const firstInvalidStep = stepsValidity.slice(0, 5).findIndex(step => !step.isValid);
-      if (firstInvalidStep !== -1) {
-        setCurrentStep(firstInvalidStep + 1);
-        window.scrollTo(0, 0);
-      }
       return;
     }
     
