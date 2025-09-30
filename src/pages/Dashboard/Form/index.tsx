@@ -1,6 +1,7 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import StepProgress from "@/components/form/StepProgress";
 import FormDisclaimer from "@/components/form/steps/FormDisclaimer";
 import FormContact from "@/components/form/steps/FormContact";
@@ -18,6 +19,7 @@ const Form = () => {
   const [formState, setFormState] = useState<FormState>(INITIAL_FORM_STATE);
   const [stepsValidity, setStepsValidity] = useState<FormStep[]>(FORM_STEPS);
   const [isLoadingDraft, setIsLoadingDraft] = useState(true);
+  const { toast } = useToast();
 
   const { submissionId, setSubmissionId, handleSave, handleSubmit, isSubmitting } = useFormSubmission(formState, setCurrentStep);
 
@@ -125,7 +127,19 @@ const Form = () => {
     // Check if all required steps are valid before submission
     const allStepsValid = stepsValidity.slice(0, 5).every(step => step.isValid); // Steps 1-5 (excluding thanks step)
     if (!allStepsValid) {
-      console.warn("Cannot submit: not all steps are valid");
+      // Afficher un popup pour informer l'utilisateur
+      toast({
+        title: "Formulaire incomplet",
+        description: "Veuillez répondre à toutes les questions obligatoires avant de soumettre votre demande.",
+        variant: "destructive"
+      });
+      
+      // Trouver la première étape invalide et y naviguer
+      const firstInvalidStep = stepsValidity.slice(0, 5).findIndex(step => !step.isValid);
+      if (firstInvalidStep !== -1) {
+        setCurrentStep(firstInvalidStep + 1);
+        window.scrollTo(0, 0);
+      }
       return;
     }
     
