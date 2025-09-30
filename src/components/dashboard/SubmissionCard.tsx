@@ -10,12 +10,14 @@ interface SubmissionCardProps {
   paymentStatus: 'unpaid' | 'pending' | 'paid' | null;
   isLoading: boolean;
   onPayment: () => void;
+  formStatus?: string | null;
 }
 
 export const SubmissionCard = ({
   paymentStatus,
   isLoading,
-  onPayment
+  onPayment,
+  formStatus
 }: SubmissionCardProps) => {
   const navigate = useNavigate();
   const [isValidated, setIsValidated] = useState(false);

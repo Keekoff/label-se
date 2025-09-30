@@ -27,7 +27,9 @@ export type FetchCompanyDataResult = {
   error: string | null;
   errorDetails: string | null;
   hasSubmittedForm: boolean;
+  isFormCompleted: boolean;
   isPremium: boolean;
+  formStatus: string | null;
 };
 
 export const useCompanyData = (): FetchCompanyDataResult => {
@@ -38,7 +40,9 @@ export const useCompanyData = (): FetchCompanyDataResult => {
   const [error, setError] = useState<string | null>(null);
   const [errorDetails, setErrorDetails] = useState<string | null>(null);
   const [hasSubmittedForm, setHasSubmittedForm] = useState<boolean>(false);
+  const [isFormCompleted, setIsFormCompleted] = useState<boolean>(false);
   const [isPremium, setIsPremium] = useState<boolean>(false);
+  const [formStatus, setFormStatus] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchCompanyName = async () => {
@@ -57,10 +61,13 @@ export const useCompanyData = (): FetchCompanyDataResult => {
         
         if (labelData) {
           setCompanyName(labelData.nom_entreprise);
-          setHasSubmittedForm(labelData.status !== 'draft');
+          setHasSubmittedForm(true); // Dès qu'une entrée existe dans label_submissions
+          setIsFormCompleted(labelData.status !== 'draft'); // Le formulaire est complété si le statut n'est pas 'draft'
           setIsPremium(labelData.payment_status === 'paid');
+          setFormStatus(labelData.status);
           console.log(`Nom d'entreprise récupéré: ${labelData.nom_entreprise}`);
           console.log(`Statut du formulaire: ${labelData.status}`);
+          console.log(`Formulaire complété: ${labelData.status !== 'draft'}`);
           console.log(`Statut premium: ${labelData.payment_status === 'paid'}`);
         } else {
           // Si pas de soumission dans label_submissions, vérifier eligibility_submissions
@@ -178,6 +185,8 @@ export const useCompanyData = (): FetchCompanyDataResult => {
     error,
     errorDetails,
     hasSubmittedForm,
-    isPremium
+    isFormCompleted,
+    isPremium,
+    formStatus
   };
 };

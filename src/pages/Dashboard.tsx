@@ -23,7 +23,9 @@ const Dashboard = () => {
     error,
     errorDetails,
     hasSubmittedForm,
-    isPremium
+    isFormCompleted,
+    isPremium,
+    formStatus
   } = useCompanyData();
 
   // Récupérer le prénom de l'utilisateur
@@ -180,6 +182,33 @@ const Dashboard = () => {
       </div>;
   }
 
+  // Si l'utilisateur a un formulaire en draft, afficher un bouton pour continuer
+  if (hasSubmittedForm && !isFormCompleted && companyName) {
+    return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center py-12">
+            <div className="space-y-4 mb-12">
+              <h1 className="text-2xl font-semibold text-[#27017F] mb-2">
+                Label Startup Engagée
+              </h1>
+              <h2 className="text-xl font-semibold text-[#27017F] mb-4">
+                Formulaire en cours 📝
+              </h2>
+              <p className="text-gray-600 mb-4">Vous avez commencé votre demande de labellisation mais ne l'avez pas encore finalisée.</p>
+              <p className="text-gray-600 mb-4">
+                Cliquez sur le bouton ci-dessous pour continuer là où vous vous êtes arrêté.
+              </p>
+              <p className="text-gray-600">Nous restons disponibles si besoin !
+Vous pouvez nous écrire à contact@startupengagee.com</p>
+            </div>
+            <button onClick={() => navigate('/dashboard/form')} className="bg-[#35DA56] text-white px-6 py-3 rounded-lg hover:bg-[#35DA56]/90 transition-colors">
+              Continuer le formulaire
+            </button>
+          </div>
+        </div>
+      </div>;
+  }
+
   // Si l'utilisateur a soumis le formulaire d'éligibilité mais n'a pas encore de soumission dans label_submissions
   // Rediriger vers le formulaire de labélisation
   if (hasSubmittedForm && !companyName) {
@@ -218,7 +247,7 @@ Vous pouvez nous écrire à contact@startupengagee.com</p>
           <NotEligibleNotice />
         ) : (
           <>
-            <SubmissionCard paymentStatus={paymentStatus} isLoading={isPaymentLoading} onPayment={handlePayment} />
+            <SubmissionCard paymentStatus={paymentStatus} isLoading={isPaymentLoading} onPayment={handlePayment} formStatus={formStatus} />
 
             <CertificationCard companyData={companyData} isPremium={isPremium} />
             
