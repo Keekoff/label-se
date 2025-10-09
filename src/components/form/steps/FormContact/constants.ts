@@ -41,9 +41,9 @@ export const LABEL_LEGAL_FORMS = [
 // Employee count options
 export const EMPLOYEE_COUNTS = [
   "0 à 10",
-  "11 à 49",
-  "50 à 99",
-  "100 et plus"
+  "11 à 50",
+  "51 à 100",
+  "Plus de 100"
 ];
 
 // Funding options
