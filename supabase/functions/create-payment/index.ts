@@ -13,13 +13,13 @@ const getStripeProductId = (employeeCount: string): string => {
   const count = parseInt(employeeCount) || 0;
   
   if (count <= 10) {
-    return 'prod_SVd1sExPwVYNzT'; // moins de 10 collaborateurs
-  } else if (count <= 50) {
-    return 'prod_SVdJmvwjJgTpX0'; // 11 à 50 collaborateurs
-  } else if (count <= 100) {
-    return 'prod_SVdKfWfUg6gNyq'; // 51 à 100 collaborateurs
+    return 'prod_SVd1sExPwVYNzT'; // 0 à 10 collaborateurs
+  } else if (count <= 49) {
+    return 'prod_SVdJmvwjJgTpX0'; // 11 à 49 collaborateurs
+  } else if (count <= 99) {
+    return 'prod_SVdKfWfUg6gNyq'; // 50 à 99 collaborateurs
   } else {
-    return 'prod_SVdM7hUC29aJxi'; // plus de 100 collaborateurs
+    return 'prod_SVdM7hUC29aJxi'; // 100 et plus collaborateurs
   }
 };
 

@@ -19,22 +19,22 @@ const pricingTiers = [{
   range: "0 à 10 salariés",
   price: "129€"
 }, {
-  range: "11 à 50 salariés",
+  range: "11 à 49 salariés",
   price: "299€"
 }, {
-  range: "51 à 100 salariés",
+  range: "50 à 99 salariés",
   price: "499€"
 }, {
-  range: "Plus de 100 salariés",
+  range: "100 et plus salariés",
   price: "699€"
 }];
 
 const getPricingTier = (employeeCount: string) => {
   const count = parseInt(employeeCount);
   if (count <= 10) return "0 à 10 salariés";
-  if (count <= 50) return "11 à 50 salariés";
-  if (count <= 100) return "51 à 100 salariés";
-  return "Plus de 100 salariés";
+  if (count <= 49) return "11 à 49 salariés";
+  if (count <= 99) return "50 à 99 salariés";
+  return "100 et plus salariés";
 };
 
 const FormThanks = ({
