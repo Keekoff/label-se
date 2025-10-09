@@ -239,11 +239,27 @@ Vous pouvez nous écrire à contact@startupengagee.com</p>
         </div>
       </div>;
   }
+  // Fonction helper pour extraire et valider l'échelon
+  const getValidEchelon = (echelonTexte?: string | string[]): number | null => {
+    if (!echelonTexte) return null;
+    
+    const echelonValue = Array.isArray(echelonTexte) 
+      ? echelonTexte[0] 
+      : echelonTexte;
+    
+    const parsed = parseInt(echelonValue);
+    return (!isNaN(parsed) && parsed >= 1) ? parsed : null;
+  };
+
+  // Vérification de l'éligibilité : un échelon valide prime sur insufficientScore
+  const hasValidEchelon = getValidEchelon(companyData?.echelonTexte) !== null;
+  const isIneligible = companyData?.insufficientScore && !hasValidEchelon;
+
   return <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white p-4">
       <div className="max-w-7xl mx-auto space-y-8">
         <WelcomeHeader firstName={firstName} companyName={companyName} />
         
-        {companyData?.insufficientScore ? (
+        {isIneligible ? (
           <NotEligibleNotice />
         ) : (
           <>
