@@ -107,15 +107,19 @@ const Form = () => {
     );
   };
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (currentStep < FORM_STEPS.length) {
+      // Sauvegarder automatiquement avant de passer à l'étape suivante
+      await handleSave();
       setCurrentStep(prev => prev + 1);
       window.scrollTo(0, 0);
     }
   };
 
-  const handlePrevious = () => {
+  const handlePrevious = async () => {
     if (currentStep > 1) {
+      // Sauvegarder automatiquement avant de revenir en arrière
+      await handleSave();
       setCurrentStep(prev => prev - 1);
       window.scrollTo(0, 0);
     }
