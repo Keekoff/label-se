@@ -5,7 +5,7 @@ const PricingSection = () => {
 
   return (
     <section id="tarif" className="py-24">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-8 md:px-12 lg:px-16">
         <div className="bg-white border-2 border-primary rounded-3xl p-10 max-w-md mx-auto text-center shadow-[0_15px_40px_-10px_hsl(var(--primary)/0.15)] relative overflow-hidden">
           {/* Top accent bar */}
           <div className="absolute top-0 left-0 right-0 h-2 bg-accent" />

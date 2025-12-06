@@ -6,7 +6,7 @@ const TrustBar = () => {
 
   return (
     <div className="bg-white py-10 border-b border-gray-100">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-8 md:px-12 lg:px-16">
         <div className="flex flex-wrap justify-center items-center gap-12 md:gap-16">
           {partners.map((partner) => (
             <img

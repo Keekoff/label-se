@@ -5,7 +5,7 @@ const HeroSection = () => {
 
   return (
     <section className="py-16 md:py-20 min-h-[80vh] flex items-center bg-[radial-gradient(circle_at_top_right,hsl(var(--secondary)/0.1),transparent_40%)]">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-8 md:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-[1.2fr_0.8fr] gap-10 lg:gap-16 items-center">
           {/* Text Content */}
           <div className="order-2 lg:order-1 text-center lg:text-left">

@@ -1,7 +1,7 @@
 const ContactSection = () => {
   return (
     <section id="contact" className="py-24 bg-bg-light">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-8 md:px-12 lg:px-16">
         <h2 className="text-3xl md:text-4xl font-bold text-primary text-center mb-8">
           Prêt à démarrer ?
         </h2>
