@@ -23,7 +23,7 @@ const LandingHeader = () => {
 
   return (
     <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-black/5 py-5">
-      <div className="container mx-auto px-6 flex justify-between items-center">
+      <div className="container mx-auto px-8 md:px-12 lg:px-16 flex justify-between items-center">
         <div className="flex items-center gap-2">
           <img 
             src="/images/landing/Logo_LSE_horizontal.jpg" 
@@ -64,7 +64,7 @@ const LandingHeader = () => {
       {/* Mobile Navigation */}
       {isMenuOpen && (
         <nav className="md:hidden bg-white border-t border-black/5 py-4">
-          <div className="container mx-auto px-6 flex flex-col gap-4">
+          <div className="container mx-auto px-8 md:px-12 lg:px-16 flex flex-col gap-4">
             {navLinks.map((link) => (
               <button
                 key={link.href}

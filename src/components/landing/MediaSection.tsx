@@ -24,7 +24,7 @@ const MediaSection = () => {
 
   return (
     <section id="media" className="py-12 bg-secondary">
-      <div className="container mx-auto px-6 text-center">
+      <div className="container mx-auto px-8 md:px-12 lg:px-16 text-center">
         <h2 className="text-white text-xl md:text-2xl font-bold mb-8">
           Ils parlent de nous
         </h2>

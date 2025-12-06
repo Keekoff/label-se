@@ -12,7 +12,7 @@ const ContentSection = () => {
 
   return (
     <section id="contenu" className="py-24 bg-white">
-      <div className="container mx-auto px-6">
+      <div className="container mx-auto px-8 md:px-12 lg:px-16">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Platform Image */}
           <div className="order-2 lg:order-1">

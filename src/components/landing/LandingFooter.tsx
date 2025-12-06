@@ -12,7 +12,7 @@ const LandingFooter = () => {
 
   return (
     <footer className="bg-white border-t border-gray-200 py-16">
-      <div className="container mx-auto px-6 text-center">
+      <div className="container mx-auto px-8 md:px-12 lg:px-16 text-center">
         {/* Logo */}
         <div className="mb-8">
           <img
