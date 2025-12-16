@@ -47,7 +47,7 @@ serve(async (req: Request) => {
 
     const { data: submission, error: submissionError } = await supabaseClient
       .from('label_submissions')
-      .select('*, nombre_employes')
+      .select('*, nombre_employes, courriel, nom_entreprise')
       .eq('id', submissionId)
       .maybeSingle()
 
@@ -78,7 +78,14 @@ serve(async (req: Request) => {
     const priceId = prices.data[0].id;
     console.log('Using price ID:', priceId);
 
-    console.log('Creating Stripe checkout session')
+    console.log('Creating Stripe checkout session with:', {
+      priceId,
+      customerEmail: submission.courriel,
+      companyName: submission.nom_entreprise,
+      automaticTax: true,
+      invoiceCreation: true
+    })
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       mode: 'payment',
@@ -88,7 +95,23 @@ serve(async (req: Request) => {
         price: priceId,
         quantity: 1
       }],
-      allow_promotion_codes: true, // Active les codes promo Stripe natifs
+      allow_promotion_codes: true,
+      billing_address_collection: 'required',
+      automatic_tax: {
+        enabled: true
+      },
+      invoice_creation: {
+        enabled: true,
+        invoice_data: {
+          description: 'Label Startup Engagée - Certification annuelle',
+          footer: 'Merci pour votre confiance ! Label Startup Engagée',
+          metadata: {
+            submission_id: submissionId,
+            company_name: submission.nom_entreprise || ''
+          }
+        }
+      },
+      customer_email: submission.courriel || undefined,
       metadata: {
         submission_id: submissionId
       }
