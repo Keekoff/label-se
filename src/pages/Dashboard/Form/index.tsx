@@ -21,7 +21,7 @@ const Form = () => {
   const [isLoadingDraft, setIsLoadingDraft] = useState(true);
   const { toast } = useToast();
 
-  const { submissionId, setSubmissionId, handleSave, handleSubmit, isSubmitting } = useFormSubmission(formState, setCurrentStep);
+  const { submissionId, setSubmissionId, handleSave, handleSubmit, isSubmitting, isSaving } = useFormSubmission(formState, setCurrentStep, currentStep);
 
   // Charger les données du draft au démarrage
   useEffect(() => {
@@ -219,6 +219,7 @@ const Form = () => {
             onNext={handleNext}
             onSave={handleSave}
             onSubmit={onSubmit}
+            isSaving={isSaving}
             isDisabled={
               (currentStep === 1 && !formState.disclaimerAccepted) || 
               isSubmitting ||

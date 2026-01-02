@@ -1,6 +1,5 @@
-
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, ArrowRight, Save } from "lucide-react";
+import { ArrowLeft, ArrowRight, Save, Loader2 } from "lucide-react";
 
 interface FormNavigationProps {
   currentStep: number;
@@ -10,6 +9,7 @@ interface FormNavigationProps {
   onSave: () => void;
   onSubmit: () => void;
   isDisabled?: boolean;
+  isSaving?: boolean;
 }
 
 export const FormNavigation = ({
@@ -20,6 +20,7 @@ export const FormNavigation = ({
   onSave,
   onSubmit,
   isDisabled = false,
+  isSaving = false,
 }: FormNavigationProps) => {
   const renderNextButton = () => {
     if (currentStep === 5) {
@@ -65,10 +66,15 @@ export const FormNavigation = ({
           <Button
             variant="outline"
             onClick={onSave}
+            disabled={isSaving}
             className="flex items-center gap-2"
           >
-            <Save className="w-4 w-4" />
-            Sauvegarder
+            {isSaving ? (
+              <Loader2 className="w-4 h-4 animate-spin" />
+            ) : (
+              <Save className="w-4 h-4" />
+            )}
+            {isSaving ? 'Sauvegarde...' : 'Sauvegarder'}
           </Button>
         )}
         {renderNextButton()}

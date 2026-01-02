@@ -15,12 +15,14 @@ const AIRTABLE_WEBHOOK_URL = "https://hooks.airtable.com/workflows/v1/genericWeb
 
 export const useFormSubmission = (
   formState: FormState,
-  setCurrentStep: (step: number) => void
+  setCurrentStep: (step: number) => void,
+  currentStep: number
 ) => {
   const [submissionId, setSubmissionId] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -233,7 +235,7 @@ export const useFormSubmission = (
       a_financements: data.hasFunding || "",
       details_financement: data.fundingDetails || "",
       status: status,
-      current_step: status === 'submitted' ? 6 : data.currentStep || 1,
+      current_step: status === 'submitted' ? 6 : currentStep,
       disclaimer_accepted: !!data.disclaimerAccepted,
       
       diversite: formatResponses(data.diversity),
@@ -600,6 +602,8 @@ export const useFormSubmission = (
       return;
     }
 
+    setIsSaving(true);
+    
     try {
       const submissionData = await formatSubmissionData(formState, 'draft');
       console.log('Saving draft with data:', submissionData);
@@ -646,6 +650,8 @@ export const useFormSubmission = (
         description: "Une erreur est survenue lors de la sauvegarde.",
         variant: "destructive"
       });
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -755,6 +761,7 @@ export const useFormSubmission = (
     handleSave,
     handleSubmit,
     isAuthenticated,
-    isSubmitting
+    isSubmitting,
+    isSaving
   };
 };
